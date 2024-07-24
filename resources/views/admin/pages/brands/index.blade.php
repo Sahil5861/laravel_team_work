@@ -69,7 +69,7 @@
                                         <td>{{ $item->brand_name }}</td>
                                         <td>
                                             <label class="form-check form-switch form-check-reverse"
-                                                style="display:flex; justify-content:space-between; width:50%;">
+                                                style="display:flex; justify-content:space-between;">
                                                 <input type="checkbox" class="status-checkbox form-check-input"
                                                     data-id="{{ $item->id }}" {{ $item->status ? 'checked' : '' }}>
                                                 @if ($item->status == 1)
