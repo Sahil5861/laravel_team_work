@@ -32,7 +32,7 @@
                                 @csrf
                                 <div class="row mb-3">
                                     <div class="col-lg-6">
-                                        <input type="text" id="name" name="name" class="form-control" placeholder="Enter Category Name"  autofocus>
+                                        <input type="text" id="name" name="name" class="form-control" placeholder="Enter Brand Name"  autofocus>
                                         <span>
                                             @error('name')
                                             <span class="text-danger">{{$message}}</span>

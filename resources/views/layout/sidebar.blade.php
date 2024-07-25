@@ -74,7 +74,7 @@
                             </a>
                         </li>
 
-                        <li class="nav-item nav-item-submenu">
+                        {{-- <li class="nav-item nav-item-submenu">
                             <a href="#" class="nav-link">
                                 <i class="ph-layout"></i>
                                 <span>Manage Examples</span>
@@ -93,16 +93,40 @@
                                     </a>
                                 </li>
                             </ul>
-                        </li>
+                        </li> --}}
                         <li class="nav-item">
                             <a href="{{ route('blogs.index') }}" class="nav-link">
                                 <i class="ph-layout"></i>
                                 <span>Manage Blogs</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{route('admin.brand')}}" class="nav-link">
+                                <i class="ph-layout"></i>
+                                <span>Manage Brands</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{route('admin.category')}}" class="nav-link">
+                                <i class="ph-layout"></i>
+                                <span>Manage Categories</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{route('admin.grouprelation')}}" class="nav-link">
+                                <i class="ph-layout"></i>
+                                <span>Manage Product Relation</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{route('admin.products')}}" class="nav-link">
+                                <i class="ph-layout"></i>
+                                <span>Manage Product</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
-                <li class="nav-item nav-item-submenu">
+                {{-- <li class="nav-item nav-item-submenu">
                     <a href="#" class="nav-link">
                         <i class="ph-layout"></i>
                         <span>Products</span>
@@ -126,8 +150,15 @@
                                 <span>Manage Product Relation</span>
                             </a>
                         </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="{{route('admin.products')}}" class="nav-link">
+                                <i class="ph-layout"></i>
+                                <span>Manage Product</span>
+                            </a>
+                        </li>
                     </ul>
-                </li>
+                </li> --}}
             </ul>
         </div>
         <!-- /main navigation -->

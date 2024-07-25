@@ -13,4 +13,9 @@ class Brand extends Model
 
     protected $table = "brands";
     protected $dates = ['deleted_at'];
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }

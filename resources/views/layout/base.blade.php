@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="{{ asset('assets/icons/phosphor/styles.min.css') }}">
     <link rel="stylesheet" href="{{ asset('full/assets/css/ltr/all.min.css') }}">
     <!-- /global stylesheets -->
+    <style>
+        
+    </style>
 </head>
 
 <body>

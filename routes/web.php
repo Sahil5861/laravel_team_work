@@ -7,6 +7,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ColourController;
 use App\Http\Controllers\ProductGroupsController;
+use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\SizeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
@@ -87,7 +88,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('admin/brand/edit/{id}', [BrandController::class, 'store'])->name('admin.brand.edit.post');
 
 
-    // -------------------------------------Product Routes---------------------------------
+    // -------------------------------------Product Group Routes---------------------------------
 
     Route::get('admin/group-relation', [ProductGroupsController::class, 'index'])->name('admin.grouprelation');
     Route::post('admin/group-relation/update-status/{id}', [ProductGroupsController::class, 'updateStatus'])->name('admin.grouprelation.status');
@@ -96,4 +97,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/group-relation/delete/{id}', [ProductGroupsController::class, 'remove'])->name('admin.grouprelation.delete');
     Route::post('admin/group-relation/create', [ProductGroupsController::class, 'store'])->name('admin.grouprelation.create.post');
     Route::post('admin/group-relation/edit/{id}', [ProductGroupsController::class, 'store'])->name('admin.grouprelation.edit.post');
+
+    // -------------------------------------Product Routes---------------------------------------
+
+    Route::get('admin/products', [ProductsController::class, 'index'])->name('admin.products');
+    Route::post('admin/products/update-status/{id}', [ProductsController::class, 'updateStatus'])->name('admin.products.status');
+    Route::get('admin/products/create', [ProductsController::class, 'create'])->name('admin.products.create');
+    Route::get('admin/products/edit/{id}', [ProductsController::class, 'edit'])->name('admin.products.edit');
+    Route::get('admin/products/delete/{id}', [ProductsController::class, 'remove'])->name('admin.products.delete');
+    Route::post('admin/products/create', [ProductsController::class, 'store'])->name('admin.products.create.post');
+    Route::post('admin/products/edit/{id}', [ProductsController::class, 'store'])->name('admin.products.edit.post');
+    
 });
