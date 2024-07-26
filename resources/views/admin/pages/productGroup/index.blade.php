@@ -25,19 +25,29 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title">Admin/Product Groups</h5>
-                        <div class="card-tools text-end" style="display: flex; align-items:center; justify-content: space-between;">
+                        <div class="card-tools text-end"
+                            style="display: flex; align-items:center; justify-content: space-between;">
                             <div class="btns">
-                                <a href="{{ route('admin.grouprelation.create') }}" class="text-dark btn btn-primary">+ Add Product Groups</a>
+                                <a href="{{ route('admin.grouprelation.create') }}" class="text-dark btn btn-primary">+
+                                    Add Product Groups</a>
                                 <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
+                                <select name="status" id="status" class="form-control mt-3">
+                                    <option value="">All</option>
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
                             </div>
-                            
+
                             <div class="dropdown">
                                 <a href="#" class="text-body" data-bs-toggle="dropdown">
                                     <i class="ph-list"></i>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="#"class="dropdown-item">Import Brands  </a>
-                                    <a href="#"class="dropdown-item">Export Brands  </a>
+                                    <a href="#" class="dropdown-item" data-toggle="modal"
+                                        data-target="#importModal">Import Product</a>
+                                    <a href="#" class="dropdown-item" id="export-product">Export
+                                        Product</a>
+
                                 </div>
                             </div>
                         </div>
@@ -45,7 +55,7 @@
 
                     <div class="card-body">
                         @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
+                            <div class="alert alert-success">{{ session('success') }}</div>
                         @endif
                         <div class="table-responsive">
                             <table class="table table-bordered text-center" id="group-table">
@@ -76,128 +86,148 @@
         var ProductGroupTable = $('#group-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('admin.grouprelation') }}",
+
+            ajax: {
+                url: "{{ route('admin.grouprelation') }}",
+                data: function (d) {
+                    d.status = $('#status').val();
+                }
+            },
             columns: [
                 {
-                data: null,
-                name: 'select',
-                orderable: false,
-                searchable: false,
-                render: function (data, type, row) {
-                    return '<input type="checkbox" class="select-row" value="' + row.id + '">';
-                }
+                    data: null,
+                    name: 'select',
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return '<input type="checkbox" class="select-row" value="' + row.id + '">';
+                    }
                 },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
                 { data: 'products_group_name', name: 'products_group_name' },
                 { data: 'created_at', name: 'created_at' },
                 { data: 'status', name: 'status', orderable: false, searchable: false },
-        ],
-        order: [[1, 'asc']],
-        drawCallback: function(settings) {
-            console.log('yes')
-            // Attach event listener to the dynamically generated checkboxes
+            ],
+            order: [[1, 'asc']],
+            drawCallback: function (settings) {
+                console.log('yes')
+                // Attach event listener to the dynamically generated checkboxes
 
-            $('#select-all').on('click', function () {
-                var isChecked = this.checked;
-                $('#group-table .select-row').each(function (){
-                    $(this).prop('checked', isChecked);
+                $('#select-all').on('click', function () {
+                    var isChecked = this.checked;
+                    $('#group-table .select-row').each(function () {
+                        $(this).prop('checked', isChecked);
+                    });
                 });
-            });
 
-            $('#delete-selected').on('click', function (){
-                var selectedIds = $('.select-row:checked').map(function(){
-                    return this.value;
-                }).get();
+                $('#delete-selected').on('click', function () {
+                    var selectedIds = $('.select-row:checked').map(function () {
+                        return this.value;
+                    }).get();
 
-                if (selectedIds.length > 0) {
-                    Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                            url: "{{ route('admin.grouprelation.deleteSelected') }}",
-                            method: 'DELETE',
-                            data: { selected_product_groups: selectedIds },
-                            success: function(response) {
-                                ProductGroupTable.ajax.reload(); // Refresh the page
-                                Swal.fire(
-                                    'Deleted!',
-                                    response.success,
-                                    'success'
-                                );
-                            },
-                            error: function(xhr) {
-                                Swal.fire(
-                                    'Error!',
-                                    'Something went wrong.',
-                                    'error'
-                                );
+                    if (selectedIds.length > 0) {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "{{ route('admin.grouprelation.deleteSelected') }}",
+                                    method: 'DELETE',
+                                    data: { selected_product_groups: selectedIds },
+                                    success: function (response) {
+                                        ProductGroupTable.ajax.reload(); // Refresh the page
+                                        Swal.fire(
+                                            'Deleted!',
+                                            response.success,
+                                            'success'
+                                        );
+                                    },
+                                    error: function (xhr) {
+                                        Swal.fire(
+                                            'Error!',
+                                            'Something went wrong.',
+                                            'error'
+                                        );
+                                    }
+                                });
                             }
-                        });
-                        }
-                    })
+                        })
 
-                    // if (confirm('Do You Want to Delete the Selected Categories')) {
-                        
-                    // }
+                        // if (confirm('Do You Want to Delete the Selected Categories')) {
+
+                        // }
+                    }
+                    else {
+                        Swal.fire(
+                            'Error!',
+                            'Please select at least one Product Group to delete.',
+                            'error'
+                        );
+                    }
+                })
+                $('.status-toggle').on('click', function () {
+                    var groupId = $(this).data('id');
+                    var status = $(this).is(':checked') ? 1 : 0;
+                    // updateStatus(groupId, status);
+                });
+            }
+
+
+
+        });
+        $('#status').on('change', function () {
+            ProductGroupTable.ajax.reload();
+        });
+
+        $(document).ready(function () {
+            $('#export-product').on('click', function () {
+                var status = $('#status').val();
+                var url = "{{ route('admin.product.export') }}";
+                if (status) {
+                    url += "?status=" + status;
                 }
-                else{
-                    Swal.fire(
-                        'Error!',
-                        'Please select at least one Product Group to delete.',
-                        'error'
-                    );
+                window.location.href = url;
+            });
+        });
+
+        function updateStatus(groupId, status) {
+            $.ajax({
+                url: `{{ url('admin/group-relation/update-status') }}/${groupId}`,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: JSON.stringify({ status: status }),
+                success: function (data) {
+                    if (data.success) {
+                        // console.log('Status Updated !!');
+                        Swal.fire(
+                            'Updated!',
+                            'Status Updated',
+                            'success'
+                        );
+                        // alert('Status Updated !!');
+
+                        // location.reload(); // Refresh the page
+                        ProductGroupTable.ajax.reload();
+                    } else {
+                        alert('Failed to update status.');
+                    }
+
+                },
+                error: function (error) {
+                    console.error('Error:', error);
                 }
-            })
-            $('.status-toggle').on('click', function() {
-                var groupId = $(this).data('id');
-                var status = $(this).is(':checked') ? 1 : 0;
-                // updateStatus(groupId, status);
             });
         }
-
-
-
     });
-
-    function updateStatus(groupId, status) {
-        $.ajax({
-            url: `{{ url('admin/group-relation/update-status') }}/${groupId}`,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data: JSON.stringify({ status: status }),
-            success: function(data) {
-                if (data.success) {
-                    // console.log('Status Updated !!');
-                    Swal.fire(
-                        'Updated!',
-                        'Status Updated',
-                        'success'
-                    );
-                    // alert('Status Updated !!');
-
-                    // location.reload(); // Refresh the page
-                    ProductGroupTable.ajax.reload();
-                } else {
-                    alert('Failed to update status.');
-                }
-                
-            },
-            error: function(error) {
-                console.error('Error:', error);
-            }
-        });
-    }
-});
 </script>
 @endsection

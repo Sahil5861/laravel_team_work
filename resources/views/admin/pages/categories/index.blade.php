@@ -25,20 +25,28 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title">Admin/Categories</h5>
-                        <div class="card-tools text-end" style="display: flex; align-items:center; justify-content: space-between;">
+                        <div class="card-tools text-end"
+                            style="display: flex; align-items:center; justify-content: space-between;">
                             <div class="btns">
-                                <a href="{{ route('admin.category.create') }}" class="text-dark btn btn-primary">Add Categories</a>
+                                <a href="{{ route('admin.category.create') }}" class="text-dark btn btn-primary">Add
+                                    Categories</a>
                                 <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
+                                <select name="status" id="status" class="form-control mt-3">
+                                    <option value="">All</option>
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
                             </div>
                             <div class="dropdown">
                                 <a href="#" class="text-body" data-bs-toggle="dropdown">
                                     <i class="ph-list"></i>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                    {{-- <a href="#"class="dropdown-item">Activate Selected</a>
-                                    <a href="#"class="dropdown-item">Deactivate Selected</a> --}}
-                                    <a href="#"class="dropdown-item" data-toggle="modal" data-target="#importModal">Import Categories</a>
-                                    <a href="{{route('admin.category.export')}}"class="dropdown-item">Export Categories</a>
+                                    <a href="#" class="dropdown-item" data-toggle="modal"
+                                        data-target="#importModal">Import Category</a>
+                                    <a href="#" class="dropdown-item" id="export-category">Export
+                                    Categories</a>
+
                                 </div>
                             </div>
                         </div>
@@ -71,7 +79,8 @@
     </div>
 </div>
 
-<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -81,7 +90,8 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="importForm" action="{{route('admin.category.import')}}" method="POST" enctype="multipart/form-data">
+                <form id="importForm" action="{{route('admin.category.import')}}" method="POST"
+                    enctype="multipart/form-data">
                     @csrf
                     <div class="form-group">
                         <label for="csv_file">Select CSV File</label>
@@ -100,131 +110,153 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function () {
-    var CategoryTable = $('#category-table').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "{{ route('admin.category') }}",
-        columns: [
-            {
-                data: null,
-                name: 'select',
-                orderable: false,
-                searchable: false,
-                render: function (data, type, row) {
-                    return '<input type="checkbox" class="select-row" value="' + row.id + '">';
+        var CategoryTable = $('#category-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('admin.category') }}",
+                data: function (d) {
+                    d.status = $('#status').val();
                 }
             },
-            { data: 'DT_RowIndex', name: 'DT_RowIndex' },
-            { data: 'action', name: 'action', orderable: false, searchable: false },
-            { data: 'category_name', name: 'category_name' },
-            {
-                data: 'image', name: 'image', render: function (data, type, row) {
-                    return '<img src="' + data + '" alt="category Image" width="70">';
-                }
-                , orderable: false, searchable: false
-            },
-            { data: 'created_at', name: 'created_at' },
-            { data: 'status', name: 'status' },
-        ],
-        order: [[1, 'asc']],
-        drawCallback: function(settings) {
+            columns: [
+                {
+                    data: null,
+                    name: 'select',
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return '<input type="checkbox" class="select-row" value="' + row.id + '">';
+                    }
+                },
+                { data: 'DT_RowIndex', name: 'DT_RowIndex' },
+                { data: 'action', name: 'action', orderable: false, searchable: false },
+                { data: 'category_name', name: 'category_name' },
+                {
+                    data: 'image', name: 'image', render: function (data, type, row) {
+                        return '<img src="' + data + '" alt="category Image" width="70">';
+                    }
+                    , orderable: false, searchable: false
+                },
+                { data: 'created_at', name: 'created_at' },
+                { data: 'status', name: 'status' },
+            ],
+            order: [[1, 'asc']],
+            drawCallback: function (settings) {
 
-            $('#select-all').on('click', function () {
-                var isChecked = this.checked;
-                $('#category-table .select-row').each(function (){
-                    $(this).prop('checked', isChecked);
+                $('#select-all').on('click', function () {
+                    var isChecked = this.checked;
+                    $('#category-table .select-row').each(function () {
+                        $(this).prop('checked', isChecked);
+                    });
                 });
-            });
 
-            $('#delete-selected').on('click', function (){
-                var selectedIds = $('.select-row:checked').map(function(){
-                    return this.value;
-                }).get();
+                $('#delete-selected').on('click', function () {
+                    var selectedIds = $('.select-row:checked').map(function () {
+                        return this.value;
+                    }).get();
 
-                if (selectedIds.length > 0) {
-                    Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                            url: "{{ route('admin.category.deleteSelected') }}",
-                            method: 'DELETE',
-                            data: { selected_categories: selectedIds },
-                            success: function(response) {
-                                CategoryTable.ajax.reload(); // Refresh the page
-                                Swal.fire(
-                                    'Deleted!',
-                                    response.success,
-                                    'success'
-                                );
-                            },
-                            error: function(xhr) {
-                                Swal.fire(
-                                    'Error!',
-                                    'Something went wrong.',
-                                    'error'
-                                );
+                    if (selectedIds.length > 0) {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "{{ route('admin.category.deleteSelected') }}",
+                                    method: 'DELETE',
+                                    data: { selected_categories: selectedIds },
+                                    success: function (response) {
+                                        CategoryTable.ajax.reload(); // Refresh the page
+                                        Swal.fire(
+                                            'Deleted!',
+                                            response.success,
+                                            'success'
+                                        );
+                                    },
+                                    error: function (xhr) {
+                                        Swal.fire(
+                                            'Error!',
+                                            'Something went wrong.',
+                                            'error'
+                                        );
+                                    }
+                                });
                             }
-                        });
-                        }
-                    })
+                        })
 
-                    // if (confirm('Do You Want to Delete the Selected Categories')) {
-                        
-                    // }
-                }
-                else{
-                    Swal.fire(
-                        'Error!',
-                        'Please select at least one Category to delete.',
-                        'error'
-                    );
-                }
-            })
+                        // if (confirm('Do You Want to Delete the Selected Categories')) {
 
-            // Attach event listener to the dynamically generated checkboxes
-            $('.status-toggle').on('click', function() {
-                var categoryId = $(this).data('id');
-                var status = $(this).is(':checked') ? 1 : 0;
-                updateStatus(categoryId, status);
+                        // }
+                    }
+                    else {
+                        Swal.fire(
+                            'Error!',
+                            'Please select at least one Category to delete.',
+                            'error'
+                        );
+                    }
+                })
+
+                // Attach event listener to the dynamically generated checkboxes
+                $('.status-toggle').on('click', function () {
+                    var categoryId = $(this).data('id');
+                    var status = $(this).is(':checked') ? 1 : 0;
+                    updateStatus(categoryId, status);
+                });
+            }
+        });
+
+        $('#status').on('change', function () {
+            CategoryTable.ajax.reload();
+        });
+
+        $(document).ready(function () {
+            $('#export-category').on('click', function () {
+                var status = $('#status').val();
+                var url = "{{ route('admin.category.export') }}";
+                if (status) {
+                    url += "?status=" + status;
+                }
+                window.location.href = url;
+            });
+        });
+
+
+
+        function updateStatus(categoryId, status) {
+            $.ajax({
+                url: `{{ url('admin/category/update-status') }}/${categoryId}`,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: JSON.stringify({ status: status }),
+                success: function (data) {
+                    if (data.success) {
+                        Swal.fire(
+                            'Updated',
+                            response.success,
+                            'success'
+                        );
+                        CategoryTable.ajax.reload(); // Refresh the page
+                    } else {
+                        alert('Failed to update status.');
+                    }
+
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
             });
         }
     });
-
-    function updateStatus(categoryId, status) {
-        $.ajax({
-            url: `{{ url('admin/category/update-status') }}/${categoryId}`,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data: JSON.stringify({ status: status }),
-            success: function(data) {
-                if (data.success) {
-                    Swal.fire(
-                        'Updated',
-                        response.success,
-                        'success'
-                    );
-                    CategoryTable.ajax.reload(); // Refresh the page
-                } else {
-                    alert('Failed to update status.');
-                }
-                
-            },
-            error: function(error) {
-                console.error('Error:', error);
-            }
-        });
-    }
-});
 
 </script>
 @endsection
