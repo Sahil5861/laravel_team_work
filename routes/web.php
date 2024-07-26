@@ -105,7 +105,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/group-relation/delete/{id}', [ProductGroupsController::class, 'remove'])->name('admin.grouprelation.delete');
     Route::post('admin/group-relation/create', [ProductGroupsController::class, 'store'])->name('admin.grouprelation.create.post');
     Route::post('admin/group-relation/edit/{id}', [ProductGroupsController::class, 'store'])->name('admin.grouprelation.edit.post');
-    Route::delete('admin/group-relation/delete-selected', [ProductsController::class, 'deleteSelected'])->name('admin.grouprelation.deleteSelected');
+    Route::delete('admin/group-relation/delete-selected', [ProductGroupsController::class, 'deleteSelected'])->name('admin.grouprelation.deleteSelected');
+    Route::get('admin/group-relation/export', [ProductGroupsController::class, 'export'])->name('admin.grouprelation.export');
+    Route::post('admin/group-relation/import', [ProductGroupsController::class, 'import'])->name('admin.grouprelation.import');
 
     // -------------------------------------Product Routes---------------------------------------
 

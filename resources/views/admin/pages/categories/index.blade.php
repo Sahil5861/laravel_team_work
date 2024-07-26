@@ -210,7 +210,7 @@
                 if (data.success) {
                     Swal.fire(
                         'Updated',
-                        response.success,
+                        'Status Updated',
                         'success'
                     );
                     CategoryTable.ajax.reload(); // Refresh the page

@@ -36,8 +36,9 @@
                                     <i class="ph-list"></i>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="#"class="dropdown-item">Import Brands  </a>
-                                    <a href="#"class="dropdown-item">Export Brands  </a>
+                                    <a href="#" class="dropdown-item" data-toggle="modal"
+                                        data-target="#importModal">Import Brands </a>
+                                    <a href="{{route('admin.grouprelation.export')}}" class="dropdown-item">Export Brands </a>
                                 </div>
                             </div>
                         </div>
@@ -65,6 +66,34 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Import Product Groups</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="importForm" action="{{route('admin.grouprelation.import')}}" method="POST"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <div class="form-group">
+                        <label for="csv_file">Select CSV File</label>
+                        <input type="file" name="csv_file" class="form-control" required value="{{old('csv_file')}}">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="submit" form="importForm" class="btn btn-primary">Import</button>
             </div>
         </div>
     </div>
@@ -159,7 +188,7 @@
             $('.status-toggle').on('click', function() {
                 var groupId = $(this).data('id');
                 var status = $(this).is(':checked') ? 1 : 0;
-                // updateStatus(groupId, status);
+                updateStatus(groupId, status);
             });
         }
 
@@ -178,7 +207,7 @@
             data: JSON.stringify({ status: status }),
             success: function(data) {
                 if (data.success) {
-                    // console.log('Status Updated !!');
+                    console.log('Status Updated !!');
                     Swal.fire(
                         'Updated!',
                         'Status Updated',
