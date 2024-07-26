@@ -30,12 +30,8 @@
                                 <a href="{{ route('admin.brand.create') }}" class="text-dark btn btn-primary">Add
                                     Brands</a>
                                 <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
-<<<<<<< HEAD
-                                <select name="status" id="status" class="form-control mt-3">
-=======
                                 <br><br>
                                 <select name="status" id="status" class="form-control">
->>>>>>> 1b5b4bf6fa80b62599736fe7384dc8cf39ec00ec
                                     <option value="">All</option>
                                     <option value="1">Active</option>
                                     <option value="0">Inactive</option>

@@ -229,37 +229,6 @@
 
 
 
-        function updateStatus(categoryId, status) {
-            $.ajax({
-                url: `{{ url('admin/category/update-status') }}/${categoryId}`,
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                data: JSON.stringify({ status: status }),
-                success: function (data) {
-                    if (data.success) {
-                        Swal.fire(
-                            'Updated',
-                            response.success,
-                            'success'
-                        );
-                        CategoryTable.ajax.reload(); // Refresh the page
-                    } else {
-                        alert('Failed to update status.');
-                    }
-
-                },
-                error: function (error) {
-                    console.error('Error:', error);
-                }
-            });
-        }
-    });
-
-<<<<<<< HEAD
-=======
     function updateStatus(categoryId, status) {
         $.ajax({
             url: `{{ url('admin/category/update-status') }}/${categoryId}`,
@@ -289,6 +258,5 @@
     }
 });
 
->>>>>>> 1b5b4bf6fa80b62599736fe7384dc8cf39ec00ec
 </script>
 @endsection
