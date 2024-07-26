@@ -173,7 +173,7 @@ class BrandController extends Controller
             'csv_file' => 'required|file|mimes:csv,txt',
         ]);
         if ($validate == false) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            return redirect()->back();
         }
         $file = $request->file('csv_file');
         $path = $file->getRealPath();
@@ -195,41 +195,53 @@ class BrandController extends Controller
 
     }
 
-
-    public function export()
+    public function export(Request $request)
     {
-        $response = new StreamedResponse(function () {
-            $spreadsheet = new Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
+        try {
+            $status = $request->query('status', null); // Get status from query parameters
 
-            // Add headers for CSV
-            $sheet->fromArray(['ID', 'Name', 'image', 'status'], null, 'A1');
+            $response = new StreamedResponse(function () use ($status) {
+                $spreadsheet = new Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
 
-            // Fetch products and add to sheet
-            $brands = Brand::all();
-            $brandsData = [];
-            foreach ($brands as $brand) {
-                $brandsData[] = [
-                    $brand->id,
-                    $brand->brand_name,
-                    $brand->image,
-                    $brand->status,
-                ];
-            }
-            $sheet->fromArray($brandsData, null, 'A2');
+                // Add headers for CSV
+                $sheet->fromArray(['ID', 'Name', 'Image', 'Created At', 'Status'], null, 'A1');
 
-            // Write CSV to output
-            $writer = new Csv($spreadsheet);
-            $writer->setUseBOM(true);
-            $writer->save('php://output');
-        });
+                // Fetch brands based on status
+                $query = Brand::query();
+                if ($status !== null) {
+                    $query->where('status', $status);
+                }
+                $brands = $query->get();
+                $brandsData = [];
+                foreach ($brands as $brand) {
+                    $brandsData[] = [
+                        $brand->id,
+                        $brand->brand_name,
+                        $brand->image,
+                        $brand->created_at->format('d M Y'),
+                        $brand->status == 1 ? 'Active' : 'Inactive',
+                    ];
+                }
+                $sheet->fromArray($brandsData, null, 'A2');
 
-        // Set headers for response
-        $response->headers->set('Content-Type', 'text/csv');
-        $response->headers->set('Content-Disposition', 'attachment; filename="brands.csv"');
+                // Write CSV to output
+                $writer = new Csv($spreadsheet);
+                $writer->setUseBOM(true);
+                $writer->save('php://output');
+            });
 
-        return $response;
+            // Set headers for response
+            $response->headers->set('Content-Type', 'text/csv');
+            $response->headers->set('Content-Disposition', 'attachment; filename="brands.csv"');
+
+            return $response;
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
+
+
 
 
 }

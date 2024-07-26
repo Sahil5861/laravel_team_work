@@ -30,8 +30,12 @@
                                 <a href="{{ route('admin.brand.create') }}" class="text-dark btn btn-primary">Add
                                     Brands</a>
                                 <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
+<<<<<<< HEAD
+                                <select name="status" id="status" class="form-control mt-3">
+=======
                                 <br><br>
                                 <select name="status" id="status" class="form-control">
+>>>>>>> 1b5b4bf6fa80b62599736fe7384dc8cf39ec00ec
                                     <option value="">All</option>
                                     <option value="1">Active</option>
                                     <option value="0">Inactive</option>
@@ -43,10 +47,12 @@
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a href="#" class="dropdown-item" data-toggle="modal"
-                                        data-target="#importModal">Import Brands </a>
-                                    <a href="{{route('admin.brand.export')}}" class="dropdown-item">Export Brands </a>
+                                        data-target="#importModal">Import Brands</a>
+                                    <a href="#" class="dropdown-item" id="export-brands">Export Brands</a>
+
                                 </div>
                             </div>
+
                         </div>
                     </div>
                     <div class="card-body">
@@ -214,6 +220,18 @@
         $('#status').on('change', function () {
             BrandTable.ajax.reload();
         });
+
+        $(document).ready(function () {
+            $('#export-brands').on('click', function () {
+                var status = $('#status').val();
+                var url = "{{ route('admin.brand.export') }}";
+                if (status) {
+                    url += "?status=" + status;
+                }
+                window.location.href = url;
+            });
+        });
+
 
         function updateStatus(brandId, status) {
             $.ajax({

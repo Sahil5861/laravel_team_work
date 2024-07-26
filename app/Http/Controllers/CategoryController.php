@@ -13,9 +13,18 @@ use Yajra\DataTables\Facades\DataTables;
 
 class CategoryController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
+
         if ($request->ajax()) {
-            $data = Category::latest()->get();
+            $query = Category::query();
+
+            if ($request->has('status') && $request->status != '') {
+                $query->where('status', $request->status);
+            }
+
+            $data = $query->latest()->get();
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('image', function ($row) {
@@ -41,7 +50,7 @@ class CategoryController extends Controller
                                         <a href="' . route('admin.category.edit', $row->id) . '" class="dropdown-item">
                                             <i class="ph-pencil me-2"></i>Edit
                                         </a>
-                                        <a href="'.route('admin.category.delete', $row->id).'" data-id="' . $row->id . '" class="dropdown-item delete-button">
+                                        <a href="' . route('admin.category.delete', $row->id) . '" data-id="' . $row->id . '" class="dropdown-item delete-button">
                                             <i class="ph-trash me-2"></i>Delete
                                         </a>
                                     </div>
@@ -54,9 +63,10 @@ class CategoryController extends Controller
     }
 
     // -----------------------------Data table-------------------------------------------
-    public function getData(Request $request){
+    public function getData(Request $request)
+    {
         $draw = $request->get('draw');
-        $start = $request->get("start",0);
+        $start = $request->get("start", 0);
         $rowperpage = $request->get("length", 10); // total number of rows per page
 
         $columnIndex_arr = $request->get('order');
@@ -74,18 +84,18 @@ class CategoryController extends Controller
 
         // total records with filter
         $totalRecordswithFilter = Category::select('count(*) as allcount')
-        ->where('category_name', 'like', '%'.$searchValue.'%')
-        ->count();
+            ->where('category_name', 'like', '%' . $searchValue . '%')
+            ->count();
 
         $records = Category::orderBy($columnName, $columnSortOrder)
-        ->where('category_name', 'like', '%'.$searchValue.'%')
-        ->orWhere(function($query) use ($searchValue){
-            $query->where('category_name', 'like', '%'.$searchValue.'%');
-        })
-        ->select('*')
-        ->skip($start)
-        ->take($rowperpage)
-        ->get();
+            ->where('category_name', 'like', '%' . $searchValue . '%')
+            ->orWhere(function ($query) use ($searchValue) {
+                $query->where('category_name', 'like', '%' . $searchValue . '%');
+            })
+            ->select('*')
+            ->skip($start)
+            ->take($rowperpage)
+            ->get();
 
         $dataArr = array();
 
@@ -98,20 +108,20 @@ class CategoryController extends Controller
                                 <i class="ph-list me-2"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
-                                <a href="'.route('admin.category.edit', $record->id).'" class="dropdown-item">
+                                <a href="' . route('admin.category.edit', $record->id) . '" class="dropdown-item">
                                     Edit
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a href="'.route('admin.category.delete', $record->id).'" class="dropdown-item">
+                                <a href="' . route('admin.category.delete', $record->id) . '" class="dropdown-item">
                                     Delete
                                 </a>
                             </div>',
-                "image" => '<img src="'.asset($record->image).'" alt="image" width="100px">',
+                "image" => '<img src="' . asset($record->image) . '" alt="image" width="100px">',
                 "category_name" => $record->category_name,
 
                 "status" => '<label class="form-check form-switch form-check-reverse" style="display:flex; justify-content:space-between; width:50%;">
-                <input type="checkbox" class="status-checkbox form-check-input" data-id="'.$record->id.'" '.$statusChecked.' id="status'.$record->id.'" style="cursor:pointer;">
-                '.$statusLabel.'
+                <input type="checkbox" class="status-checkbox form-check-input" data-id="' . $record->id . '" ' . $statusChecked . ' id="status' . $record->id . '" style="cursor:pointer;">
+                ' . $statusLabel . '
             </label>',
             );
         }
@@ -129,21 +139,24 @@ class CategoryController extends Controller
 
     // -----------------------------Data table Ends-------------------------------------------
 
-    public function create(){
+    public function create()
+    {
         $categories = Category::whereNull('deleted_at')->get();
         return view('admin.pages.categories.create', compact('categories'));
     }
 
-    public function edit($id){
+    public function edit($id)
+    {
         $categories = Category::whereNull('deleted_at')->get();
         $category = Category::find($id);
-        
+
         return view('admin.pages.categories.edit', compact('category', 'categories'));
     }
 
-    
-    public function store(Request $request){
-        
+
+    public function store(Request $request)
+    {
+
         $validate = $request->validate([
             'name' => 'required',
             'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif',
@@ -159,53 +172,50 @@ class CategoryController extends Controller
 
             if ($request->file('image')) {
                 $image = $request->file('image');
-                $imagename = time().'.'.$image->getClientOriginalName();
+                $imagename = time() . '.' . $image->getClientOriginalName();
                 $destination = public_path('uploads/category');
                 $image->move($destination, $imagename);
-    
-                $imagepath = 'uploads/category/'.$imagename;
+
+                $imagepath = 'uploads/category/' . $imagename;
                 $category->image = $imagepath;
             }
 
             if ($category->save()) {
                 return back()->with('success', 'Category Updated Suuccessfully !!');
-            }
-            else{
+            } else {
                 return back()->with('error', 'Something went wrong !!');
             }
-        }
-        else{
+        } else {
             $category = new Category();
 
             $category->category_name = $request->input('name');
             $category->parent_category = $request->input('parent_category');
-    
+
             if ($request->file('image')) {
                 $image = $request->file('image');
-                $imagename = time().'.'.$image->getClientOriginalName();
+                $imagename = time() . '.' . $image->getClientOriginalName();
                 $destination = public_path('uploads/category');
                 $image->move($destination, $imagename);
-    
-                $imagepath = 'uploads/category/'.$imagename;
+
+                $imagepath = 'uploads/category/' . $imagename;
                 $category->image = $imagepath;
             }
-    
+
             if ($category->save()) {
                 return back()->with('success', 'Category added Suuccessfully !!');
-            }
-            else{
+            } else {
                 return back()->with('error', 'Something went wrong !!');
             }
-        }    
+        }
     }
 
-    public function remove(Request $request ,$id){
+    public function remove(Request $request, $id)
+    {
         $category = Category::firstwhere('id', $request->id);
 
         if ($category->delete()) {
             return back()->with('success', 'Category deleted Suuccessfully !!');
-        }
-        else{
+        } else {
             return back()->with('error', 'Something went wrong !!');
         }
     }
@@ -227,7 +237,8 @@ class CategoryController extends Controller
         }
     }
 
-    public function deleteSelected(Request $request){
+    public function deleteSelected(Request $request)
+    {
         $selectedCategories = $request->input('selected_categories');
         if (!empty($selectedCategories)) {
             Category::whereIn('id', $selectedCategories)->delete();
@@ -237,68 +248,77 @@ class CategoryController extends Controller
     }
 
 
-    public function import(Request $request){
+    public function import(Request $request)
+    {
         $validate = $request->validate([
             'csv_file' => 'required|file|mimes:csv,txt',
         ]);
         if ($validate == false) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            return redirect()->back();
         }
         $file = $request->file('csv_file');
         $path = $file->getRealPath();
         if (($handle = fopen($path, 'r')) !== false) {
             $header = fgetcsv($handle, 1000, ','); // Skip the header row
-            
+
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
                 Category::create([
-                    'id' =>$data[0],
+                    'id' => $data[0],
                     'category_name' => $data[1],
-                    'image'=>$data[2],
+                    'image' => $data[2],
                 ]);
             }
-    
+
             fclose($handle);
         }
 
         return redirect()->route('admin.category')->with('success', 'Category imported successfully.');
-    
+
     }
 
 
-    public function export()
+    public function export(Request $request)
     {
-        $response = new StreamedResponse(function () {
-            $spreadsheet = new Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
+        $status = $request->query('status', '');
 
-            // Add headers for CSV
-            $sheet->fromArray(['ID', 'Name', 'image', 'Created At', 'status'], null, 'A1');
+        $query = Category::query();
 
-            // Fetch products and add to sheet
-            $categories = Category::all();
-            $categoryData = [];
-            foreach ($categories as $category) {
-                $categoryData[] = [
-                    $category->id,
-                    $category->category_name,
-                    $category->image,
-                    $category->created_at,
-                    $category->status,
-                ];
-            }
-            $sheet->fromArray($categoryData, null, 'A2');
+        if ($status !== '') {
+            $query->where('status', $status);
+        }
 
-            // Write CSV to output
-            $writer = new Csv($spreadsheet);
-            $writer->setUseBOM(true);
+        $categories = $query->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Add header row
+        $sheet->setCellValue('A1', 'Id')
+            ->setCellValue('B1', 'Category Name')
+            ->setCellValue('C1', 'Image')
+            ->setCellValue('D1', 'Created At')
+            ->setCellValue('E1', 'Status');
+
+        // Add data rows
+        $row = 2;
+        foreach ($categories as $category) {
+            $sheet->setCellValue('A' . $row, $category->id)
+                ->setCellValue('B' . $row, $category->category_name)
+                ->setCellValue('C' . $row, $category->image)
+                ->setCellValue('D' . $row, $category->created_at->format('d M Y'))
+                ->setCellValue('E' . $row, $category->status == 1 ? 'Active' : 'Inactive');
+            $row++;
+        }
+
+        $writer = new Csv($spreadsheet);
+        $response = new StreamedResponse(function () use ($writer) {
             $writer->save('php://output');
         });
 
-        // Set headers for response
         $response->headers->set('Content-Type', 'text/csv');
-        $response->headers->set('Content-Disposition', 'attachment; filename="category.csv"');
+        $response->headers->set('Content-Disposition', 'attachment; filename="categories.csv"');
 
         return $response;
     }
-
 }
+
