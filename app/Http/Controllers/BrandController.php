@@ -203,7 +203,7 @@ class BrandController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
 
             // Add headers for CSV
-            $sheet->fromArray(['ID', 'Name', 'image', 'Created At', 'status'], null, 'A1');
+            $sheet->fromArray(['ID', 'Name', 'image', 'status'], null, 'A1');
 
             // Fetch products and add to sheet
             $brands = Brand::all();

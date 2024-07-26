@@ -49,15 +49,18 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::resource('size', SizeController::class);
-    Route::post('sizes/toggle-status/{id}', [SizeController::class, 'toggleStatus'])->name('sizes.toggleStatus');
-    Route::post('sizes/bulk-delete', [SizeController::class, 'bulkDelete'])->name('sizes.bulkDelete');
-    Route::post('sizes/bulk-status-update', [SizeController::class, 'bulkStatusUpdate'])->name('sizes.bulkStatusUpdate');
+    Route::post('admin/sizes/toggle-status/{id}', [SizeController::class, 'toggleStatus'])->name('sizes.toggleStatus');
+    Route::post('admin/sizes/bulk-delete', [SizeController::class, 'bulkDelete'])->name('sizes.bulkDelete');
+    Route::post('admin/sizes/bulk-status-update', [SizeController::class, 'bulkStatusUpdate'])->name('sizes.bulkStatusUpdate');
 
+    // -----------------------------------colors Routes--------------------------------------
 
-    Route::resource('colour', ColourController::class);
-    Route::post('colours/toggle-status/{id}', [ColourController::class, 'toggleStatus'])->name('colours.toggleStatus');
-    Route::post('colours/bulk-delete', [ColourController::class, 'bulkDelete'])->name('colours.bulkDelete');
-    Route::post('colours/bulk-status-update', [ColourController::class, 'bulkStatusUpdate'])->name('colours.bulkStatusUpdate');
+    Route::resource('admin/colour', ColourController::class);
+    Route::post('admin/colours/toggle-status/{id}', [ColourController::class, 'toggleStatus'])->name('colours.toggleStatus');
+    Route::post('admin/colours/bulk-delete', [ColourController::class, 'bulkDelete'])->name('colours.bulkDelete');
+    Route::post('admin/colours/bulk-status-update', [ColourController::class, 'bulkStatusUpdate'])->name('colours.bulkStatusUpdate');
+    Route::get('admin/colours/export', [ColourController::class, 'export'])->name('colours.export');
+    Route::post('admin/colours/import', [ColourController::class, 'import'])->name('colours.import');
 
 
     Route::resource('blogs', BlogController::class);

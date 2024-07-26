@@ -25,11 +25,28 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title">Colour</h5>
-                        <div class="card-tools text-end">
-                            <button id="delete-all" class="btn btn-danger delete-button">Delete All</button>
-                            <button id="activate-all" class="btn btn-success">Activate Selected</button>
-                            <button id="deactivate-all" class="btn btn-warning">Deactivate Selected</button>
-                            <a href="{{ route('colour.create') }}" class="btn btn-primary">Add Colour</a>
+                        <div class="card-tools text-end" style="display: flex; align-items:center; justify-content: space-between;">
+                            <div class="btns">
+                                <a href="{{ route('colour.create') }}" class="text-dark btn btn-primary">Add
+                                    Colors</a>
+                                <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
+                                <br><br>
+                                <select name="status" id="status" class="form-control">
+                                    <option value="">All</option>
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="dropdown">
+                                <a href="#" class="text-body" data-bs-toggle="dropdown">
+                                    <i class="ph-list"></i>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <a href="#" class="dropdown-item" data-toggle="modal"
+                                        data-target="#importModal">Import Colors </a>
+                                    <a href="{{route('colours.export')}}" class="dropdown-item">Export Colors</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -57,6 +74,34 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Import Colors</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="importForm" action="{{route('admin.brand.import')}}" method="POST"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <div class="form-group">
+                        <label for="csv_file">Select CSV File</label>
+                        <input type="file" name="csv_file" class="form-control" required value="{{old('csv_file')}}">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="submit" form="importForm" class="btn btn-primary">Import</button>
             </div>
         </div>
     </div>

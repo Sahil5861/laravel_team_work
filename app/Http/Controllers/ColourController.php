@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Http\Request;
 use App\Models\Colour;
 use DataTables;
@@ -130,6 +133,42 @@ class ColourController extends Controller
         Colour::whereIn('id', $ids)->update(['status' => $status]);
 
         return response()->json(['success' => 'Selected Colours have been updated.']);
+    }
+
+
+    public function export()
+    {
+        $response = new StreamedResponse(function () {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Add headers for CSV
+            $sheet->fromArray(['ID', 'Name', 'Short Name', 'status'], null, 'A1');
+
+            // Fetch products and add to sheet
+            $colors = Colour::all();
+            $colorsData = [];
+            foreach ($colors as $color) {
+                $colorsData[] = [
+                    $color->id,
+                    $color->name,
+                    $color->short_name,
+                    $color->status,
+                ];
+            }
+            $sheet->fromArray($colorsData, null, 'A2');
+
+            // Write CSV to output
+            $writer = new Csv($spreadsheet);
+            $writer->setUseBOM(true);
+            $writer->save('php://output');
+        });
+
+        // Set headers for response
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="colors.csv"');
+
+        return $response;
     }
 
 }
