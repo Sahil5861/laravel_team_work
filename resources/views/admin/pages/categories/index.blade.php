@@ -44,7 +44,7 @@
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a href="#" class="dropdown-item" data-toggle="modal"
                                         data-target="#importModal">Import Category</a>
-                                    <a href="#" class="dropdown-item" id="export-category">Export
+                                    <a href="{{route('admin.category.export')}}" class="dropdown-item" id="export-category">Export
                                     Categories</a>
 
                                 </div>

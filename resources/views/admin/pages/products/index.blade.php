@@ -29,6 +29,11 @@
                             <div class="btns">
                                 <a href="{{ route('admin.products.create') }}" class="text-dark btn btn-primary">+ Add Product</a>
                                 <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
+                                <select name="status" id="status" class="form-control mt-3">
+                                    <option value="">All</option>
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
                             </div>
                             <div class="dropdown">
                                 <a href="#" class="text-body" data-bs-toggle="dropdown">
