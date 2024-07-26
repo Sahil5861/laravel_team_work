@@ -12,9 +12,16 @@ use DataTables;
 
 class ProductGroupsController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         if ($request->ajax()) {
-            $data = ProductsGroup::latest()->get();
+            $query = ProductsGroup::query();
+
+            if ($request->has('status') && $request->status != '') {
+                $query->where('status', $request->status);
+            }
+
+            $data = $query->latest()->get();
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('created_at', function ($row) {
@@ -37,31 +44,34 @@ class ProductGroupsController extends Controller
                                         <a href="' . route('admin.grouprelation.edit', $row->id) . '" class="dropdown-item">
                                             <i class="ph-pencil me-2"></i>Edit
                                         </a>
-                                        <a href="'.route('admin.grouprelation.delete', $row->id).'" data-id="' . $row->id . '" class="dropdown-item delete-button">
+                                        <a href="' . route('admin.grouprelation.delete', $row->id) . '" data-id="' . $row->id . '" class="dropdown-item delete-button">
                                             <i class="ph-trash me-2"></i>Delete
                                         </a>
                                     </div>
                                 </div>';
                 })
-                ->rawColumns(['action','status'])
+                ->rawColumns(['action', 'status'])
                 ->make(true);
         }
 
         return view('admin.pages.productGroup.index');
     }
-    public function create(){
+    public function create()
+    {
         return view('admin.pages.productGroup.create');
     }
 
-    public function edit($id){
+    public function edit($id)
+    {
         $productsgroup = ProductsGroup::find($id);
-        
+
         return view('admin.pages.productGroup.edit', compact('productsgroup'));
     }
 
-    
-    public function store(Request $request){
-        
+
+    public function store(Request $request)
+    {
+
         $validate = $request->validate([
             'name' => 'required',
         ]);
@@ -75,32 +85,29 @@ class ProductGroupsController extends Controller
 
             if ($productsgroup->save()) {
                 return back()->with('success', 'Productsgroup Updated Suuccessfully !!');
-            }
-            else{
+            } else {
                 return back()->with('error', 'Something went wrong !!');
             }
-        }
-        else{
+        } else {
             $productsgroup = new ProductsGroup();
 
             $productsgroup->products_group_name = $request->input('name');
 
             if ($productsgroup->save()) {
                 return back()->with('success', 'Productsgroup added Suuccessfully !!');
-            }
-            else{
+            } else {
                 return back()->with('error', 'Something went wrong !!');
             }
-        }    
+        }
     }
 
-    public function remove(Request $request ,$id){
+    public function remove(Request $request, $id)
+    {
         $productsgroup = ProductsGroup::firstwhere('id', $request->id);
 
         if ($productsgroup->delete()) {
             return back()->with('success', 'Productsgroup deleted Suuccessfully !!');
-        }
-        else{
+        } else {
             return back()->with('error', 'Something went wrong !!');
         }
     }
@@ -117,15 +124,15 @@ class ProductGroupsController extends Controller
             $productsgroup->status = $request->status;
             $productsgroup->save();
             return response()->json(['success' => true]);
-        }
-        else{
+        } else {
             return response()->json(['success' => false]);
         }
 
     }
 
 
-    public function deleteSelected(Request $request){
+    public function deleteSelected(Request $request)
+    {
         $selectedProductGroups = $request->input('selected_product_groups');
         if (!empty($selectedProductGroups)) {
             ProductsGroup::whereIn('id', $selectedProductGroups)->delete();
@@ -134,7 +141,8 @@ class ProductGroupsController extends Controller
         return response()->json(['success' => false, 'message' => 'No Product Groups selected for deletion.']);
     }
 
-    public function import(Request $request){
+    public function import(Request $request)
+    {
         $validate = $request->validate([
             'csv_file' => 'required|file|mimes:csv,txt',
         ]);
@@ -145,32 +153,38 @@ class ProductGroupsController extends Controller
         $path = $file->getRealPath();
         if (($handle = fopen($path, 'r')) !== false) {
             $header = fgetcsv($handle, 1000, ','); // Skip the header row
-            
+
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
                 ProductsGroup::create([
                     'products_group_name' => $data[0],
                 ]);
             }
-    
+
             fclose($handle);
         }
 
         return redirect()->route('admin.brand')->with('success', 'Products Group imported successfully.');
-    
+
     }
 
-
-    public function export()
+    public function export(Request $request)
     {
-        $response = new StreamedResponse(function () {
+        $status = $request->query('status'); // Retrieve status from query parameters
+    
+        $response = new StreamedResponse(function () use ($status) {
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
-
+    
             // Add headers for CSV
-            $sheet->fromArray(['Name'], null, 'A1');
-
-            // Fetch products and add to sheet
-            $productsgroups = ProductsGroup::all();
+            $sheet->fromArray(['ID', 'Name'], null, 'A1');
+    
+            // Fetch filtered products and add to sheet
+            $query = ProductsGroup::query();
+            if ($status !== null) {
+                $query->where('status', $status);
+            }
+            $productsgroups = $query->get();
+    
             $productsgroupsData = [];
             foreach ($productsgroups as $productsgroup) {
                 $productsgroupsData[] = [
@@ -179,19 +193,20 @@ class ProductGroupsController extends Controller
                 ];
             }
             $sheet->fromArray($productsgroupsData, null, 'A2');
-
+    
             // Write CSV to output
             $writer = new Csv($spreadsheet);
             $writer->setUseBOM(true);
             $writer->save('php://output');
         });
-
+    
         // Set headers for response
         $response->headers->set('Content-Type', 'text/csv');
         $response->headers->set('Content-Disposition', 'attachment; filename="productgroups.csv"');
-
+    
         return $response;
     }
+    
 
 
 }
