@@ -227,10 +227,14 @@ class CategoryController extends Controller
         ]);
 
         $category = Category::findOrFail($id);
-        $category->status = $request->status;
-        $category->save();
-
-        return response()->json(['success' => true]);
+        if ($category) {
+            $category->status = $request->status;
+            $category->save();
+            return response()->json(['success' => true]);
+        }
+        else{
+            return response()->json(['error' => false]);
+        }
     }
 
     public function deleteSelected(Request $request)

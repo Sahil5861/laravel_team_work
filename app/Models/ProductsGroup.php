@@ -14,6 +14,8 @@ class ProductsGroup extends Model
     protected $table = "product_groups";
     protected $dates = ['deleted_at'];
 
+    protected $fillable = ['products_group_name'];
+
     public function products()
     {
         return $this->hasMany(Product::class);

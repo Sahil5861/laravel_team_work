@@ -44,10 +44,15 @@
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a href="#" class="dropdown-item" data-toggle="modal"
+<<<<<<< HEAD
                                         data-target="#importModal">Import Product</a>
                                     <a href="#" class="dropdown-item" id="export-product">Export
                                         Product</a>
 
+=======
+                                        data-target="#importModal">Import Brands </a>
+                                    <a href="{{route('admin.grouprelation.export')}}" class="dropdown-item">Export Brands </a>
+>>>>>>> 1b5b4bf6fa80b62599736fe7384dc8cf39ec00ec
                                 </div>
                             </div>
                         </div>
@@ -75,6 +80,34 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Import Product Groups</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="importForm" action="{{route('admin.grouprelation.import')}}" method="POST"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <div class="form-group">
+                        <label for="csv_file">Select CSV File</label>
+                        <input type="file" name="csv_file" class="form-control" required value="{{old('csv_file')}}">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="submit" form="importForm" class="btn btn-primary">Import</button>
             </div>
         </div>
     </div>
@@ -226,8 +259,52 @@
                 error: function (error) {
                     console.error('Error:', error);
                 }
+<<<<<<< HEAD
+=======
+            })
+            $('.status-toggle').on('click', function() {
+                var groupId = $(this).data('id');
+                var status = $(this).is(':checked') ? 1 : 0;
+                updateStatus(groupId, status);
+>>>>>>> 1b5b4bf6fa80b62599736fe7384dc8cf39ec00ec
             });
         }
     });
+<<<<<<< HEAD
+=======
+
+    function updateStatus(groupId, status) {
+        $.ajax({
+            url: `{{ url('admin/group-relation/update-status') }}/${groupId}`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: JSON.stringify({ status: status }),
+            success: function(data) {
+                if (data.success) {
+                    console.log('Status Updated !!');
+                    Swal.fire(
+                        'Updated!',
+                        'Status Updated',
+                        'success'
+                    );
+                    // alert('Status Updated !!');
+
+                    // location.reload(); // Refresh the page
+                    ProductGroupTable.ajax.reload();
+                } else {
+                    alert('Failed to update status.');
+                }
+                
+            },
+            error: function(error) {
+                console.error('Error:', error);
+            }
+        });
+    }
+});
+>>>>>>> 1b5b4bf6fa80b62599736fe7384dc8cf39ec00ec
 </script>
 @endsection
