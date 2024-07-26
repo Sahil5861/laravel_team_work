@@ -12,9 +12,17 @@ use DataTables;
 
 class BrandController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         if ($request->ajax()) {
-            $data = Brand::latest()->get();
+            $query = Brand::query();
+
+            if ($request->has('status') && $request->status != '') {
+                $query->where('status', $request->status);
+            }
+
+            $data = $query->latest()->get();
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('image', function ($row) {
@@ -40,7 +48,7 @@ class BrandController extends Controller
                                         <a href="' . route('admin.brand.edit', $row->id) . '" class="dropdown-item">
                                             <i class="ph-pencil me-2"></i>Edit
                                         </a>
-                                        <a href="'.route('admin.brand.delete', $row->id).'" data-id="' . $row->id . '" class="dropdown-item delete-button">
+                                        <a href="' . route('admin.brand.delete', $row->id) . '" data-id="' . $row->id . '" class="dropdown-item delete-button">
                                             <i class="ph-trash me-2"></i>Delete
                                         </a>
                                     </div>
@@ -54,21 +62,24 @@ class BrandController extends Controller
     }
 
 
-    public function create(){
+    public function create()
+    {
         $brands = Brand::whereNull('deleted_at')->get();
         return view('admin.pages.brands.create', compact('brands'));
     }
 
-    public function edit($id){
+    public function edit($id)
+    {
         $brands = Brand::whereNull('deleted_at')->get();
         $brand = Brand::find($id);
-        
+
         return view('admin.pages.brands.edit', compact('brand', 'brands'));
     }
 
 
-    public function store(Request $request){
-        
+    public function store(Request $request)
+    {
+
         $validate = $request->validate([
             'name' => 'required',
             'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif',
@@ -79,52 +90,49 @@ class BrandController extends Controller
 
             if ($request->file('image')) {
                 $image = $request->file('image');
-                $imagename = time().'.'.$image->getClientOriginalName();
+                $imagename = time() . '.' . $image->getClientOriginalName();
                 $destination = public_path('uploads/brand');
                 $image->move($destination, $imagename);
-    
-                $imagepath = 'uploads/brand/'.$imagename;
+
+                $imagepath = 'uploads/brand/' . $imagename;
                 $brand->image = $imagepath;
             }
 
             if ($brand->save()) {
                 return back()->with('success', 'Brand Updated Suuccessfully !!');
-            }
-            else{
+            } else {
                 return back()->with('error', 'Something went wrong !!');
             }
-        }
-        else{
+        } else {
             $brand = new Brand();
 
             $brand->brand_name = $request->input('name');
-    
+
             if ($request->file('image')) {
                 $image = $request->file('image');
-                $imagename = time().'.'.$image->getClientOriginalName();
+                $imagename = time() . '.' . $image->getClientOriginalName();
                 $destination = public_path('uploads/brand');
                 $image->move($destination, $imagename);
-    
-                $imagepath = 'uploads/brand/'.$imagename;
+
+                $imagepath = 'uploads/brand/' . $imagename;
                 $brand->image = $imagepath;
             }
-    
+
             if ($brand->save()) {
                 return back()->with('success', 'Brand added Suuccessfully !!');
-            }
-            else{
+            } else {
                 return back()->with('error', 'Something went wrong !!');
             }
-        }    
+        }
     }
 
-    public function remove(Request $request ,$id){
+    public function remove(Request $request, $id)
+    {
         $brand = Brand::firstwhere('id', $request->id);
 
         if ($brand->delete()) {
             return back()->with('success', 'Brand deleted Suuccessfully !!');
-        }
-        else{
+        } else {
             return back()->with('error', 'Something went wrong !!');
         }
     }
@@ -141,8 +149,7 @@ class BrandController extends Controller
             $brand->status = $request->status;
             $brand->save();
             return response()->json(['success' => true]);
-        }
-        else{
+        } else {
             return response()->json(['success' => false]);
         }
 
@@ -150,7 +157,8 @@ class BrandController extends Controller
 
 
 
-    public function deleteSelected(Request $request){
+    public function deleteSelected(Request $request)
+    {
         $selectedBrands = $request->input('selected_brands');
         if (!empty($selectedBrands)) {
             Brand::whereIn('id', $selectedBrands)->delete();
@@ -159,7 +167,8 @@ class BrandController extends Controller
         return response()->json(['success' => false, 'message' => 'No brands selected for deletion.']);
     }
 
-    public function import(Request $request){
+    public function import(Request $request)
+    {
         $validate = $request->validate([
             'csv_file' => 'required|file|mimes:csv,txt',
         ]);
@@ -170,20 +179,20 @@ class BrandController extends Controller
         $path = $file->getRealPath();
         if (($handle = fopen($path, 'r')) !== false) {
             $header = fgetcsv($handle, 1000, ','); // Skip the header row
-            
+
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
                 Brand::create([
-                    'id' =>$data[0],
+                    'id' => $data[0],
                     'brand_name' => $data[1],
                     'image' => $data[2],
                 ]);
             }
-    
+
             fclose($handle);
         }
 
         return redirect()->route('admin.brand')->with('success', 'Brands imported successfully.');
-    
+
     }
 
 
