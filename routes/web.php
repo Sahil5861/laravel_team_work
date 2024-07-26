@@ -75,6 +75,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/category/delete/{id}', [CategoryController::class, 'remove'])->name('admin.category.delete');
     Route::post('admin/category/create', [CategoryController::class, 'store'])->name('admin.category.create.post');
     Route::post('admin/category/edit/{id}', [CategoryController::class, 'store'])->name('admin.category.edit.post');
+    Route::delete('admin/category/delete-selected', [CategoryController::class, 'deleteSelected'])->name('admin.category.deleteSelected');
+    Route::get('admin/category/export', [CategoryController::class, 'export'])->name('admin.category.export');
+    Route::post('admin/category/import', [CategoryController::class, 'import'])->name('admin.category.import');
+
 
 
     // --------------------------------------brand Routes----------------------------------
@@ -86,6 +90,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/brand/delete/{id}', [BrandController::class, 'remove'])->name('admin.brand.delete');
     Route::post('admin/brand/create', [BrandController::class, 'store'])->name('admin.brand.create.post');
     Route::post('admin/brand/edit/{id}', [BrandController::class, 'store'])->name('admin.brand.edit.post');
+    Route::delete('admin/brand/delete-selected', [BrandController::class, 'deleteSelected'])->name('admin.brand.deleteSelected');
+    Route::get('admin/brand/export', [BrandController::class, 'export'])->name('admin.brand.export');
+    Route::post('admin/brand/import', [BrandController::class, 'import'])->name('admin.brand.import');
+
 
 
     // -------------------------------------Product Group Routes---------------------------------
@@ -97,6 +105,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/group-relation/delete/{id}', [ProductGroupsController::class, 'remove'])->name('admin.grouprelation.delete');
     Route::post('admin/group-relation/create', [ProductGroupsController::class, 'store'])->name('admin.grouprelation.create.post');
     Route::post('admin/group-relation/edit/{id}', [ProductGroupsController::class, 'store'])->name('admin.grouprelation.edit.post');
+    Route::delete('admin/group-relation/delete-selected', [ProductsController::class, 'deleteSelected'])->name('admin.grouprelation.deleteSelected');
 
     // -------------------------------------Product Routes---------------------------------------
 
@@ -107,5 +116,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/products/delete/{id}', [ProductsController::class, 'remove'])->name('admin.products.delete');
     Route::post('admin/products/create', [ProductsController::class, 'store'])->name('admin.products.create.post');
     Route::post('admin/products/edit/{id}', [ProductsController::class, 'store'])->name('admin.products.edit.post');
+    Route::delete('admin/products/delete-selected', [ProductsController::class, 'deleteSelected'])->name('admin.products.deleteSelected');
     
 });

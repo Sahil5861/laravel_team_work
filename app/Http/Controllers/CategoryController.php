@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 use App\Models\Category;
 
@@ -10,20 +13,44 @@ use Yajra\DataTables\Facades\DataTables;
 
 class CategoryController extends Controller
 {
-    public function index(){
-        $categories = Category::whereNull('deleted_at')->get();
-        foreach ($categories as $item) {
-            if ($item->parent_category == null) {
-                $item->parent_category = 'Not set';
-            }
-            if ($item->status == 1) {
-                $status = 'Active';
-            }
-            else{
-                $status = 'Inactive';
-            }
-        };
-        return view('admin.pages.categories.index', compact('categories'));
+    public function index(Request $request){
+        if ($request->ajax()) {
+            $data = Category::latest()->get();
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('image', function ($row) {
+                    return $row->image ? asset($row->image) : '';
+                })
+                ->addColumn('status', function ($row) {
+                    $checked = $row->status == '1' ? 'checked' : '';
+                    $text = $checked ? 'Active' : 'Inactive';
+                    return '<label class="switch">
+                                    <input type="checkbox" class="status-checkbox status-toggle" data-id="' . $row->id . '" ' . $checked . '>
+                                    <span class="slider round status-text"></span>
+                            </label>';
+                })
+                ->addColumn('created_at', function ($row) {
+                    return $row->created_at->format('d M Y');
+                })
+                ->addColumn('action', function ($row) {
+                    return '<div class="dropdown">
+                                    <a href="#" class="text-body" data-bs-toggle="dropdown">
+                                        <i class="ph-list"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-end">
+                                        <a href="' . route('admin.category.edit', $row->id) . '" class="dropdown-item">
+                                            <i class="ph-pencil me-2"></i>Edit
+                                        </a>
+                                        <a href="'.route('admin.category.delete', $row->id).'" data-id="' . $row->id . '" class="dropdown-item delete-button">
+                                            <i class="ph-trash me-2"></i>Delete
+                                        </a>
+                                    </div>
+                                </div>';
+                })
+                ->rawColumns(['action', 'status', 'image'])
+                ->make(true);
+        }
+        return view('admin.pages.categories.index');
     }
 
     // -----------------------------Data table-------------------------------------------
@@ -195,4 +222,79 @@ class CategoryController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function deleteSelected(Request $request){
+        $selectedCategories = $request->input('selected_categories');
+        if (!empty($selectedCategories)) {
+            Category::whereIn('id', $selectedCategories)->delete();
+            return response()->json(['success' => true, 'message' => 'Selected categories deleted successfully.']);
+        }
+        return response()->json(['success' => false, 'message' => 'No categories selected for deletion.']);
+    }
+
+
+    public function import(Request $request){
+        $validate = $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt',
+        ]);
+        if ($validate == false) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $file = $request->file('csv_file');
+        $path = $file->getRealPath();
+        if (($handle = fopen($path, 'r')) !== false) {
+            $header = fgetcsv($handle, 1000, ','); // Skip the header row
+            
+            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+                Category::create([
+                    'id' =>$data[0],
+                    'category_name' => $data[1],
+                    'image'=>$data[2],
+                ]);
+            }
+    
+            fclose($handle);
+        }
+
+        return redirect()->route('admin.category')->with('success', 'Category imported successfully.');
+    
+    }
+
+
+    public function export()
+    {
+        $response = new StreamedResponse(function () {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Add headers for CSV
+            $sheet->fromArray(['ID', 'Name', 'image', 'Created At', 'status'], null, 'A1');
+
+            // Fetch products and add to sheet
+            $categories = Category::all();
+            $categoryData = [];
+            foreach ($categories as $category) {
+                $categoryData[] = [
+                    $category->id,
+                    $category->category_name,
+                    $category->image,
+                    $category->created_at,
+                    $category->status,
+                ];
+            }
+            $sheet->fromArray($categoryData, null, 'A2');
+
+            // Write CSV to output
+            $writer = new Csv($spreadsheet);
+            $writer->setUseBOM(true);
+            $writer->save('php://output');
+        });
+
+        // Set headers for response
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="category.csv"');
+
+        return $response;
+    }
+
 }

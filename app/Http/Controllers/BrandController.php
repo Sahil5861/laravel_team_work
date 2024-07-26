@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Models\Brand;
 
 use DataTables;
@@ -137,14 +140,87 @@ class BrandController extends Controller
         if ($brand) {
             $brand->status = $request->status;
             $brand->save();
-            return response()->json(['success' => true])->with('success', 'Status Updated');
+            return response()->json(['success' => true]);
         }
         else{
-            return response()->json(['success' => false])->with('error', 'Somethin Went Wrong');
+            return response()->json(['success' => false]);
         }
 
     }
 
+
+
+    public function deleteSelected(Request $request){
+        $selectedBrands = $request->input('selected_brands');
+        if (!empty($selectedBrands)) {
+            Brand::whereIn('id', $selectedBrands)->delete();
+            return response()->json(['success' => true, 'message' => 'Selected brands deleted successfully.']);
+        }
+        return response()->json(['success' => false, 'message' => 'No brands selected for deletion.']);
+    }
+
+    public function import(Request $request){
+        $validate = $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt',
+        ]);
+        if ($validate == false) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $file = $request->file('csv_file');
+        $path = $file->getRealPath();
+        if (($handle = fopen($path, 'r')) !== false) {
+            $header = fgetcsv($handle, 1000, ','); // Skip the header row
+            
+            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+                Brand::create([
+                    'id' =>$data[0],
+                    'brand_name' => $data[1],
+                    'image' => $data[2],
+                ]);
+            }
+    
+            fclose($handle);
+        }
+
+        return redirect()->route('admin.brand')->with('success', 'Brands imported successfully.');
+    
+    }
+
+
+    public function export()
+    {
+        $response = new StreamedResponse(function () {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Add headers for CSV
+            $sheet->fromArray(['ID', 'Name', 'image', 'Created At', 'status'], null, 'A1');
+
+            // Fetch products and add to sheet
+            $brands = Brand::all();
+            $brandsData = [];
+            foreach ($brands as $brand) {
+                $brandsData[] = [
+                    $brand->id,
+                    $brand->brand_name,
+                    $brand->image,
+                    $brand->status,
+                ];
+            }
+            $sheet->fromArray($brandsData, null, 'A2');
+
+            // Write CSV to output
+            $writer = new Csv($spreadsheet);
+            $writer->setUseBOM(true);
+            $writer->save('php://output');
+        });
+
+        // Set headers for response
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="brands.csv"');
+
+        return $response;
+    }
 
 
 }
