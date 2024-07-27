@@ -13,8 +13,15 @@ class ColourController extends Controller
 {
     public function index(Request $request)
     {
+
         if ($request->ajax()) {
-            $data = Colour::latest()->get();
+            $query = Colour::query();
+
+            if ($request->has('status') && $request->status != '') {
+                $query->where('status', $request->status);
+            }
+
+            $data = $query->latest()->get();
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('status', function ($row) {
@@ -153,41 +160,50 @@ class ColourController extends Controller
     }
 
 
-
-
-    public function export()
+    public function export(Request $request)
     {
-        $response = new StreamedResponse(function () {
-            $spreadsheet = new Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
+        try {
+            $status = $request->query('status', null); // Get status from query parameters
 
-            // Add headers for CSV
-            $sheet->fromArray(['ID', 'Name', 'Short Name', 'status'], null, 'A1');
+            $response = new StreamedResponse(function () use ($status) {
+                $spreadsheet = new Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
 
-            // Fetch products and add to sheet
-            $colors = Colour::all();
-            $colorsData = [];
-            foreach ($colors as $color) {
-                $colorsData[] = [
-                    $color->id,
-                    $color->name,
-                    $color->short_name,
-                    $color->status,
-                ];
-            }
-            $sheet->fromArray($colorsData, null, 'A2');
+                // Add headers for CSV
+                $sheet->fromArray(['ID', 'Name', 'Short Name', 'status'], null, 'A1');
+                // Fetch Colors based on status
+                $query = Colour::query();
+                if ($status !== null) {
+                    $query->where('status', $status);
+                }
 
-            // Write CSV to output
-            $writer = new Csv($spreadsheet);
-            $writer->setUseBOM(true);
-            $writer->save('php://output');
-        });
+                $colors = $query->get();
+                $colorsData = [];
+                foreach ($colors as $color) {
+                    $colorsData[] = [
+                        $color->id,
+                        $color->name,
+                        $color->short_name,
+                        $color->status,
+                    ];
+                }
+                $sheet->fromArray($colorsData, null, 'A2');
 
-        // Set headers for response
-        $response->headers->set('Content-Type', 'text/csv');
-        $response->headers->set('Content-Disposition', 'attachment; filename="colors.csv"');
+                // Write CSV to output
+                $writer = new Csv($spreadsheet);
+                $writer->setUseBOM(true);
+                $writer->save('php://output');
+            });
 
-        return $response;
+            // Set headers for response
+            $response->headers->set('Content-Type', 'text/csv');
+            $response->headers->set('Content-Disposition', 'attachment; filename="colors.csv"');
+
+            return $response;
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
+
 
 }

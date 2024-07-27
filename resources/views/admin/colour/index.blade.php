@@ -25,7 +25,8 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title">Colour</h5>
-                        <div class="card-tools text-end" style="display: flex; align-items:center; justify-content: space-between;">
+                        <div class="card-tools text-end"
+                            style="display: flex; align-items:center; justify-content: space-between;">
                             <div class="btns">
                                 <a href="{{ route('colour.create') }}" class="text-dark btn btn-primary">Add
                                     Colors</a>
@@ -33,8 +34,8 @@
                                 <br><br>
                                 <select name="status" id="status" class="form-control">
                                     <option value="">All</option>
-                                    <option value="1">Active</option>
-                                    <option value="0">Inactive</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
                                 </select>
                             </div>
                             <div class="dropdown">
@@ -43,9 +44,15 @@
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a href="#" class="dropdown-item" data-toggle="modal"
+                                        data-target="#importModal">Import Colors</a>
+                                    <a href="#" class="dropdown-item" id="export-colours">Export Colors</a>
+
+                                </div>
+                                <!-- <div class="dropdown-menu dropdown-menu-end">
+                                    <a href="#" class="dropdown-item" data-toggle="modal"
                                         data-target="#importModal">Import Colors </a>
                                     <a href="{{route('colours.export')}}" class="dropdown-item">Export Colors</a>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -122,7 +129,12 @@
         var ColourTable = $('#colour-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('colour.index') }}",
+            ajax: {
+                url: "{{ route('colour.index') }}",
+                data: function (d) {
+                    d.status = $('#status').val();
+                }
+            },
             columns: [
                 {
                     data: null,
@@ -141,11 +153,10 @@
                 { data: 'status', name: 'status' },
             ],
             order: [[1, 'asc']],
-
             drawCallback: function (settings) {
                 $('#select-all').on('click', function () {
                     var isChecked = this.checked;
-                    $('#colour-table .select-row').each(function () {
+                    $('#color-table .select-row').each(function () {
                         $(this).prop('checked', isChecked);
                     });
                 });
@@ -169,7 +180,7 @@
                                 $.ajax({
                                     url: "{{ route('admin.colours.deleteSelected') }}",
                                     method: 'DELETE',
-                                    data: { selectedColors: selectedIds },
+                                    data: { selected_colors: selectedIds },
                                     success: function (response) {
                                         ColourTable.ajax.reload(); // Refresh the page
                                         Swal.fire(
@@ -194,62 +205,180 @@
                     else {
                         Swal.fire(
                             'Error!',
-                            'Please select at least one Color to delete.',
+                            'Please select at least one color to delete.',
                             'error'
                         );
                     }
-                });
+                })
+
 
                 $('.status-toggle').on('click', function () {
-                    var colorId = $(this).data('id');
+                    var ColorId = $(this).data('id');
                     var status = $(this).is(':checked') ? 1 : 0;
-                    updateStatus(colorId, status);
+                    updateStatus(ColorId, status);
                 });
-
-
-
             }
         });
 
-        function updateStatus(colorId, status) {
-            $.ajax({
-                url: `{{ url('admin/colours/update-status') }}/${colorId}`,
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                data: JSON.stringify({ status: status }),
-                success: function (data) {
-                    if (data.success) {
-                        // console.log('Status Updated !!');
-                        Swal.fire(
-                            'Updated!',
-                            'Status Updated',
-                            'success'
-                        );
-                        // alert('Status Updated !!');
+        $('#status').on('change', function () {
+            ColourTable.ajax.reload();
+        });
 
-                        // location.reload(); // Refresh the page
-                        ColourTable.ajax.reload();
-                    } else {
-                        alert('Failed to update status.');
-                    }
-
-                },
-                error: function (error) {
-                    console.error('Error:', error);
+        $(document).ready(function () {
+            $('#export-colours').on('click', function () {
+                var status = $('#status').val();
+                var url = "{{ route('colours.export') }}";
+                if (status) {
+                    url += "?status=" + status;
                 }
+                window.location.href = url;
             });
-        }
-
+        });
 
 
         // Select/Deselect all checkboxes
         
 
         // Delete selected rows
-        // 
+        $('#delete-all').on('click', function () {
+            var ids = [];
+            $('.select-row:checked').each(function () {
+                ids.push($(this).val());
+            });
+
+            if (ids.length > 0) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '{{ route("colours.bulkDelete") }}',
+                            method: 'POST',
+                            data: { ids: ids },
+                            success: function (response) {
+                                ColourTable.ajax.reload();
+                                Swal.fire(
+                                    'Deleted!',
+                                    response.success,
+                                    'success'
+                                );
+                            },
+                            error: function (xhr) {
+                                console.log(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            } else {
+                Swal.fire(
+                    'No Rows Selected',
+                    'Please select at least one colour to delete.',
+                    'warning'
+                );
+            }
+        });
+
+        // Activate selected rows
+        $('#activate-all').on('click', function () {
+            var ids = [];
+            $('.select-row:checked').each(function () {
+                ids.push($(this).val());
+            });
+
+            if (ids.length > 0) {
+                $.ajax({
+                    url: '{{ route("colours.bulkStatusUpdate") }}',
+                    method: 'POST',
+                    data: { ids: ids, status: 'active' },
+                    success: function (response) {
+                        ColourTable.ajax.reload();
+                        Swal.fire(
+                            'Activated!',
+                            response.success,
+                            'success'
+                        );
+                    },
+                    error: function (xhr) {
+                        console.log(xhr.responseText);
+                    }
+                });
+            } else {
+                Swal.fire(
+                    'No Rows Selected',
+                    'Please select at least one colour to activate.',
+                    'warning'
+                );
+            }
+        });
+
+        $(document).on('change', '.status-toggle', function () {
+            var status = $(this).is(':checked') ? 'active' : 'inactive';
+            var id = $(this).data('id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You want to update the status!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update status!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ route("colours.bulkStatusUpdate") }}',
+                        type: 'POST',
+                        data: { ids: [id], status: status },
+                        success: function (response) {
+                            Swal.fire(
+                                'Updated!',
+                                'colour status has been updated.',
+                                'success'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+
+        // Deactivate selected rows
+        $('#deactivate-all').on('click', function () {
+            var ids = [];
+            $('.select-row:checked').each(function () {
+                ids.push($(this).val());
+            });
+
+            if (ids.length > 0) {
+                $.ajax({
+                    url: '{{ route("colours.bulkStatusUpdate") }}',
+                    method: 'POST',
+                    data: { ids: ids, status: 'inactive' },
+                    success: function (response) {
+                        ColourTable.ajax.reload();
+                        Swal.fire(
+                            'Deactivated!',
+                            response.success,
+                            'success'
+                        );
+                    },
+                    error: function (xhr) {
+                        console.log(xhr.responseText);
+                    }
+                });
+            } else {
+                Swal.fire(
+                    'No Rows Selected',
+                    'Please select at least one colour to deactivate.',
+                    'warning'
+                );
+            }
+        });
     });
 </script>
 

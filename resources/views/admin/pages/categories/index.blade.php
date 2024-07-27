@@ -44,8 +44,9 @@
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a href="#" class="dropdown-item" data-toggle="modal"
                                         data-target="#importModal">Import Category</a>
-                                    <a href="{{route('admin.category.export')}}" class="dropdown-item" id="export-category">Export
-                                    Categories</a>
+                                    <a href="{{route('admin.category.export')}}" class="dropdown-item"
+                                        id="export-category">Export
+                                        Categories</a>
 
                                 </div>
                             </div>
@@ -228,34 +229,34 @@
 
 
 
-    function updateStatus(categoryId, status) {
-        $.ajax({
-            url: `{{ url('admin/category/update-status') }}/${categoryId}`,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data: JSON.stringify({ status: status }),
-            success: function(data) {
-                if (data.success) {
-                    Swal.fire(
-                        'Updated',
-                        'Status Updated',
-                        'success'
-                    );
-                    CategoryTable.ajax.reload(); // Refresh the page
-                } else {
-                    alert('Failed to update status.');
+        function updateStatus(categoryId, status) {
+            $.ajax({
+                url: `{{ url('admin/category/update-status') }}/${categoryId}`,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: JSON.stringify({ status: status }),
+                success: function (data) {
+                    if (data.success) {
+                        Swal.fire(
+                            'Updated',
+                            'Status Updated',
+                            'success'
+                        );
+                        CategoryTable.ajax.reload(); // Refresh the page
+                    } else {
+                        alert('Failed to update status.');
+                    }
+
+                },
+                error: function (error) {
+                    console.error('Error:', error);
                 }
-                
-            },
-            error: function(error) {
-                console.error('Error:', error);
-            }
-        });
-    }
-});
+            });
+        }
+    });
 
 </script>
 @endsection

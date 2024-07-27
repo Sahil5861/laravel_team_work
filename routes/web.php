@@ -62,7 +62,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('admin/colours/update-status/{id}', [ColourController::class, 'updateStatus'])->name('admin.colours.status');
     Route::get('admin/colours/export', [ColourController::class, 'export'])->name('colours.export');
     Route::post('admin/colours/import', [ColourController::class, 'import'])->name('colours.import');
-
+    Route::delete('admin/colours/delete-selected', [ColourController::class, 'deleteSelected'])->name('admin.colours.deleteSelected');
 
     Route::resource('blogs', BlogController::class);
     Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
@@ -123,5 +123,5 @@ Route::middleware(['auth'])->group(function () {
     Route::post('admin/products/create', [ProductsController::class, 'store'])->name('admin.products.create.post');
     Route::post('admin/products/edit/{id}', [ProductsController::class, 'store'])->name('admin.products.edit.post');
     Route::delete('admin/products/delete-selected', [ProductsController::class, 'deleteSelected'])->name('admin.products.deleteSelected');
-    
+
 });
