@@ -90,7 +90,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="importForm" action="{{route('admin.brand.import')}}" method="POST"
+                <form id="importForm" action="{{route('colours.import')}}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
                     <div class="form-group">
@@ -141,15 +141,112 @@
                 { data: 'status', name: 'status' },
             ],
             order: [[1, 'asc']],
+
+            drawCallback: function (settings) {
+                $('#select-all').on('click', function () {
+                    var isChecked = this.checked;
+                    $('#colour-table .select-row').each(function () {
+                        $(this).prop('checked', isChecked);
+                    });
+                });
+
+                $('#delete-selected').on('click', function () {
+                    var selectedIds = $('.select-row:checked').map(function () {
+                        return this.value;
+                    }).get();
+
+                    if (selectedIds.length > 0) {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "{{ route('colours.bulkDelete') }}",
+                                    method: 'DELETE',
+                                    data: { selected_colors: selectedIds },
+                                    success: function (response) {
+                                        ColourTable.ajax.reload(); // Refresh the page
+                                        Swal.fire(
+                                            'Deleted!',
+                                            response.success,
+                                            'success'
+                                        );
+                                    },
+                                    error: function (xhr) {
+                                        Swal.fire(
+                                            'Error!',
+                                            'Something went wrong.',
+                                            'error'
+                                        );
+                                    }
+                                });
+                            }
+                        })
+
+
+                    }
+                    else {
+                        Swal.fire(
+                            'Error!',
+                            'Please select at least one Color to delete.',
+                            'error'
+                        );
+                    }
+                });
+
+                $('.status-toggle').on('click', function () {
+                    var colorId = $(this).data('id');
+                    var status = $(this).is(':checked') ? 1 : 0;
+                    updateStatus(colorId, status);
+                });
+
+
+
+            }
         });
 
-        // Select/Deselect all checkboxes
-        $('#select-all').on('click', function () {
-            var isChecked = this.checked;
-            $('#colour-table .select-row').each(function () {
-                $(this).prop('checked', isChecked);
+        function updateStatus(colorId, status) {
+            $.ajax({
+                url: `{{ url('admin/colours/update-status') }}/${colorId}`,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: JSON.stringify({ status: status }),
+                success: function (data) {
+                    if (data.success) {
+                        // console.log('Status Updated !!');
+                        Swal.fire(
+                            'Updated!',
+                            'Status Updated',
+                            'success'
+                        );
+                        // alert('Status Updated !!');
+
+                        // location.reload(); // Refresh the page
+                        ColourTable.ajax.reload();
+                    } else {
+                        alert('Failed to update status.');
+                    }
+
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
             });
-        });
+        }
+
+
+
+        // Select/Deselect all checkboxes
+        
 
         // Delete selected rows
         $('#delete-all').on('click', function () {
@@ -195,6 +292,7 @@
                 );
             }
         });
+        
 
         // Activate selected rows
         $('#activate-all').on('click', function () {

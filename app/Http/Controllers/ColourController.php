@@ -125,6 +125,23 @@ class ColourController extends Controller
         return response()->json(['success' => 'Selected Colours have been deleted.']);
     }
 
+
+
+    public function updateStatus($id, Request $request){
+        $request->validate([
+            'status' => 'required|boolean',
+        ]);
+        $color = Colour::findOrFail($id);
+        if ($color) {
+            $color->status = $request->status;
+            $color->save();
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false]);
+        }
+
+    }
+
     public function bulkStatusUpdate(Request $request)
     {
         $ids = $request->ids;
@@ -134,6 +151,8 @@ class ColourController extends Controller
 
         return response()->json(['success' => 'Selected Colours have been updated.']);
     }
+
+
 
 
     public function export()

@@ -59,6 +59,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('admin/colours/toggle-status/{id}', [ColourController::class, 'toggleStatus'])->name('colours.toggleStatus');
     Route::post('admin/colours/bulk-delete', [ColourController::class, 'bulkDelete'])->name('colours.bulkDelete');
     Route::post('admin/colours/bulk-status-update', [ColourController::class, 'bulkStatusUpdate'])->name('colours.bulkStatusUpdate');
+    Route::post('admin/colours/update-status/{id}', [ColourController::class, 'updateStatus'])->name('admin.colours.status');
     Route::get('admin/colours/export', [ColourController::class, 'export'])->name('colours.export');
     Route::post('admin/colours/import', [ColourController::class, 'import'])->name('colours.import');
 
