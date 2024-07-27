@@ -202,7 +202,7 @@ class CategoryController extends Controller
             }
 
             if ($category->save()) {
-                return back()->with('success', 'Category added Suuccessfully !!');
+                return redirect()->route('admin.category')->with('success', 'Category added Suuccessfully !!');
             } else {
                 return back()->with('error', 'Something went wrong !!');
             }

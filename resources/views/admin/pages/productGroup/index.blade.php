@@ -43,11 +43,8 @@
                                     <i class="ph-list"></i>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="#" class="dropdown-item" data-toggle="modal"
-                                        data-target="#importModal">Import Product</a>
-                                    <a href="#" class="dropdown-item" id="export-product">Export
-                                        Product</a>
-
+                                    <a href="#" class="dropdown-item" data-toggle="modal" data-target="#importModal">Import Product Groups</a>
+                                    <a href="#" class="dropdown-item" id="export-product">Export Product Groups</a>
                                 </div>
                             </div>
                         </div>
