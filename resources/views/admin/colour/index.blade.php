@@ -25,7 +25,8 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title">Colour</h5>
-                        <div class="card-tools text-end" style="display: flex; align-items:center; justify-content: space-between;">
+                        <div class="card-tools text-end"
+                            style="display: flex; align-items:center; justify-content: space-between;">
                             <div class="btns">
                                 <a href="{{ route('colour.create') }}" class="text-dark btn btn-primary">Add
                                     Colors</a>
@@ -33,8 +34,8 @@
                                 <br><br>
                                 <select name="status" id="status" class="form-control">
                                     <option value="">All</option>
-                                    <option value="1">Active</option>
-                                    <option value="0">Inactive</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
                                 </select>
                             </div>
                             <div class="dropdown">
@@ -43,9 +44,15 @@
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a href="#" class="dropdown-item" data-toggle="modal"
+                                        data-target="#importModal">Import Colors</a>
+                                    <a href="#" class="dropdown-item" id="export-colours">Export Colors</a>
+
+                                </div>
+                                <!-- <div class="dropdown-menu dropdown-menu-end">
+                                    <a href="#" class="dropdown-item" data-toggle="modal"
                                         data-target="#importModal">Import Colors </a>
                                     <a href="{{route('colours.export')}}" class="dropdown-item">Export Colors</a>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -90,7 +97,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="importForm" action="{{route('admin.brand.import')}}" method="POST"
+                <form id="importForm" action="{{route('colours.import')}}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
                     <div class="form-group">
@@ -122,7 +129,12 @@
         var ColourTable = $('#colour-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('colour.index') }}",
+            ajax: {
+                url: "{{ route('colour.index') }}",
+                data: function (d) {
+                    d.status = $('#status').val();
+                }
+            },
             columns: [
                 {
                     data: null,
@@ -141,7 +153,88 @@
                 { data: 'status', name: 'status' },
             ],
             order: [[1, 'asc']],
+            drawCallback: function (settings) {
+                $('#select-all').on('click', function () {
+                    var isChecked = this.checked;
+                    $('#color-table .select-row').each(function () {
+                        $(this).prop('checked', isChecked);
+                    });
+                });
+
+                $('#delete-selected').on('click', function () {
+                    var selectedIds = $('.select-row:checked').map(function () {
+                        return this.value;
+                    }).get();
+
+                    if (selectedIds.length > 0) {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "{{ route('admin.colours.deleteSelected') }}",
+                                    method: 'DELETE',
+                                    data: { selected_colors: selectedIds },
+                                    success: function (response) {
+                                        ColourTable.ajax.reload(); // Refresh the page
+                                        Swal.fire(
+                                            'Deleted!',
+                                            response.success,
+                                            'success'
+                                        );
+                                    },
+                                    error: function (xhr) {
+                                        Swal.fire(
+                                            'Error!',
+                                            'Something went wrong.',
+                                            'error'
+                                        );
+                                    }
+                                });
+                            }
+                        })
+
+
+                    }
+                    else {
+                        Swal.fire(
+                            'Error!',
+                            'Please select at least one color to delete.',
+                            'error'
+                        );
+                    }
+                })
+
+
+                $('.status-toggle').on('click', function () {
+                    var ColorId = $(this).data('id');
+                    var status = $(this).is(':checked') ? 1 : 0;
+                    updateStatus(ColorId, status);
+                });
+            }
         });
+
+        $('#status').on('change', function () {
+            ColourTable.ajax.reload();
+        });
+
+        $(document).ready(function () {
+            $('#export-colours').on('click', function () {
+                var status = $('#status').val();
+                var url = "{{ route('colours.export') }}";
+                if (status) {
+                    url += "?status=" + status;
+                }
+                window.location.href = url;
+            });
+        });
+
 
         // Select/Deselect all checkboxes
         $('#select-all').on('click', function () {
@@ -227,6 +320,36 @@
                     'warning'
                 );
             }
+        });
+
+        $(document).on('change', '.status-toggle', function () {
+            var status = $(this).is(':checked') ? 'active' : 'inactive';
+            var id = $(this).data('id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You want to update the status!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update status!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ route("colours.bulkStatusUpdate") }}',
+                        type: 'POST',
+                        data: { ids: [id], status: status },
+                        success: function (response) {
+                            Swal.fire(
+                                'Updated!',
+                                'colour status has been updated.',
+                                'success'
+                            );
+                        }
+                    });
+                }
+            });
         });
 
         // Deactivate selected rows

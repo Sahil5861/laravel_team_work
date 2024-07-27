@@ -13,8 +13,15 @@ class ColourController extends Controller
 {
     public function index(Request $request)
     {
+
         if ($request->ajax()) {
-            $data = Colour::latest()->get();
+            $query = Colour::query();
+
+            if ($request->has('status') && $request->status != '') {
+                $query->where('status', $request->status);
+            }
+
+            $data = $query->latest()->get();
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('status', function ($row) {
@@ -135,40 +142,61 @@ class ColourController extends Controller
         return response()->json(['success' => 'Selected Colours have been updated.']);
     }
 
-
-    public function export()
+    public function deleteSelected(Request $request)
     {
-        $response = new StreamedResponse(function () {
-            $spreadsheet = new Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
-
-            // Add headers for CSV
-            $sheet->fromArray(['ID', 'Name', 'Short Name', 'status'], null, 'A1');
-
-            // Fetch products and add to sheet
-            $colors = Colour::all();
-            $colorsData = [];
-            foreach ($colors as $color) {
-                $colorsData[] = [
-                    $color->id,
-                    $color->name,
-                    $color->short_name,
-                    $color->status,
-                ];
-            }
-            $sheet->fromArray($colorsData, null, 'A2');
-
-            // Write CSV to output
-            $writer = new Csv($spreadsheet);
-            $writer->setUseBOM(true);
-            $writer->save('php://output');
-        });
-
-        // Set headers for response
-        $response->headers->set('Content-Type', 'text/csv');
-        $response->headers->set('Content-Disposition', 'attachment; filename="colors.csv"');
-
-        return $response;
+        $selectedColours = $request->input('selected_colors');
+        if (!empty($selectedColours)) {
+            Colour::whereIn('id', $selectedColours)->delete();
+            return response()->json(['success' => true, 'message' => 'Selected colors deleted successfully.']);
+        }
+        return response()->json(['success' => false, 'message' => 'No colors selected for deletion.']);
     }
+
+
+    public function export(Request $request)
+    {
+        try {
+            $status = $request->query('status', null); // Get status from query parameters
+
+            $response = new StreamedResponse(function () use ($status) {
+                $spreadsheet = new Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
+
+                // Add headers for CSV
+                $sheet->fromArray(['ID', 'Name', 'Short Name', 'status'], null, 'A1');
+                // Fetch Colors based on status
+                $query = Colour::query();
+                if ($status !== null) {
+                    $query->where('status', $status);
+                }
+
+                $colors = $query->get();
+                $colorsData = [];
+                foreach ($colors as $color) {
+                    $colorsData[] = [
+                        $color->id,
+                        $color->name,
+                        $color->short_name,
+                        $color->status,
+                    ];
+                }
+                $sheet->fromArray($colorsData, null, 'A2');
+
+                // Write CSV to output
+                $writer = new Csv($spreadsheet);
+                $writer->setUseBOM(true);
+                $writer->save('php://output');
+            });
+
+            // Set headers for response
+            $response->headers->set('Content-Type', 'text/csv');
+            $response->headers->set('Content-Disposition', 'attachment; filename="colors.csv"');
+
+            return $response;
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
 
 }
