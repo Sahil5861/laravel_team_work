@@ -11,6 +11,7 @@ use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\SizeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\DealersController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -127,5 +128,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('admin/products/create', [ProductsController::class, 'store'])->name('admin.products.create.post');
     Route::post('admin/products/edit/{id}', [ProductsController::class, 'store'])->name('admin.products.edit.post');
     Route::delete('admin/products/delete-selected', [ProductsController::class, 'deleteSelected'])->name('admin.products.deleteSelected');
+
+
+    // ------------------------------------Dealers Routes----------------------------------------
+
+    Route::get('admin/dealers', [DealersController::class, 'index'])->name('admin.dealers');
+    Route::get('admin/dealers/create', [DealersController::class, 'create'])->name('admin.dealers.create');
+    Route::post('admin/dealers/create', [DealersController::class, 'store'])->name('admin.dealers.create.post');
+
 
 });
