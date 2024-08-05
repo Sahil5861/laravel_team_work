@@ -22,7 +22,7 @@
                     </div>
                     <div class="card-body">
 
-                        <form action="{{ route('role.update', $role->id) }}" method="POST">
+                        <form action="{{ route('admin.role.edit.post', $role->id) }}" method="POST">
                             @csrf
                             @method('PUT')
                             <div class="mb-3">

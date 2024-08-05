@@ -99,7 +99,7 @@ class BrandController extends Controller
             }
 
             if ($brand->save()) {
-                return redirect()->route('admin.brand')->with('success', 'Brand '.$request->id.' Updated Suuccessfully !!');
+                return redirect()->route('admin.brand')->with('success', 'Brand ' . $request->id . ' Updated Suuccessfully !!');
             } else {
                 return back()->with('error', 'Something went wrong !!');
             }

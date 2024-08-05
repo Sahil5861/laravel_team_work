@@ -21,8 +21,7 @@
                         <h5 class="card-title fw-bold">Add Role</h5>
                     </div>
                     <div class="card-body">
-
-                        <form action="{{ route('role.store') }}" method="POST">
+                        <form action="{{route('admin.role.create.post')}}" method="POST">
                             @csrf
                             <div class="mb-3">
                                 <label for="title" class="form-label">Title</label>
