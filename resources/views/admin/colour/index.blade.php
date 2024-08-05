@@ -237,12 +237,7 @@
 
 
         // Select/Deselect all checkboxes
-        $('#select-all').on('click', function () {
-            var isChecked = this.checked;
-            $('#colour-table .select-row').each(function () {
-                $(this).prop('checked', isChecked);
-            });
-        });
+        
 
         // Delete selected rows
         $('#delete-all').on('click', function () {

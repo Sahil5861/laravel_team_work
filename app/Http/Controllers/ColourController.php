@@ -132,6 +132,23 @@ class ColourController extends Controller
         return response()->json(['success' => 'Selected Colours have been deleted.']);
     }
 
+
+
+    public function updateStatus($id, Request $request){
+        $request->validate([
+            'status' => 'required|boolean',
+        ]);
+        $color = Colour::findOrFail($id);
+        if ($color) {
+            $color->status = $request->status;
+            $color->save();
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false]);
+        }
+
+    }
+
     public function bulkStatusUpdate(Request $request)
     {
         $ids = $request->ids;
@@ -140,16 +157,6 @@ class ColourController extends Controller
         Colour::whereIn('id', $ids)->update(['status' => $status]);
 
         return response()->json(['success' => 'Selected Colours have been updated.']);
-    }
-
-    public function deleteSelected(Request $request)
-    {
-        $selectedColours = $request->input('selected_colors');
-        if (!empty($selectedColours)) {
-            Colour::whereIn('id', $selectedColours)->delete();
-            return response()->json(['success' => true, 'message' => 'Selected colors deleted successfully.']);
-        }
-        return response()->json(['success' => false, 'message' => 'No colors selected for deletion.']);
     }
 
 
