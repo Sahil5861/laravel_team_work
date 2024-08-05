@@ -56,54 +56,55 @@
                     </a>
                     <ul class="nav-group-sub collapse">
                         <li class="nav-item">
-                            <a href="{{ route('role.index') }}" class="nav-link">
+                            <a href="{{ route('admin.role') }}" class="nav-link">
                                 <i class="ph-layout"></i>
                                 <span>Manage Roles</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('colour.index') }}" class="nav-link">
+                            <a href="{{ route('admin.colour') }}" class="nav-link">
                                 <i class="ph-layout"></i>
                                 <span>Manage Colours</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('size.index') }}" class="nav-link">
+                            <a href="{{ route('admin.size') }}" class="nav-link">
                                 <i class="ph-layout"></i>
                                 <span>Manage Sizes</span>
                             </a>
                         </li>
 
-                        {{-- <li class="nav-item nav-item-submenu">
+                        <li class="nav-item nav-item-submenu">
                             <a href="#" class="nav-link">
                                 <i class="ph-layout"></i>
-                                <span>Manage Examples</span>
+                                <span>Dealers</span>
                             </a>
                             <ul class="nav-group-sub collapse">
                                 <li class="nav-item">
-                                    <a href="{{ route('role.index') }}" class="nav-link">
+                                    <a href="{{ route('admin.dealers') }}" class="nav-link">
                                         <i class="ph-layout"></i>
-                                        <span>Example</span>
+                                        <span>Manage Dealers</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                    <a href="{{route('admin.contactPersons')}}" class="nav-link">
                                         <i class="ph-layout"></i>
-                                        <span>Example 2</span>
+                                        <span>Manage contact Persons</span>
                                     </a>
                                 </li>
                             </ul>
-                        </li> --}}
-                        <li class="nav-item">
-                            <a href="{{ route('blogs.index') }}" class="nav-link">
-                                <i class="ph-layout"></i>
-                                <span>Manage Blogs</span>
-                            </a>
                         </li>
+
                         <li class="nav-item">
                             <a href="{{route('admin.brand')}}" class="nav-link">
                                 <i class="ph-layout"></i>
                                 <span>Manage Brands</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{route('admin.plan')}}" class="nav-link">
+                                <i class="ph-layout"></i>
+                                <span>Manage Plans</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -122,6 +123,12 @@
                             <a href="{{route('admin.products')}}" class="nav-link">
                                 <i class="ph-layout"></i>
                                 <span>Manage Product</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('blogs.index') }}" class="nav-link">
+                                <i class="ph-layout"></i>
+                                <span>Manage Blogs</span>
                             </a>
                         </li>
                     </ul>

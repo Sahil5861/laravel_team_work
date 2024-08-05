@@ -6,11 +6,14 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ColourController;
+use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ProductGroupsController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\SizeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\DealersController;
+use App\Http\Controllers\ContactPersonController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -42,26 +45,39 @@ Route::middleware(['auth'])->group(function () {
     Route::post('users/deactivate-selected', [UserController::class, 'deactivateSelected'])->name('users.deactivateSelected');
 
 
-    Route::resource('role', RoleController::class);
-    Route::post('roles/bulk-delete', [RoleController::class, 'bulkDelete'])->name('roles.bulkDelete');
-    Route::post('roles/bulk-status-update', [RoleController::class, 'bulkStatusUpdate'])->name('roles.bulkStatusUpdate');
-    Route::post('role/{id}/toggle-status', [RoleController::class, 'toggleStatus'])->name('role.toggleStatus');
+    Route::get('admin/role', [RoleController::class, 'index'])->name('admin.role');
+    Route::post('admin/role/update-status/{id}', [RoleController::class, 'updateStatus'])->name('admin.role.status');
+    Route::get('admin/role/create', [RoleController::class, 'create'])->name('admin.role.create');
+    Route::get('admin/role/edit/{id}', [RoleController::class, 'edit'])->name('admin.role.edit');
+    Route::get('admin/role/delete/{id}', [RoleController::class, 'remove'])->name('admin.role.delete');
+    Route::post('admin/role/create', [RoleController::class, 'store'])->name('admin.role.create.post');
+    Route::put('admin/role/edit/{id}', [RoleController::class, 'store'])->name('admin.role.edit.post'); // Updated to PUT method
+    Route::delete('admin/role/delete-selected', [RoleController::class, 'deleteSelected'])->name('admin.role.deleteSelected');
+    Route::get('admin/role/export', [RoleController::class, 'export'])->name('admin.role.export');
+    Route::post('admin/role/import', [RoleController::class, 'import'])->name('admin.role.import');
 
 
-    Route::resource('size', SizeController::class);
+    Route::resource('admin/size', SizeController::class);
+    Route::get('admin/size', [SizeController::class, 'index'])->name('admin.size');
     Route::post('admin/sizes/toggle-status/{id}', [SizeController::class, 'toggleStatus'])->name('sizes.toggleStatus');
     Route::post('admin/sizes/bulk-delete', [SizeController::class, 'bulkDelete'])->name('sizes.bulkDelete');
     Route::post('admin/sizes/bulk-status-update', [SizeController::class, 'bulkStatusUpdate'])->name('sizes.bulkStatusUpdate');
+    Route::get('admin/sizes/export', [SizeController::class, 'export'])->name('sizes.export');
+    Route::post('admin/sizes/import', [SizeController::class, 'import'])->name('sizes.import');
+    Route::delete('admin/sizes/delete-selected', [SizeController::class, 'deleteSelected'])->name('admin.sizes.deleteSelected');
+
 
     // -----------------------------------colors Routes--------------------------------------
 
     Route::resource('admin/colour', ColourController::class);
+    Route::get('admin/colour', [ColourController::class, 'index'])->name('admin.colour');
     Route::post('admin/colours/toggle-status/{id}', [ColourController::class, 'toggleStatus'])->name('colours.toggleStatus');
     Route::post('admin/colours/delete-selected', [ColourController::class, 'deleteSelected'])->name('admin.colours.deleteSelected');
     Route::post('admin/colours/bulk-status-update', [ColourController::class, 'bulkStatusUpdate'])->name('colours.bulkStatusUpdate');
     Route::post('admin/colours/update-status/{id}', [ColourController::class, 'updateStatus'])->name('admin.colours.status');
     Route::get('admin/colours/export', [ColourController::class, 'export'])->name('colours.export');
     Route::post('admin/colours/import', [ColourController::class, 'import'])->name('colours.import');
+    Route::post('admin/colours/bulk-delete', [ColourController::class, 'bulkDelete'])->name('colours.bulkDelete');
     Route::delete('admin/colours/delete-selected', [ColourController::class, 'deleteSelected'])->name('admin.colours.deleteSelected');
 
     Route::resource('blogs', BlogController::class);
@@ -100,6 +116,25 @@ Route::middleware(['auth'])->group(function () {
 
 
 
+
+    // --------------------------------------Plans Routes----------------------------------
+
+    Route::get('admin/plan', [PlanController::class, 'index'])->name('admin.plan');
+    Route::post('admin/plan/update-status/{id}', [PlanController::class, 'updateStatus'])->name('admin.plan.status');
+    Route::get('admin/plan/create', [PlanController::class, 'create'])->name('admin.plan.create');
+    Route::get('admin/plan/edit/{id}', [PlanController::class, 'edit'])->name('admin.plan.edit');
+    Route::get('admin/plan/delete/{id}', [PlanController::class, 'remove'])->name('admin.plan.delete');
+    Route::post('admin/plan/create', [PlanController::class, 'store'])->name('admin.plan.create.post');
+    Route::post('admin/plan/edit/{id}', [PlanController::class, 'store'])->name('admin.plan.edit.post');
+    Route::delete('admin/plan/delete-selected', [PlanController::class, 'deleteSelected'])->name('admin.plan.deleteSelected');
+    Route::get('admin/plan/export', [PlanController::class, 'export'])->name('admin.plan.export');
+    Route::post('admin/plan/import', [PlanController::class, 'import'])->name('admin.plan.import');
+
+
+
+
+
+
     // -------------------------------------Product Group Routes---------------------------------
 
     Route::get('admin/group-relation', [ProductGroupsController::class, 'index'])->name('admin.grouprelation');
@@ -124,4 +159,25 @@ Route::middleware(['auth'])->group(function () {
     Route::post('admin/products/edit/{id}', [ProductsController::class, 'store'])->name('admin.products.edit.post');
     Route::delete('admin/products/delete-selected', [ProductsController::class, 'deleteSelected'])->name('admin.products.deleteSelected');
 
+
+    // ------------------------------------Dealers Routes----------------------------------------
+
+    Route::get('admin/dealers', [DealersController::class, 'index'])->name('admin.dealers');
+    Route::post('admin/dealer/update-status/{id}', [DealersController::class, 'updateStatus'])->name('admin.grouprelation.status');
+    Route::get('admin/dealers/create', [DealersController::class, 'create'])->name('admin.dealers.create');
+    Route::get('admin/dealers/edit/{id}', [DealersController::class, 'edit'])->name('admin.dealers.edit');
+    Route::post('admin/dealers/edit/{id}', [DealersController::class, 'store'])->name('admin.dealers.edit.post');
+    Route::post('admin/dealers/create', [DealersController::class, 'store'])->name('admin.dealers.create.post');
+    Route::get('admin/dealers/delete/{id}', [DealersController::class, 'remove'])->name('admin.dealers.delete');
+    Route::delete('admin/dealers/delete-selected', [DealersController::class, 'deleteSelected'])->name('admin.dealers.deleteSelected');
+
+    //-------------------------------------Conatact Persons--------------------------------------
+    
+    Route::get('admin/contact-persons', [ContactPersonController::class, 'index'])->name('admin.contactPersons');
+    Route::get('admin/contact-persons/create', [ContactPersonController::class, 'create'])->name('admin.contactPersons.create');
+    Route::post('admin/dealers/create', [DealersController::class, 'store'])->name('admin.contactPersons.create.post');
+    Route::get('admin/contact-persons/edit/{id}', [ContactPersonController::class, 'edit'])->name('admin.contactPersons.edit');
+    
+
+    Route::delete('admin/contact-persons/delete-selected', [ContactPersonController::class, 'deleteSelected'])->name('admin.contactPersons.deleteSelected');
 });
