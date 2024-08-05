@@ -162,54 +162,50 @@
                 });
 
                 $('#delete-selected').on('click', function () {
-                    var selectedIds = $('.select-row:checked').map(function () {
-                        return this.value;
-                    }).get();
+                var ids = [];
+                $('.select-row:checked').each(function () {
+                    ids.push($(this).val());
+                });
 
-                    if (selectedIds.length > 0) {
-                        Swal.fire({
-                            title: 'Are you sure?',
-                            text: "You won't be able to revert this!",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Yes, delete it!'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                $.ajax({
-                                    url: "{{ route('admin.colours.deleteSelected') }}",
-                                    method: 'DELETE',
-                                    data: { selected_colors: selectedIds },
-                                    success: function (response) {
-                                        ColourTable.ajax.reload(); // Refresh the page
-                                        Swal.fire(
-                                            'Deleted!',
-                                            response.success,
-                                            'success'
-                                        );
-                                    },
-                                    error: function (xhr) {
-                                        Swal.fire(
-                                            'Error!',
-                                            'Something went wrong.',
-                                            'error'
-                                        );
-                                    }
-                                });
+            if (ids.length > 0) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '{{ route("admin.colours.deleteSelected") }}',
+                            method: 'Delete',
+                            data: { ids: ids },
+                            success: function (response) {
+                                ColourTable.ajax.reload();
+                                Swal.fire(
+                                    'Deleted!',
+                                    response.success,
+                                    'success'
+                                );
+                            },
+                            error: function (xhr) {
+                                console.log(xhr.responseText);
                             }
-                        })
-
-
+                        });
                     }
-                    else {
-                        Swal.fire(
-                            'Error!',
-                            'Please select at least one color to delete.',
-                            'error'
-                        );
-                    }
-                })
+                });
+            } else {
+                Swal.fire(
+                    'No Rows Selected',
+                    'Please select at least one colour to delete.',
+                    'warning'
+                );
+            }
+        });
+
+                
 
 
                 $('.status-toggle').on('click', function () {
@@ -240,49 +236,7 @@
         
 
         // Delete selected rows
-        $('#delete-all').on('click', function () {
-            var ids = [];
-            $('.select-row:checked').each(function () {
-                ids.push($(this).val());
-            });
-
-            if (ids.length > 0) {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: '{{ route("colours.bulkDelete") }}',
-                            method: 'POST',
-                            data: { ids: ids },
-                            success: function (response) {
-                                ColourTable.ajax.reload();
-                                Swal.fire(
-                                    'Deleted!',
-                                    response.success,
-                                    'success'
-                                );
-                            },
-                            error: function (xhr) {
-                                console.log(xhr.responseText);
-                            }
-                        });
-                    }
-                });
-            } else {
-                Swal.fire(
-                    'No Rows Selected',
-                    'Please select at least one colour to delete.',
-                    'warning'
-                );
-            }
-        });
+        
 
         // Activate selected rows
         $('#activate-all').on('click', function () {
