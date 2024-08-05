@@ -27,7 +27,7 @@
                         <div class="card-tools text-end"
                             style="display: flex; align-items:center; justify-content: space-between;">
                             <div class="btns">
-                                <a href="{{ route('admin.dealers.create') }}" class="text-dark btn btn-primary">Add
+                                <a href="{{ route('admin.contactPersons.create') }}" class="text-dark btn btn-primary">Add
                                     Conatct Persons</a>
                                 <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
                                 <br><br>
@@ -171,9 +171,9 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: "{{ route('admin.dealers.deleteSelected') }}",
+                                    url: "{{ route('admin.contactPersons.deleteSelected') }}",
                                     method: 'DELETE',
-                                    data: { selected_dealers: selectedIds },
+                                    data: { selected_persons: selectedIds },
                                     success: function (response) {
                                         BrandTable.ajax.reload(); // Refresh the page
                                         Swal.fire(

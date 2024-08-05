@@ -133,7 +133,7 @@
                         return '<input type="checkbox" class="select-row" value="' + row.id + '">';
                     }
                 },
-                { data: 'DT_RowIndex', name: 'DT_RowIndex' },
+                { data: 'id', name: 'id' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
                 { data: 'business_name', name: 'business_name' },
                 { data: 'business_email', name: 'business_email' },
@@ -147,7 +147,7 @@
                         return 'Not Provided'
                     }
                     else {
-                        return row.contact_person_id;
+                        return row.contact_person.name;
                     } 
                 }
                     

@@ -12,6 +12,10 @@ class DealersController extends Controller
 {
     public function index(Request $request)
     {
+        // $query = Dealer::query();
+        // $data = $query->latest()->with('ContactPerson')->get();
+        //     dd($data);
+        //     exit;
         if ($request->ajax()) {
             $query = Dealer::query();
 
@@ -19,8 +23,7 @@ class DealersController extends Controller
                 $query->where('status', $request->status);
             }
 
-            $data = $query->latest()->get();
-
+            $data = $query->latest()->with('ContactPerson');
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('status', function ($row) {
@@ -160,7 +163,7 @@ class DealersController extends Controller
     {
         $selectedDealers = $request->input('selected_dealers');
         if (!empty($selectedDealers)) {
-            Brand::whereIn('id', $selectedDealers)->delete();
+            Dealer::whereIn('id', $selectedDealers)->delete();
             return response()->json(['success' => true, 'message' => 'Selected Dealers deleted successfully.']);
         }
         return response()->json(['success' => false, 'message' => 'No Dealers selected for deletion.']);

@@ -25,6 +25,7 @@
 </head>
 
 <body>
+    @include('layout.header')
 
     {{-- @include('layout.header')
     @if(session('success'))

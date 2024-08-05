@@ -145,7 +145,9 @@ Route::middleware(['auth'])->group(function () {
     //-------------------------------------Conatact Persons--------------------------------------
     
     Route::get('admin/contact-persons', [ContactPersonController::class, 'index'])->name('admin.contactPersons');
+    Route::get('admin/contact-persons/create', [ContactPersonController::class, 'create'])->name('admin.contactPersons.create');
+    Route::get('admin/contact-persons/edit/{id}', [ContactPersonController::class, 'edit'])->name('admin.contactPersons.edit');
     
 
-
+    Route::delete('admin/contact-persons/delete-selected', [ContactPersonController::class, 'deleteSelected'])->name('admin.contactPersons.deleteSelected');
 });
