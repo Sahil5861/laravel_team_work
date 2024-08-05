@@ -85,26 +85,21 @@ class ContactPersonController extends Controller
             $person->designatin = $request->input('designatin');
 
             if ($person->save()) {
-                return redirect()->route('admin.dealers')->with('success', 'Dealer '.$request->id.' Updated Suuccessfully !!');
+                return redirect()->route('admin.contactPersons')->with('success', 'Person '.$request->id.' Updated Suuccessfully !!');
             } else {
                 return back()->with('error', 'Something went wrong !!');
             }
         } else {
 
-            $dealer = new Dealer();
+            $person = new ContactPerson();
 
-            $dealer->business_name = $request->input('name');
-            $dealer->business_email = $request->input('email');
-            $dealer->phone_number = $request->input('phone');
-            $dealer->contact_person_id = $request->input('contact_person_id');
-            $dealer->city = $request->input('city');
-            $dealer->state = $request->input('state');
-            $dealer->country = $request->input('country');
-            $dealer->authenticated = $request->input('authenticated');
-            $dealer->GST_number = $request->input('gst_no');
+            $person->name = $request->input('name');
+            $person->email = $request->input('email');
+            $person->phone = $request->input('phone');
+            $person->designatin = $request->input('designatin');
 
-            if ($dealer->save()) {
-                return redirect()->route('admin.dealers')->with('success', 'Dealer added Suuccessfully !!');
+            if ($person->save()) {
+                return redirect()->route('admin.contactPersons')->with('success', 'Person added Suuccessfully !!');
             } else {
                 return back()->with('error', 'Something went wrong !!');
             }

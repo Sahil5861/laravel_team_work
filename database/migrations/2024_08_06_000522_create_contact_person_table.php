@@ -13,9 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('dealers', function (Blueprint $table) {
-            //
-            $table->foreignId('contact_person_id')->nullable()->constrained('ContactPerson')->onDelete('cascade');
+        Schema::create('contact_person', function (Blueprint $table) {
+            $table->id();
+            $table->boolean('status')->default(false); // true represents "active", false represents "inactive"
+            $table->timestamps();
         });
     }
 
@@ -26,8 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('dealers', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('contact_person');
     }
 };

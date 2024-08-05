@@ -174,8 +174,9 @@ Route::middleware(['auth'])->group(function () {
     //-------------------------------------Conatact Persons--------------------------------------
     
     Route::get('admin/contact-persons', [ContactPersonController::class, 'index'])->name('admin.contactPersons');
+    Route::post('admin/contact-persons/update-status/{id}', [ContactPersonController::class, 'updateStatus'])->name('admin.contactPersons.status');
     Route::get('admin/contact-persons/create', [ContactPersonController::class, 'create'])->name('admin.contactPersons.create');
-    Route::post('admin/dealers/create', [DealersController::class, 'store'])->name('admin.contactPersons.create.post');
+    Route::post('admin/contact-persons/create', [DealersController::class, 'store'])->name('admin.contactPersons.create.post');
     Route::get('admin/contact-persons/edit/{id}', [ContactPersonController::class, 'edit'])->name('admin.contactPersons.edit');
     
 

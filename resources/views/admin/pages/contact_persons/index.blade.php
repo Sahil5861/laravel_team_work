@@ -204,9 +204,9 @@
                     }
                 })
                 $('.status-toggle').on('click', function () {
-                    var dealerId = $(this).data('id');
+                    var conatctPersonId = $(this).data('id');
                     var status = $(this).is(':checked') ? 1 : 0;
-                    updateStatus(dealerId, status);
+                    updateStatus(conatctPersonId, status);
                 });
             }
 
@@ -230,9 +230,9 @@
         });
 
 
-        function updateStatus(brandId, status) {
+        function updateStatus(conatctPersonId, status) {
             $.ajax({
-                url: `{{ url('admin/dealer/update-status') }}/${brandId}`,
+                url: `{{ url('admin/contact-persons/update-status') }}/${conatctPersonId}`,
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
