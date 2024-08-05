@@ -74,6 +74,7 @@ class ContactPersonController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'phone' => 'required|string|max:20',
+            'designatin' => 'required|string',
 
         ]);
         if (!empty($request->id)) {

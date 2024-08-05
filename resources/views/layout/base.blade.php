@@ -26,10 +26,6 @@
 
 <body>
     @include('layout.header')
-<<<<<<< HEAD
-
-=======
->>>>>>> bdff5abec128c17352c3887e9b617f6905d840e2
     {{-- @include('layout.header')
     @if(session('success'))
     <div class="alert alert-success">

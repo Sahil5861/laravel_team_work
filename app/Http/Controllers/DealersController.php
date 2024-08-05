@@ -23,7 +23,7 @@ class DealersController extends Controller
                 $query->where('status', $request->status);
             }
 
-            $data = $query->latest()->with('ContactPerson');
+            $data = $query->latest()->with('ContactPerson')->get();
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('status', function ($row) {

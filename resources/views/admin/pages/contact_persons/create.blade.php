@@ -33,7 +33,7 @@
                             </div>
                             <div class="collapse show">
                                 <div class="card-body">
-                                    <form action="{{route('admin.dealers.create.post')}}" method="POST" enctype="multipart/form-data">
+                                    <form action="{{route('admin.contactPersons.create.post')}}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <div class="row mb-3">
                                             <div class="col-lg-6">
