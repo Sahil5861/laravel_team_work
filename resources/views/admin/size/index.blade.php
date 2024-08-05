@@ -25,11 +25,30 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title">Size</h5>
-                        <div class="card-tools text-end">
-                            <button id="delete-all" class="btn btn-danger delete-button">Delete All</button>
-                            <button id="activate-all" class="btn btn-success">Activate Selected</button>
-                            <button id="deactivate-all" class="btn btn-warning">Deactivate Selected</button>
-                            <a href="{{ route('size.create') }}" class="btn btn-primary">Add Size</a>
+                        <div class="card-tools text-end"
+                            style="display: flex; align-items:center; justify-content: space-between;">
+                            <div class="btns">
+                                <a href="{{ route('size.create') }}" class="text-dark btn btn-primary">Add
+                                Size</a>
+                                <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
+                                <br><br>
+                                <select name="status" id="status" class="form-control">
+                                    <option value="">All</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="dropdown">
+                                <a href="#" class="text-body" data-bs-toggle="dropdown">
+                                    <i class="ph-list"></i>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <a href="#" class="dropdown-item" data-toggle="modal"
+                                        data-target="#importModal">Import Sizes</a>
+                                    <a href="#" class="dropdown-item" id="export-sizes">Export Sizes</a>
+
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -62,6 +81,34 @@
     </div>
 </div>
 
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Import sizes</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="importForm" action="{{route('sizes.import')}}" method="POST"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <div class="form-group">
+                        <label for="csv_file">Select CSV File</label>
+                        <input type="file" name="csv_file" class="form-control" required value="{{old('csv_file')}}">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="submit" form="importForm" class="btn btn-primary">Import</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -74,10 +121,15 @@
 
     $(document).ready(function () {
         // Initialize DataTable
-        var sizeTable = $('#size-table').DataTable({
+        var SizeTable = $('#size-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('size.index') }}",
+            ajax: {
+                url: "{{ route('admin.size') }}",
+                data: function (d) {
+                    d.status = $('#status').val();
+                }
+            },
             columns: [
                 {
                     data: null,
@@ -96,7 +148,88 @@
                 { data: 'status', name: 'status' },
             ],
             order: [[1, 'asc']],
+            drawCallback: function (settings) {
+                $('#select-all').on('click', function () {
+                    var isChecked = this.checked;
+                    $('#size-table .select-row').each(function () {
+                        $(this).prop('checked', isChecked);
+                    });
+                });
+
+                $('#delete-selected').on('click', function () {
+                    var selectedIds = $('.select-row:checked').map(function () {
+                        return this.value;
+                    }).get();
+
+                    if (selectedIds.length > 0) {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonSize: '#3085d6',
+                            cancelButtonSize: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "{{ route('admin.sizes.deleteSelected') }}",
+                                    method: 'DELETE',
+                                    data: { selected_sizes: selectedIds },
+                                    success: function (response) {
+                                        SizeTable.ajax.reload(); // Refresh the page
+                                        Swal.fire(
+                                            'Deleted!',
+                                            response.success,
+                                            'success'
+                                        );
+                                    },
+                                    error: function (xhr) {
+                                        Swal.fire(
+                                            'Error!',
+                                            'Something went wrong.',
+                                            'error'
+                                        );
+                                    }
+                                });
+                            }
+                        })
+
+
+                    }
+                    else {
+                        Swal.fire(
+                            'Error!',
+                            'Please select at least one size to delete.',
+                            'error'
+                        );
+                    }
+                })
+
+
+                $('.status-toggle').on('click', function () {
+                    var SizeId = $(this).data('id');
+                    var status = $(this).is(':checked') ? 1 : 0;
+                    updateStatus(SizeId, status);
+                });
+            }
         });
+
+        $('#status').on('change', function () {
+            SizeTable.ajax.reload();
+        });
+
+        $(document).ready(function () {
+            $('#export-sizes').on('click', function () {
+                var status = $('#status').val();
+                var url = "{{ route('sizes.export') }}";
+                if (status) {
+                    url += "?status=" + status;
+                }
+                window.location.href = url;
+            });
+        });
+
 
         // Select/Deselect all checkboxes
         $('#select-all').on('click', function () {
@@ -119,8 +252,8 @@
                     text: "You won't be able to revert this!",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
+                    confirmButtonSize: '#3085d6',
+                    cancelButtonSize: '#d33',
                     confirmButtonText: 'Yes, delete it!'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -129,7 +262,7 @@
                             method: 'POST',
                             data: { ids: ids },
                             success: function (response) {
-                                sizeTable.ajax.reload();
+                                SizeTable.ajax.reload();
                                 Swal.fire(
                                     'Deleted!',
                                     response.success,
@@ -164,7 +297,7 @@
                     method: 'POST',
                     data: { ids: ids, status: 'active' },
                     success: function (response) {
-                        sizeTable.ajax.reload();
+                        SizeTable.ajax.reload();
                         Swal.fire(
                             'Activated!',
                             response.success,
@@ -184,6 +317,36 @@
             }
         });
 
+        $(document).on('change', '.status-toggle', function () {
+            var status = $(this).is(':checked') ? 'active' : 'inactive';
+            var id = $(this).data('id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You want to update the status!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonSize: '#3085d6',
+                cancelButtonSize: '#d33',
+                confirmButtonText: 'Yes, update status!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ route("sizes.bulkStatusUpdate") }}',
+                        type: 'POST',
+                        data: { ids: [id], status: status },
+                        success: function (response) {
+                            Swal.fire(
+                                'Updated!',
+                                'size status has been updated.',
+                                'success'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+
         // Deactivate selected rows
         $('#deactivate-all').on('click', function () {
             var ids = [];
@@ -197,7 +360,7 @@
                     method: 'POST',
                     data: { ids: ids, status: 'inactive' },
                     success: function (response) {
-                        sizeTable.ajax.reload();
+                        SizeTable.ajax.reload();
                         Swal.fire(
                             'Deactivated!',
                             response.success,

@@ -130,7 +130,7 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: "{{ route('colour.index') }}",
+                url: "{{ route('admin.colour') }}",
                 data: function (d) {
                     d.status = $('#status').val();
                 }

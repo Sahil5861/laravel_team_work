@@ -153,6 +153,37 @@ class ColourController extends Controller
     }
 
 
+
+    public function import(Request $request)
+    {
+        $validate = $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt',
+        ]);
+        if ($validate == false) {
+            return redirect()->back();
+        }
+        $file = $request->file('csv_file');
+        $path = $file->getRealPath();
+        if (($handle = fopen($path, 'r')) !== false) {
+            $header = fgetcsv($handle, 1000, ','); // Skip the header row
+
+            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+                Colour::create([
+                    'id' => $data[0],
+                    'name' => $data[1],
+                    'short_name' => $data[2],
+                ]);
+            }
+
+            fclose($handle);
+        }
+
+        return redirect()->route('admin.colour')->with('success', 'Colour imported successfully.');
+
+    }
+
+
+
     public function export(Request $request)
     {
         try {

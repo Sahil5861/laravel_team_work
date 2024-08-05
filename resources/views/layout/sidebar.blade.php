@@ -62,13 +62,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('colour.index') }}" class="nav-link">
+                            <a href="{{ route('admin.colour') }}" class="nav-link">
                                 <i class="ph-layout"></i>
                                 <span>Manage Colours</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('size.index') }}" class="nav-link">
+                            <a href="{{ route('admin.size') }}" class="nav-link">
                                 <i class="ph-layout"></i>
                                 <span>Manage Sizes</span>
                             </a>
