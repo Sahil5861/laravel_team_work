@@ -87,7 +87,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                    <a href="{{route('admin.contactPersons')}}" class="nav-link">
                                         <i class="ph-layout"></i>
                                         <span>Manage contact Persons</span>
                                     </a>

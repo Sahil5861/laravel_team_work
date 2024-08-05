@@ -40,10 +40,10 @@ class DealersController extends Controller
                                         <i class="ph-list"></i>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-end">
-                                        <a href="' . route('admin.brand.edit', $row->id) . '" class="dropdown-item">
+                                        <a href="' . route('admin.dealers.edit', $row->id) . '" class="dropdown-item">
                                             <i class="ph-pencil me-2"></i>Edit
                                         </a>
-                                        <a href="' . route('admin.brand.delete', $row->id) . '" data-id="' . $row->id . '" class="dropdown-item delete-button">
+                                        <a href="' . route('admin.dealers.delete', $row->id) . '" data-id="' . $row->id . '" class="dropdown-item delete-button">
                                             <i class="ph-trash me-2"></i>Delete
                                         </a>
                                     </div>
@@ -64,7 +64,12 @@ class DealersController extends Controller
     }
 
 
-
+    public function edit($id)
+    {
+        $dealer = Dealer::find($id);
+        $contactPersons = ContactPerson::all();
+        return view('admin.pages.dealers.edit', compact('dealer', 'contactPersons'));
+    }
 
 
     public function store(Request $request)
@@ -81,7 +86,7 @@ class DealersController extends Controller
             'country' => 'required|string|max:100',
             'contact_person_id' => 'nullable|max:6',
             'authenticated' => 'required',
-            'GST_number' => 'nullable|string|max:15',
+            'gst_no' => 'nullable|string|max:15',
         ]);
         if (!empty($request->id)) {
             $dealer = Dealer::firstwhere('id', $request->id);
@@ -93,7 +98,7 @@ class DealersController extends Controller
             $dealer->state = $request->input('state');
             $dealer->country = $request->input('country');
             $dealer->authenticated = $request->input('authenticated');
-            $dealer->GST_number = $request->input('GST_number');
+            $dealer->GST_number = $request->input('gst_no');
 
             if ($dealer->save()) {
                 return redirect()->route('admin.dealers')->with('success', 'Dealer '.$request->id.' Updated Suuccessfully !!');
@@ -112,7 +117,7 @@ class DealersController extends Controller
             $dealer->state = $request->input('state');
             $dealer->country = $request->input('country');
             $dealer->authenticated = $request->input('authenticated');
-            $dealer->GST_number = $request->input('GST_number');
+            $dealer->GST_number = $request->input('gst_no');
 
             if ($dealer->save()) {
                 return redirect()->route('admin.dealers')->with('success', 'Dealer added Suuccessfully !!');
@@ -120,6 +125,45 @@ class DealersController extends Controller
                 return back()->with('error', 'Something went wrong !!');
             }
         }
+    }
+
+
+    public function updateStatus($id, Request $request)
+    {
+        $request->validate([
+            'status' => 'required|boolean',
+        ]);
+
+        $dealer = Dealer::findOrFail($id);
+        if ($dealer) {
+            $dealer->status = $request->status;
+            $dealer->save();
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false]);
+        }
+
+    }
+
+    public function remove(Request $request, $id)
+    {
+        $dealer = Dealer::firstwhere('id', $request->id);
+
+        if ($dealer->delete()) {
+            return back()->with('success', 'Dealer deleted Suuccessfully !!');
+        } else {
+            return back()->with('error', 'Something went wrong !!');
+        }
+    }
+
+    public function deleteSelected(Request $request)
+    {
+        $selectedDealers = $request->input('selected_dealers');
+        if (!empty($selectedDealers)) {
+            Brand::whereIn('id', $selectedDealers)->delete();
+            return response()->json(['success' => true, 'message' => 'Selected Dealers deleted successfully.']);
+        }
+        return response()->json(['success' => false, 'message' => 'No Dealers selected for deletion.']);
     }
 
 }

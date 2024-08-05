@@ -9,7 +9,7 @@
                 <div class="page-header-content d-lg-flex">
                     <div class="d-flex">
                         <h4 class="page-title mb-0">
-                            Dashboard - <span class="fw-normal">Dealers</span>
+                            Dashboard - <span class="fw-normal">Conatct Persons</span>
                         </h4>
                         <a href="#page_header"
                             class="btn btn-light align-self-center collapsed d-lg-none border-transparent rounded-pill p-0 ms-auto"
@@ -23,12 +23,12 @@
             <div class="content">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title">Dealers</h5>
+                        <h5 class="card-title">Conatct Persons</h5>
                         <div class="card-tools text-end"
                             style="display: flex; align-items:center; justify-content: space-between;">
                             <div class="btns">
                                 <a href="{{ route('admin.dealers.create') }}" class="text-dark btn btn-primary">Add
-                                    Dealers</a>
+                                    Conatct Persons</a>
                                 <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
                                 <br><br>
                                 <select name="status" id="status" class="form-control">
@@ -43,8 +43,8 @@
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a href="#" class="dropdown-item" data-toggle="modal"
-                                        data-target="#importModal">Import Dealers</a>
-                                    <a href="#" class="dropdown-item" id="export-brands">Export Dealers</a>
+                                        data-target="#importModal">Import Contact Persons</a>
+                                    <a href="#" class="dropdown-item" id="export-brands">Export Contact Persons</a>
 
                                 </div>
                             </div>
@@ -56,20 +56,18 @@
                             <div class="alert alert-success">{{ session('success') }}</div>
                         @endif
                         <div class="table-responsive">
-                            <table class="table table-bordered text-center" id="dealers-table">
+                            <table class="table table-bordered text-center" id="persons-table">
                                 <thead>
                                     <tr>
                                         <th><input type="checkbox" id="select-all"></th>
                                         <th>ID</th>
-                                        <th>Actions</th>
-                                        <th>Dealers Name</th>
-                                        <th>Dealers Email</th>
-                                        <th>Dealers Phone</th>
-                                        <th>Address</th>
-                                        <th>Conatct Person</th>
-                                        <th>Is Authorized</th>
-                                        <th>GST Number</th>
+                                        <th>Action</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Designation</th>
+                                        <th>Phone</th>
                                         <th>Status</th>
+                                        <th>Is Primary</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -114,11 +112,11 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
-        var dealersTable = $('#dealers-table').DataTable({
+        var personsTable = $('#persons-table').DataTable({
             processing: true,
             serverSide: true,
             ajax: {
-                url: "{{ route('admin.dealers') }}",
+                url: "{{ route('admin.contactPersons') }}",
                 data: function (d) {
                     d.status = $('#status').val();
                 }
@@ -135,34 +133,16 @@
                 },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
-                { data: 'business_name', name: 'business_name' },
-                { data: 'business_email', name: 'business_email' },
-                { data: 'phone_number', name: 'phone_number' },
-                {data : 'address', 'name' : 'address', render:function (data, type, row){
-                    return row.city + ', ' + row.state + ', ' + row.country;
-                }},
-                { data: 'contact_person_id', name: 'contact_person_id',
-                 render: function (data, type, row){
-                    if (row.contact_person_id == null) {
-                        return 'Not Provided'
-                    }
-                    else {
-                        return row.contact_person_id;
-                    } 
-                }
-                    
-                },
-                { data: 'authenticated', name: 'authenticated', render: function (data, type, row){
-                    if(data == 1){
-                        return 'Yes';
-                    } 
-                    else{
-                        return 'No';
-                    }
-
-                }},
-                {data: 'GST_number', name: 'GST_number'},
+                { data: 'name', name: 'name' },
+                { data: 'email', name: 'email' },
+                {data: 'designation', name: 'designation'},
+                { data: 'phone', name: 'phone' },
                 { data: 'status', name: 'status' },
+                {data: 'is_primary', name: 'is_primary',
+                    render:function (data, type, row){
+                        return data == '1'? 'yes':'no'
+                    }
+                },
             ],
 
             order: [[1, 'asc']],

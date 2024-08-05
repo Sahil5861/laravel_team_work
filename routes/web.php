@@ -12,6 +12,7 @@ use App\Http\Controllers\SizeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\DealersController;
+use App\Http\Controllers\ContactPersonController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -133,8 +134,18 @@ Route::middleware(['auth'])->group(function () {
     // ------------------------------------Dealers Routes----------------------------------------
 
     Route::get('admin/dealers', [DealersController::class, 'index'])->name('admin.dealers');
+    Route::post('admin/dealer/update-status/{id}', [DealersController::class, 'updateStatus'])->name('admin.grouprelation.status');
     Route::get('admin/dealers/create', [DealersController::class, 'create'])->name('admin.dealers.create');
+    Route::get('admin/dealers/edit/{id}', [DealersController::class, 'edit'])->name('admin.dealers.edit');
+    Route::post('admin/dealers/edit/{id}', [DealersController::class, 'store'])->name('admin.dealers.edit.post');
     Route::post('admin/dealers/create', [DealersController::class, 'store'])->name('admin.dealers.create.post');
+    Route::get('admin/dealers/delete/{id}', [DealersController::class, 'remove'])->name('admin.dealers.delete');
+    Route::delete('admin/dealers/delete-selected', [DealersController::class, 'deleteSelected'])->name('admin.dealers.deleteSelected');
+
+    //-------------------------------------Conatact Persons--------------------------------------
+    
+    Route::get('admin/contact-persons', [ContactPersonController::class, 'index'])->name('admin.contactPersons');
+    
 
 
 });
