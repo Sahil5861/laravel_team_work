@@ -6,6 +6,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ColourController;
+use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ProductGroupsController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\SizeController;
@@ -42,10 +43,16 @@ Route::middleware(['auth'])->group(function () {
     Route::post('users/deactivate-selected', [UserController::class, 'deactivateSelected'])->name('users.deactivateSelected');
 
 
-    Route::resource('role', RoleController::class);
-    Route::post('roles/bulk-delete', [RoleController::class, 'bulkDelete'])->name('roles.bulkDelete');
-    Route::post('roles/bulk-status-update', [RoleController::class, 'bulkStatusUpdate'])->name('roles.bulkStatusUpdate');
-    Route::post('role/{id}/toggle-status', [RoleController::class, 'toggleStatus'])->name('role.toggleStatus');
+    Route::get('admin/role', [RoleController::class, 'index'])->name('admin.role');
+    Route::post('admin/role/update-status/{id}', [RoleController::class, 'updateStatus'])->name('admin.role.status');
+    Route::get('admin/role/create', [RoleController::class, 'create'])->name('admin.role.create');
+    Route::get('admin/role/edit/{id}', [RoleController::class, 'edit'])->name('admin.role.edit');
+    Route::get('admin/role/delete/{id}', [RoleController::class, 'remove'])->name('admin.role.delete');
+    Route::post('admin/role/create', [RoleController::class, 'store'])->name('admin.role.create.post');
+    Route::put('admin/role/edit/{id}', [RoleController::class, 'store'])->name('admin.role.edit.post'); // Updated to PUT method
+    Route::delete('admin/role/delete-selected', [RoleController::class, 'deleteSelected'])->name('admin.role.deleteSelected');
+    Route::get('admin/role/export', [RoleController::class, 'export'])->name('admin.role.export');
+    Route::post('admin/role/import', [RoleController::class, 'import'])->name('admin.role.import');
 
 
     Route::resource('admin/size', SizeController::class);
@@ -56,6 +63,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/sizes/export', [SizeController::class, 'export'])->name('sizes.export');
     Route::post('admin/sizes/import', [SizeController::class, 'import'])->name('sizes.import');
     Route::delete('admin/sizes/delete-selected', [SizeController::class, 'deleteSelected'])->name('admin.sizes.deleteSelected');
+
+
     // -----------------------------------colors Routes--------------------------------------
 
     Route::resource('admin/colour', ColourController::class);
@@ -66,6 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('admin/colours/update-status/{id}', [ColourController::class, 'updateStatus'])->name('admin.colours.status');
     Route::get('admin/colours/export', [ColourController::class, 'export'])->name('colours.export');
     Route::post('admin/colours/import', [ColourController::class, 'import'])->name('colours.import');
+    Route::post('admin/colours/bulk-delete', [ColourController::class, 'bulkDelete'])->name('colours.bulkDelete');
     Route::delete('admin/colours/delete-selected', [ColourController::class, 'deleteSelected'])->name('admin.colours.deleteSelected');
 
     Route::resource('blogs', BlogController::class);
@@ -101,6 +111,25 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('admin/brand/delete-selected', [BrandController::class, 'deleteSelected'])->name('admin.brand.deleteSelected');
     Route::get('admin/brand/export', [BrandController::class, 'export'])->name('admin.brand.export');
     Route::post('admin/brand/import', [BrandController::class, 'import'])->name('admin.brand.import');
+
+
+
+
+    // --------------------------------------Plans Routes----------------------------------
+
+    Route::get('admin/plan', [PlanController::class, 'index'])->name('admin.plan');
+    Route::post('admin/plan/update-status/{id}', [PlanController::class, 'updateStatus'])->name('admin.plan.status');
+    Route::get('admin/plan/create', [PlanController::class, 'create'])->name('admin.plan.create');
+    Route::get('admin/plan/edit/{id}', [PlanController::class, 'edit'])->name('admin.plan.edit');
+    Route::get('admin/plan/delete/{id}', [PlanController::class, 'remove'])->name('admin.plan.delete');
+    Route::post('admin/plan/create', [PlanController::class, 'store'])->name('admin.plan.create.post');
+    Route::post('admin/plan/edit/{id}', [PlanController::class, 'store'])->name('admin.plan.edit.post');
+    Route::delete('admin/plan/delete-selected', [PlanController::class, 'deleteSelected'])->name('admin.plan.deleteSelected');
+    Route::get('admin/plan/export', [PlanController::class, 'export'])->name('admin.plan.export');
+    Route::post('admin/plan/import', [PlanController::class, 'import'])->name('admin.plan.import');
+
+
+
 
 
 

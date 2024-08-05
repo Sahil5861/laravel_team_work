@@ -20,29 +20,29 @@
 
     <!-- /global stylesheets -->
     <style>
-        
+
     </style>
 </head>
 
 <body>
-
+    @include('layout.header')
     {{-- @include('layout.header')
     @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-        <script>
-            alert("{{ session('success') }}");
-        </script>
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+    <script>
+        alert("{{ session('success') }}");
+    </script>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
-        </div>
-        <script>
-            alert("{{ session('error') }}");
-        </script>
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+    <script>
+        alert("{{ session('error') }}");
+    </script>
     @endif --}}
     @yield('content')
 
@@ -147,7 +147,7 @@
             });
 
 
-         
+
         });
     </script>
 
