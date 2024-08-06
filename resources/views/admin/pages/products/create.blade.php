@@ -9,126 +9,128 @@
                 <div class="page-header-content d-lg-flex">
                     <div class="d-flex">
                         <h4 class="page-title mb-0">
-                            Dashboard - <span class="fw-normal">Products</span>
+                            Dashboard - <span class="fw-normal">Add Product</span>
                         </h4>
-                        <a href="#page_header"
-                            class="btn btn-light align-self-center collapsed d-lg-none border-transparent rounded-pill p-0 ms-auto"
-                            data-bs-toggle="collapse">
-                            <i class="ph-caret-down collapsible-indicator ph-sm m-1"></i>
-                        </a>
                     </div>
                 </div>
             </div>
 
             <div class="content">
-                <h3></h3>
-                <div class="row">
-                    <div class="col-lg-12">
-                        {{--  Form --}}
-                        <div class="card">
-                            <div class="card-header d-flex align-items-center">
-                                <h5 class="mb-0">Add New Product </h5>
-                                <div class="hstack gap-2 ms-auto">
-                                    <a href="{{route('admin.products')}}" class="text-dark btn btn-dark">Back</a>                
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title fw-bold">Add Product</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ route('admin.product.create.post') }}" method="POST"
+                            enctype="multipart/form-data">
+                            @csrf
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Name</label>
+                                        <input type="text" name="name" id="name" class="form-control"
+                                            value="{{ old('name') }}">
+                                        @error('name')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="price" class="form-label">Price</label>
+                                        <input type="number" step="0.01" name="price" id="price" class="form-control"
+                                            value="{{ old('price') }}">
+                                        @error('price')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="image" class="form-label">Image</label>
+                                        <input type="file" name="image" id="image" class="form-control">
+                                        @error('image')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">Description</label>
+                                        <textarea name="description" id="description"
+                                            class="form-control">{{ old('description') }}</textarea>
+                                        @error('description')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 border-left">
+                                    <div class="mb-3">
+                                        <label for="category_id" class="form-label">Category</label>
+                                        <select name="category_id" id="category_id" class="form-control">
+                                            <option value="">Select Category</option>
+                                            @foreach($categories as $category)
+                                                <option value="{{ $category->id }}">{{ $category->category_name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('category_id')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+
+                                    <div class="mb-3">
+                                        <label for="brand_id" class="form-label">Brand</label>
+                                        <select name="brand_id" id="brand_id" class="form-control">
+                                        <option value="">Select Brand</option>
+                                            @foreach($brands as $brand)
+                                                <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('brand_id')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="product_group_id" class="form-label">Product Group</label>
+                                        <select name="product_group_id" id="product_group_id" class="form-control">
+                                        <option value="">Select Product Group</option>
+                                            @foreach($productGroups as $group)
+                                                <option value="{{ $group->id }}">{{ $group->products_group_name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('product_group_id')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="offer_price" class="form-label">Offer Price</label>
+                                        <input type="number" step="0.01" name="offer_price" id="offer_price"
+                                            class="form-control" value="{{ old('offer_price') }}">
+                                        @error('offer_price')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="offer_expiry" class="form-label">Offer Expiry</label>
+                                        <input type="date" name="offer_expiry" id="offer_expiry" class="form-control"
+                                            value="{{ old('offer_expiry') }}">
+                                        @error('offer_expiry')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
                                 </div>
                             </div>
-            
-                            <div class="collapse show">
-                                <div class="card-body">
-                                    <form action="{{route('admin.products.create.post')}}" method="POST" enctype="multipart/form-data">
-                                        @csrf
-                                        <div class="row mb-3">
-                                            <div class="col-lg-6">
-                                                <input type="text" id="name" name="name" class="form-control" placeholder="Enter Product Name"value="{{old('name')}}"  autofocus>
-                                                <span>
-                                                    @error('name')
-                                                    <span class="text-danger">{{$message}}</span>
-                                                    @enderror
-                                                </span>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <input type="file" id="image" name="image" class="form-control" placeholder="Choose Image" value="{{old('image')}}">
-                                                <span>
-                                                    @error('image')
-                                                    <span class="text-danger">{{$message}}</span>
-                                                    @enderror
-                                                </span>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <input type="text" name="amount" id="amount"  class="form-control" placeholder="Product Price" value="{{old('amount')}}">
-                                                <span>
-                                                    @error('amount')
-                                                    <span class="text-danger">{{$message}}</span>
-                                                    @enderror
-                                                </span>
-                                            </div>
-                                            
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-lg-4">
-                                                <select name="brand" id="brand" class="form-control">
-                                                    <option value="">Select Brand Name</option>
-                                                    @foreach ($brands as $brand)
-                                                        <option value="{{$brand->id}}" {{old('brand') == $brand->id ? 'selected' : ''}}>{{$brand->brand_name}}</option>
-                                                    @endforeach
-                                                </select>
-                                                <span>
-                                                    @error('brand')
-                                                    <span class="text-danger">{{$message}}</span>
-                                                    @enderror
-                                                </span>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <select name="category" id="category" class="form-control">
-                                                    <option value="">Select Category Name</option>
-                                                    @foreach ($categories as $category)
-                                                        <option value="{{$category->id}}" {{old('category') == $category->id ? 'selected':''}}>{{$category->category_name}}</option>
-                                                    @endforeach
-                                                </select>
-                                                <span>
-                                                    @error('category')
-                                                    <span class="text-danger">{{$message}}</span>
-                                                    @enderror
-                                                </span>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <select name="product_group" id="product_group" class="form-control">
-                                                    <option value="">Select Product Group Name</option>
-                                                    @foreach ($productgroups as $productgroup)
-                                                        <option value="{{$productgroup->id}}" {{old('product_group') == $productgroup->id ? 'selected':''}}>{{$productgroup->products_group_name}}</option>
-                                                    @endforeach
-                                                </select>
-                                                <span>
-                                                    @error('product_group')
-                                                    <span class="text-danger">{{$message}}</span>
-                                                    @enderror
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-lg-12">
-                                                <textarea name="desc" id="desc" cols="10" rows="5" class="form-control" placeholder="Product Description"></textarea>
-                                            </div>
-                                            @error('desc')
-                                                <span class="text-danger">{{$message}}</span>
-                                            @enderror
-                                        </div>
-                                            <div class=" col-lg-4">
-                                                <button type="submit" class="btn btn-primary">Create </button>
-                                            </div>
-            
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
+
+
+                            <button type="submit" class="btn btn-primary">Add Product</button>
+                        </form>
                     </div>
                 </div>
             </div>
-
-
-
-
         </div>
     </div>
 </div>
+
 @endsection

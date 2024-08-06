@@ -165,13 +165,55 @@ Route::middleware(['auth'])->group(function () {
 
     // -------------------------------------Product Routes---------------------------------------
 
-    Route::get('admin/products', [ProductsController::class, 'index'])->name('admin.products');
-    Route::post('admin/products/update-status/{id}', [ProductsController::class, 'updateStatus'])->name('admin.products.status');
-    Route::get('admin/products/create', [ProductsController::class, 'create'])->name('admin.products.create');
-    Route::get('admin/products/edit/{id}', [ProductsController::class, 'edit'])->name('admin.products.edit');
-    Route::get('admin/products/delete/{id}', [ProductsController::class, 'remove'])->name('admin.products.delete');
-    Route::post('admin/products/create', [ProductsController::class, 'store'])->name('admin.products.create.post');
-    Route::post('admin/products/edit/{id}', [ProductsController::class, 'store'])->name('admin.products.edit.post');
-    Route::delete('admin/products/delete-selected', [ProductsController::class, 'deleteSelected'])->name('admin.products.deleteSelected');
+
+    Route::get('admin/product', [ProductsController::class, 'index'])->name('admin.product');
+    Route::post('admin/product/update-status/{id}', [ProductsController::class, 'updateStatus'])->name('admin.product.status');
+    Route::get('admin/product/create', [ProductsController::class, 'create'])->name('admin.product.create');
+    Route::get('admin/product/edit/{id}', [ProductsController::class, 'edit'])->name('admin.product.edit');
+    Route::get('admin/product/delete/{id}', [ProductsController::class, 'remove'])->name('admin.product.delete');
+    Route::post('admin/product/create', [ProductsController::class, 'store'])->name('admin.product.create.post');
+    Route::put('admin/product/edit/{id}', [ProductsController::class, 'update'])->name('admin.product.edit.post');
+    Route::delete('admin/product/delete-selected', [ProductsController::class, 'deleteSelected'])->name('admin.product.deleteSelected');
+    Route::get('admin/product/export', [ProductsController::class, 'export'])->name('admin.product.export');
+    Route::post('admin/product/import', [ProductsController::class, 'import'])->name('admin.product.import');
+
+
+
+    // ------------------------------------Dealers Routes----------------------------------------
+
+    Route::get('admin/dealers', [DealersController::class, 'index'])->name('admin.dealers');
+    Route::post('admin/dealer/update-status/{id}', [DealersController::class, 'updateStatus'])->name('admin.grouprelation.status');
+    Route::get('admin/dealers/create', [DealersController::class, 'create'])->name('admin.dealers.create');
+    Route::get('admin/dealers/edit/{id}', [DealersController::class, 'edit'])->name('admin.dealers.edit');
+    Route::post('admin/dealers/edit/{id}', [DealersController::class, 'store'])->name('admin.dealers.edit.post');
+    Route::post('admin/dealers/create', [DealersController::class, 'store'])->name('admin.dealers.create.post');
+    Route::get('admin/dealers/delete/{id}', [DealersController::class, 'remove'])->name('admin.dealers.delete');
+    Route::delete('admin/dealers/delete-selected', [DealersController::class, 'deleteSelected'])->name('admin.dealers.deleteSelected');
+    Route::get('admin/dealers/export', [DealersController::class, 'export'])->name('admin.dealers.export');
+    Route::post('admin/dealers/import', [DealersController::class, 'import'])->name('admin.dealers.import');
+    Route::post('admin/dealers/{id}/update-primary-contact', [DealersController::class, 'updatePrimaryContact'])->name('admin.dealers.updatePrimary');
+    //-------------------------------------Conatact Persons--------------------------------------
+
+    Route::get('admin/contact-persons', [ContactPersonController::class, 'index'])->name('admin.contactPersons');
+    Route::post('admin/contact-persons/update-status/{id}', [ContactPersonController::class, 'updateStatus'])->name('admin.contactPersons.status');
+    Route::get('admin/contact-persons/create', [ContactPersonController::class, 'create'])->name('admin.contactPersons.create');
+    Route::post('admin/contact-persons/create', [DealersController::class, 'store'])->name('admin.contactPersons.create.post');
+    Route::get('admin/contact-persons/edit/{id}', [ContactPersonController::class, 'edit'])->name('admin.contactPersons.edit');
+    Route::delete('admin/contact-persons/delete-selected', [ContactPersonController::class, 'deleteSelected'])->name('admin.contactPersons.deleteSelected');
+
+
+
+
+
+    Route::resource('blogs', BlogController::class);
+    Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
+
 
 });
+
+
+
+
+
+
+

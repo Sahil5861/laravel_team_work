@@ -77,7 +77,7 @@ class DealersController extends Controller
 
     public function store(Request $request)
     {
-        
+
         // dd($request);
         // exit;
         $request->validate([
@@ -104,7 +104,7 @@ class DealersController extends Controller
             $dealer->GST_number = $request->input('gst_no');
 
             if ($dealer->save()) {
-                return redirect()->route('admin.dealers')->with('success', 'Dealer '.$request->id.' Updated Suuccessfully !!');
+                return redirect()->route('admin.dealers')->with('success', 'Dealer ' . $request->id . ' Updated Suuccessfully !!');
             } else {
                 return back()->with('error', 'Something went wrong !!');
             }
