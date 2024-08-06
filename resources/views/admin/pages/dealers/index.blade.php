@@ -44,7 +44,7 @@
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a href="#" class="dropdown-item" data-toggle="modal"
                                         data-target="#importModal">Import Dealers</a>
-                                    <a href="#" class="dropdown-item" id="export-brands">Export Dealers</a>
+                                    <a href="#" class="dropdown-item" id="export-dealers">Export Dealers</a>
 
                                 </div>
                             </div>
@@ -114,6 +114,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
+        var contactPersons = @json($contactPersons);
         var dealersTable = $('#dealers-table').DataTable({
             processing: true,
             serverSide: true,
@@ -141,16 +142,15 @@
                 {data : 'address', 'name' : 'address', render:function (data, type, row){
                     return row.city + ', ' + row.state + ', ' + row.country;
                 }},
-                { data: 'contact_person_id', name: 'contact_person_id',
-                 render: function (data, type, row){
-                    if (row.contact_person_id == null) {
-                        return 'Not Provided'
-                    }
-                    else {
-                        return row.contact_person.name;
-                    } 
-                }
-                    
+                { data: 'contact_person', name: 'contact_person',
+                //  render: function (data, type, row){
+                //     if (row.contact_person_id == null) {
+                //         return 'Not Provided'
+                //     }
+                //     else {
+                //         return row.contact_person.name;
+                //     } 
+                // }
                 },
                 { data: 'authenticated', name: 'authenticated', render: function (data, type, row){
                     if(data == 1){
@@ -167,6 +167,16 @@
 
             order: [[1, 'asc']],
             drawCallback: function (settings) {
+                $('.contact-person-select').each(function() {
+                var dealerId = $(this).data('dealer-id');
+                var $select = $(this);
+                $select.empty();
+
+                $select.append('<option>Select Contact Person</option>');
+                contactPersons.forEach(function(person) {
+                    $select.append('<option value="' + person.id + '">' + person.name + '</option>');
+                });
+            });
                 $('#select-all').on('click', function () {
                     var isChecked = this.checked;
                     $('#dealers-table .select-row').each(function () {
@@ -235,19 +245,37 @@
         });
 
         $('#status').on('change', function () {
-            BrandTable.ajax.reload();
+            dealersTable.ajax.reload();
         });
 
         $(document).ready(function () {
-            $('#export-brands').on('click', function () {
+            $('#export-dealers').on('click', function () {
                 var status = $('#status').val();
-                var url = "{{ route('admin.brand.export') }}";
+                var url = "{{ route('admin.dealers.export') }}";
                 if (status) {
                     url += "?status=" + status;
                 }
                 window.location.href = url;
             });
         });
+
+        $(document).on('change', '.contact-person-select', function() {
+        var contactPersonId = $(this).val();
+        var dealerId = $(this).data('dealer-id');
+
+        $.ajax({
+            url: 'admin/dealers/' + dealerId + '/update-primary-contact',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                contact_person_id: contactPersonId
+            },
+            success: function(response) {
+                alert(response.success);
+                dealersTable.ajax.reload();
+            }
+        });
+    });
 
 
         function updateStatus(brandId, status) {

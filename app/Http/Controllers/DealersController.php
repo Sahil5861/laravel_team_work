@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Dealer;
 use App\Models\ContactPerson;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 use DataTables;
 
@@ -18,12 +21,14 @@ class DealersController extends Controller
         //     exit;
         if ($request->ajax()) {
             $query = Dealer::query();
+            $contactPersons = ContactPerson::where('status', 1);
 
             if ($request->has('status') && $request->status != '') {
                 $query->where('status', $request->status);
             }
 
             $data = $query->latest()->with('ContactPerson')->get();
+            
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('status', function ($row) {
@@ -34,9 +39,11 @@ class DealersController extends Controller
                                     <span class="slider round status-text"></span>
                             </label>';
                 })
-                // ->addcolumn('address', function ($row){
-                //     return  $row->city.", ". $row->state.", ". $row->country;
-                // })
+                ->addColumn('contact_person', function ($row){
+                    
+                    return '<select class="form-control contact-person-select" data-dealer-id="' . $row->id . '"></select>';
+
+                })
                 ->addColumn('action', function ($row) {
                     return '<div class="dropdown">
                                     <a href="#" class="text-body" data-bs-toggle="dropdown">
@@ -52,17 +59,18 @@ class DealersController extends Controller
                                     </div>
                                 </div>';
                 })
-                ->rawColumns(['action', 'status', 'address'])
+                ->rawColumns(['action', 'status', 'contact_person'])
                 ->make(true);
-        }
+            }
+            $contactPersons = ContactPerson::where('status', 0)->get();
 
-        return view('admin.pages.dealers.index');
+        return view('admin.pages.dealers.index', compact('contactPersons'));
     }
 
 
     public function create()
     {
-        $contactPersons = ContactPerson::all();
+        $contactPersons = ContactPerson::where('status', 1)->get();
         return view('admin.pages.dealers.create', compact('contactPersons'));
     }
 
@@ -168,5 +176,112 @@ class DealersController extends Controller
         }
         return response()->json(['success' => false, 'message' => 'No Dealers selected for deletion.']);
     }
+
+
+    // Import And Exports--------------------------------------------------------------------
+    public function import(Request $request)
+    {
+        $validate = $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt',
+        ]);
+        if ($validate == false) {
+            return redirect()->back();
+        }
+        $file = $request->file('csv_file');
+        $path = $file->getRealPath();
+        if (($handle = fopen($path, 'r')) !== false) {
+            $header = fgetcsv($handle, 1000, ','); // Skip the header row
+
+            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+                Brand::create([
+                    'id' => $data[0],
+                    'business' => $data[1],
+                    'business_email' => $data[2],
+                    'city' => $data[3],
+                    'state' => $data[4],
+                    'country' => $data[5],
+                    'conatact_person_id' => $data[6],
+                    'authenticated' => $data[7],
+                    'GST_number' => $data[8],
+                ]);
+            }
+
+            fclose($handle);
+        }
+
+        return redirect()->route('admin.brand')->with('success', 'Dealers imported successfully.');
+
+    }
+
+
+    public function export(Request $request)
+    {
+        try {
+            $status = $request->query('status', null); // Get status from query parameters
+
+            $response = new StreamedResponse(function () use ($status) {
+                $spreadsheet = new Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
+
+                // Add headers for CSV
+                $sheet->fromArray(['ID', 'Dealer Name', 'Dealer Email', 'Dealer Phone', 'City', 'State', 'Conuntry', 'Conatact Person Id', 'Is Authenticated','GST number'], null, 'A1');
+
+                // Fetch brands based on status
+                $query = Dealer::query();
+                if ($status !== null) {
+                    $query->where('status', $status);
+                }
+                $dealers = $query->get();
+                $dealersData = [];
+                foreach ($dealers as $dealer) {
+                    $dealersData[] = [
+                        $dealer->id,
+                        $dealer->business_name,
+                        $dealer->business_email,
+                        $dealer->phone_number,
+                        $dealer->city,
+                        $dealer->state,
+                        $dealer->country,
+                        $dealer->contact_person_id,
+                        $dealer->authenticated,
+                        $dealer->GST_number,
+                    ];
+                }
+                $sheet->fromArray($dealersData, null, 'A2');
+
+                // Write CSV to output
+                $writer = new Csv($spreadsheet);
+                $writer->setUseBOM(true);
+                $writer->save('php://output');
+            });
+
+            // Set headers for response
+            $response->headers->set('Content-Type', 'text/csv');
+            $response->headers->set('Content-Disposition', 'attachment; filename="dealers.csv"');
+
+            return $response;
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+   // app/Http/Controllers/DealerController.php
+
+    public function updatePrimaryContact(Request $request, $dealerId)
+    {
+        $dealer = Dealer::findOrFail($dealerId);
+        $contactPersonId = $request->input('contact_person_id');
+
+        // Set all contact persons of this dealer to 'no'
+        $dealer->contactPersons()->update(['is_primary' => false]);
+
+        // Set the selected contact person to 'yes'
+        $dealer->contactPersons()->where('id', $contactPersonId)->update(['is_primary' => true]);
+
+        return response()->json(['success' => 'Primary contact updated successfully.']);
+}
+
+
+
 
 }
