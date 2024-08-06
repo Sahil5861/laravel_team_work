@@ -39,22 +39,25 @@ class DealersController extends Controller
                                     <span class="slider round status-text"></span>
                             </label>';
                 })
+                ->addColumn('view', function ($row){
+                    return '<a href="' . route('admin.dealers.view', $row->id) . '" class="text-primary"><i class="ph-eye me-2"></i></a>';
+                })
                 ->addColumn('action', function ($row) {
                     return '<div class="dropdown">
-                                    <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                        <i class="ph-list"></i>
+                                <a href="#" class="text-body" data-bs-toggle="dropdown">
+                                    <i class="ph-list"></i>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <a href="' . route('admin.dealers.edit', $row->id) . '" class="dropdown-item">
+                                        <i class="ph-pencil me-2"></i>Edit
                                     </a>
-                                    <div class="dropdown-menu dropdown-menu-end">
-                                        <a href="' . route('admin.dealers.edit', $row->id) . '" class="dropdown-item">
-                                            <i class="ph-pencil me-2"></i>Edit
-                                        </a>
-                                        <a href="' . route('admin.dealers.delete', $row->id) . '" data-id="' . $row->id . '" class="dropdown-item delete-button">
-                                            <i class="ph-trash me-2"></i>Delete
-                                        </a>
-                                    </div>
-                                </div>';
+                                    <a href="' . route('admin.dealers.delete', $row->id) . '" data-id="' . $row->id . '" class="dropdown-item delete-button">
+                                        <i class="ph-trash me-2"></i>Delete
+                                    </a>
+                                </div>
+                            </div>';
                 })
-                ->rawColumns(['action', 'status'])
+                ->rawColumns(['action', 'status', 'view'])
                 ->make(true);
             }
             $contactPersons = ContactPerson::where('status', 0)->get();
@@ -62,6 +65,10 @@ class DealersController extends Controller
         return view('admin.pages.dealers.index', compact('contactPersons'));
     }
 
+    public function view($id){
+        $dealer = Dealer::find($id);
+        return view('admin.pages.dealers.view', compact('dealer'));
+    }
 
     public function create()
     {

@@ -172,6 +172,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('admin/dealers/delete-selected', [DealersController::class, 'deleteSelected'])->name('admin.dealers.deleteSelected');
     Route::get('admin/dealers/export', [DealersController::class, 'export'])->name('admin.dealers.export');
     Route::post('admin/dealers/import', [DealersController::class, 'import'])->name('admin.dealers.import');
+    Route::get('admin/dealers/view/{id}', [DealersController::class, 'view'])->name('admin.dealers.view');
+    
+
 
     Route::post('admin/dealers/{id}/update-primary-contact', [DealersController::class,'updatePrimaryContact'])->name('admin.dealers.updatePrimary');
     //-------------------------------------Conatact Persons--------------------------------------

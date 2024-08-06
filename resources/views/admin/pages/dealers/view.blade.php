@@ -11,11 +11,6 @@
                         <h4 class="page-title mb-0">
                             Dashboard - <span class="fw-normal">Dealers</span>
                         </h4>
-                        <a href="#page_header"
-                            class="btn btn-light align-self-center collapsed d-lg-none border-transparent rounded-pill p-0 ms-auto"
-                            data-bs-toggle="collapse">
-                            <i class="ph-caret-down collapsible-indicator ph-sm m-1"></i>
-                        </a>
                     </div>
                 </div>
             </div>
@@ -23,55 +18,63 @@
             <div class="content">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title">Dealers</h5>
-                        <div class="card-tools text-end"
-                            style="display: flex; align-items:center; justify-content: space-between;">
-                            <div class="btns">
-                                <a href="{{ route('admin.dealers.create') }}" class="text-dark btn btn-primary">Add
-                                    Dealers</a>
-                                <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
-                                <br><br>
-                                <select name="status" id="status" class="form-control">
-                                    <option value="">All</option>
-                                    <option value="1">Active</option>
-                                    <option value="0">Inactive</option>
-                                </select>
+                        <div class="row">
+                            <div class="col-lg-11">
+                                <h5 class="card-title">Dealers</h5>
                             </div>
-                            <div class="dropdown">
-                                <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                    <i class="ph-list"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="#" class="dropdown-item" data-toggle="modal"
-                                        data-target="#importModal">Import Dealers</a>
-                                    <a href="#" class="dropdown-item" id="export-dealers">Export Dealers</a>
-
-                                </div>
+                            <div class="col-lg-1">
+                                <a href="{{route('admin.dealers')}}" class="text-dark btn btn-info text-white">Back</a>  
                             </div>
-
                         </div>
+                        
                     </div>
                     <div class="card-body">
                         @if(session('success'))
                             <div class="alert alert-success">{{ session('success') }}</div>
                         @endif
-                        <div class="table-responsive">
-                            <table class="table table-bordered text-center" id="dealers-table">
-                                <thead>
-                                    <tr>
-                                        <th><input type="checkbox" id="select-all"></th>
-                                        <th>ID</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                        <th>Dealers Name</th>
-                                        <th>Dealers Email</th>
-                                        <th>Dealers Phone</th>
-                                        <th>View</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Dealer</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <table class="table table-striped table-borderless">
+                                            <tr>
+                                                <th>Dealer Name</th>
+                                                <td>{{$dealer->business_name}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Dealer Email</th>
+                                                <td class="text-primary">{{$dealer->business_email}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Dealer Phone</th>
+                                                <td>{{$dealer->phone_number}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Address</th>
+                                                <td>{{$dealer->city}}, {{$dealer->state}}, {{$dealer->country}}</td>
+                                           </tr>
+                                           <tr>
+                                            
+                                                <th>GST Number</th>
+                                                <td class="text-primary">{{$dealer->GST_number ? $dealer->GST_number : "----------"}}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <div class="col-md-6 ml md-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Contact Persons</h3>
+                                    </div>
+                                </div>
+                                
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -111,7 +114,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
-        var contactPersons = @json($contactPersons);
         var dealersTable = $('#dealers-table').DataTable({
             processing: true,
             serverSide: true,
@@ -224,22 +226,6 @@
             });
         });
 
-        $(document).on('change', '.contact-person-select', function() {
-        var contactPersonId = $(this).val();
-        var dealerId = $(this).data('dealer-id');
-
-        $.ajax({
-            url: 'admin/dealers/' + dealerId + '/update-primary-contact',
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                contact_person_id: contactPersonId
-            },
-            success: function(response) {
-                alert(response.success);
-                dealersTable.ajax.reload();
-            }
-        });
     });
 
 
