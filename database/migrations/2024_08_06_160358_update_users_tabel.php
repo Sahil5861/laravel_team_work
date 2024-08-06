@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->unsignedBigInteger('dealers_id')->nullable()->after('id'); // Reference to dealers table
             $table->string('real_password')->nullable()->after('password'); // Store real password
-            $table->softDeletes(); // Add deleted_at column for soft deletes
         });
     }
 

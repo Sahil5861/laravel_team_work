@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 use App\Models\ContactPerson;
+use App\Models\User;
 use App\Models\Dealer;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
@@ -79,15 +81,21 @@ class ContactPersonController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'phone' => 'required|string|max:20',
-            'designation' => 'required|string',
+            'role' => 'required|string',
+            'pass1' => 'required|min:8|confirmed',
+            'pass2' => 'required',
+            'dealer_id' => 'required|string',
 
         ]);
         if (!empty($request->id)) {
-            $person = ContactPerson::firstwhere('id', $request->id);
+            $person = User::firstwhere('id', $request->id);
             $person->name = $request->input('name');
             $person->email = $request->input('email');
             $person->phone = $request->input('phone');
-            $person->designatin = $request->input('designatin');
+            $person->role = $request->input('role');
+            $person->password = Hash::make($request->input('pass1'));
+            $person->real_password = $request->input('pass1');
+            $person->dealer_id = $request->input('dealer_id');
 
             if ($person->save()) {
                 return redirect()->route('admin.contactPersons')->with('success', 'Person '.$request->id.' Updated Suuccessfully !!');
@@ -96,12 +104,15 @@ class ContactPersonController extends Controller
             }
         } else {
 
-            $person = new ContactPerson();
+            $person = new User();
 
             $person->name = $request->input('name');
             $person->email = $request->input('email');
             $person->phone = $request->input('phone');
-            $person->designation = $request->input('designation');
+            $person->role_id = $request->input('role');
+            $person->password =Hash::make($request->input('pass1'));
+            $person->real_password = $request->input('pass1');
+            $person->dealer_id = $request->input('dealer_id');
 
             if ($person->save()) {
                 return redirect()->route('admin.contactPersons')->with('success', 'Person added Suuccessfully !!');
