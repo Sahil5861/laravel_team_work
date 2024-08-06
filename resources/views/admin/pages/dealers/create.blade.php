@@ -38,7 +38,7 @@
                                         <div class="row mb-3">
                                             <div class="col-lg-4">
                                                 <label for="name">Dealer Name</label>
-                                                <input type="text" id="name" name="name" class="form-control" placeholder="Enter Dealer's Name"  autofocus {{old('name')}}>
+                                                <input type="text" id="name" name="name" class="form-control" placeholder="Enter Dealer's Name"  autofocus value="{{old('name')}}" >
                                                 <span>
                                                     @error('name')
                                                     <span class="text-danger">{{$message}}</span>
@@ -47,7 +47,7 @@
                                             </div>
                                             <div class="col-lg-4">
                                                 <label for="name">Dealer Email</label>
-                                                <input type="email" id="email" name="email" class="form-control" placeholder="Enter Dealer's Email"  autofocus {{old('email')}}>
+                                                <input type="email" id="email" name="email" class="form-control" placeholder="Enter Dealer's Email"  value="{{old('email')}}">
                                                 <span>
                                                     @error('email')
                                                     <span class="text-danger">{{$message}}</span>
@@ -56,7 +56,7 @@
                                             </div>
                                             <div class="col-lg-4">
                                                 <label for="name">Dealer Phone</label>
-                                                <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter Dealer's Phone Number"  autofocus {{old('phone')}} >
+                                                <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter Dealer's Phone Number"  value="{{old('phone')}}" >
                                                 <span>
                                                     @error('phone')
                                                     <span class="text-danger">{{$message}}</span>
@@ -67,7 +67,7 @@
                                         <div class="row mb-3">
                                             <div class="col-lg-4">
                                                 <label for="name">City</label>
-                                                <input type="text" id="city" name="city" class="form-control" placeholder="Enter Dealer's City"  autofocus {{old('city')}} >
+                                                <input type="text" id="city" name="city" class="form-control" placeholder="Enter Dealer's City"   value="{{old('city')}}" >
                                                 <span>
                                                     @error('city')
                                                     <span class="text-danger">{{$message}}</span>
@@ -76,7 +76,7 @@
                                             </div>
                                             <div class="col-lg-4">
                                                 <label for="name">State</label>
-                                                <input type="text" id="state" name="state" class="form-control" placeholder="Enter Dealer's State"  autofocus {{old('state')}} >
+                                                <input type="text" id="state" name="state" class="form-control" placeholder="Enter Dealer's State" value="{{old('state')}}" >
                                                 <span>
                                                     @error('state')
                                                     <span class="text-danger">{{$message}}</span>
@@ -85,9 +85,9 @@
                                             </div>
                                             <div class="col-lg-4">
                                                 <label for="name">Country</label>
-                                                <input type="text" id="country" name="country" class="form-control" placeholder="Enter Dealer's Contry"  autofocus {{old('contry')}} >
+                                                <input type="text" id="country" name="country" class="form-control" placeholder="Enter Dealer's Contry" value="{{old('country')}}" >
                                                 <span>
-                                                    @error('contry')
+                                                    @error('country')
                                                     <span class="text-danger">{{$message}}</span>
                                                     @enderror
                                                 </span>
@@ -96,15 +96,17 @@
 
                                         <div class="row mb-3">
                                             <div class="col-lg-4">
-                                                <label for="contact_person_id">Contact Person Id</label>
+                                                <label for="contact_person_id">Contact Person</label>
                                                 <select name="contact_person_id" id="contact_person_id" class="form-control">
                                                     <option value="">--Select Contact Person--</option>
                                                     @foreach ($contactPersons as $item)
-                                                        <option value="{{$item->id}}">{{$item->name}}</option>
+                                                        <option value="{{$item->id}}"
+                                                                @if(old('contact_person_id') == $item->id) selected @endif
+                                                            >{{$item->name}}</option>
                                                     @endforeach
                                                 </select>
                                                 <span>
-                                                    @error('contry')
+                                                    @error('contact_person_id')
                                                     <span class="text-danger">{{$message}}</span>
                                                     @enderror
                                                 </span>
@@ -113,9 +115,16 @@
                                             <div class="col-lg-4">
                                                 <label for="authenticated">Is Authenticated</label>
                                                 <select name="authenticated" id="authenticated" class="form-control">
-                                                    <option value="">--Select--</option>
-                                                    <option value="1">Yes</option>
-                                                    <option value="0">No</option>
+                                                    <option value="1"
+                                                        @if(old('authenticated') == 0)
+                                                            selected
+                                                        @endif
+                                                    >Yes</option>
+                                                    <option value="0"
+                                                        @if(old('authenticated') == 0)
+                                                            selected
+                                                        @endif
+                                                    >No</option>
                                                 </select>
                                                 <span>
                                                     @error('authenticated')
@@ -125,7 +134,7 @@
                                             </div>
                                             <div class="col-lg-4" style="display: none" id="gst_number_group">
                                                 <label for="gst_no">GSTI Number</label>
-                                                <input type="text" id="gst_no" name="gst_no" class="form-control" placeholder="Enter Dealer's GST Number"  autofocus {{old('gst_no')}} >
+                                                <input type="text" id="gst_no" name="gst_no" class="form-control" placeholder="Enter Dealer's GST Number"   {{old('gst_no')}} >
                                                 <span>
                                                     @error('gst_no')
                                                     <span class="text-danger">{{$message}}</span>

@@ -49,7 +49,7 @@
                                         <div class="row mb-3">
                                             <div class="col-lg-4">
                                                 <label for="name">Dealer Name</label>
-                                                <input type="text" id="name" name="name" class="form-control" value="{{$dealer->business_name}}"  autofocus {{old('name')}}>
+                                                <input type="text" id="name" name="name" class="form-control" value="{{$dealer->business_name}}"  autofocus value="{{old('name')}}">
                                                 <span>
                                                     @error('name')
                                                     <span class="text-danger">{{$message}}</span>
@@ -58,7 +58,7 @@
                                             </div>
                                             <div class="col-lg-4">
                                                 <label for="name">Dealer Email</label>
-                                                <input type="email" id="email" name="email" class="form-control" value="{{$dealer->business_email}}"  autofocus {{old('email')}}>
+                                                <input type="email" id="email" name="email" class="form-control" value="{{$dealer->business_email}}">
                                                 <span>
                                                     @error('email')
                                                     <span class="text-danger">{{$message}}</span>
@@ -67,7 +67,7 @@
                                             </div>
                                             <div class="col-lg-4">
                                                 <label for="name">Dealer Phone</label>
-                                                <input type="text" id="phone" name="phone" class="form-control" value="{{$dealer->phone_number}}"  autofocus {{old('phone')}} >
+                                                <input type="text" id="phone" name="phone" class="form-control" value="{{$dealer->phone_number}}" value="{{old('phone')}}" >
                                                 <span>
                                                     @error('phone')
                                                     <span class="text-danger">{{$message}}</span>
