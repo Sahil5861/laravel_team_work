@@ -35,8 +35,8 @@
                                 <div class="card-body">
                                     <form action="{{route('admin.contactPersons.create.post')}}" method="POST" enctype="multipart/form-data">
                                         @csrf
-                                        <div class="row mb-3">
-                                            <div class="col-lg-6">
+                                        <div class="row mb-4">
+                                            <div class="col-lg-4">
                                                 <label for="name">Contact Person Name</label>
                                                 <input type="text" id="name" name="name" class="form-control" placeholder="Enter Dealer's Name"  autofocus {{old('name')}}>
                                                 <span>
@@ -45,7 +45,7 @@
                                                     @enderror
                                                 </span>
                                             </div>
-                                            <div class="col-lg-6">
+                                            <div class="col-lg-4">
                                                 <label for="name">Conatct Person Email</label>
                                                 <input type="email" id="email" name="email" class="form-control" placeholder="Enter Dealer's Email"  autofocus {{old('email')}}>
                                                 <span>
@@ -54,9 +54,8 @@
                                                     @enderror
                                                 </span>
                                             </div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-lg-6">
+
+                                            <div class="col-lg-4">
                                                 <label for="name">Contact Person Phone</label>
                                                 <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter Dealer's Phone Number"  autofocus {{old('phone')}} >
                                                 <span>
@@ -65,9 +64,45 @@
                                                     @enderror
                                                 </span>
                                             </div>
-                                            <div class="col-lg-6">
+                                            
+                                            
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-lg-3">
+                                                <label for="name">Conatct Person Role</label>
+                                                <input type="email" id="role" name="role" class="form-control bg-dark text-white" placeholder="Enter Dealer's Email" value="Contact Person" readonly>
+                                                <span>
+                                                    @error('email')
+                                                    <span class="text-danger">{{$message}}</span>
+                                                    @enderror
+                                                </span>
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <label for="name">Create Password</label>
+                                                <input type="email" id="email" name="email" class="form-control" placeholder="Enter Dealer's Email"  autofocus {{old('email')}}>
+                                                <span>
+                                                    @error('email')
+                                                    <span class="text-danger">{{$message}}</span>
+                                                    @enderror
+                                                </span>
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <label for="name">confirm Password</label>
+                                                <input type="email" id="email" name="email" class="form-control" placeholder="Enter Dealer's Email"  autofocus {{old('email')}}>
+                                                <span>
+                                                    @error('email')
+                                                    <span class="text-danger">{{$message}}</span>
+                                                    @enderror
+                                                </span>
+                                            </div>
+                                            <div class="col-lg-3">
                                                 <label for="name">Designation</label>
-                                                <input type="text" id="designation" name="designation" class="form-control" placeholder="Enter Contact Persons Designation"  autofocus {{old('designation')}} >
+                                                <select name="dealer_id" id="dealer_id" class="form-control">
+                                                    <option value="">--Select Dealer--</option>
+                                                    @foreach ($dealers as $dealer)
+                                                        <option value="{{$dealer->id}}">{{$dealer->business_name}}</option>
+                                                    @endforeach
+                                                </select>
                                                 <span>
                                                     @error('designation')
                                                     <span class="text-danger">{{$message}}</span>
@@ -77,7 +112,7 @@
                                         </div>
                                         <div class="row mb-3">
                                             <div class=" col-lg-4">
-                                                <button type="submit" class="btn btn-primary">Create </button>
+                                                <button type="submit" class="btn btn-primary btn-block">Create </button>
                                             </div>
                                         </div>
         

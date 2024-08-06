@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\ContactPerson;
+use App\Models\Dealer;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -58,7 +59,8 @@ class ContactPersonController extends Controller
 
     public function create()
     {
-        return view('admin.pages.contact_persons.create');
+        $dealers = Dealer::where('status', 1)->get();
+        return view('admin.pages.contact_persons.create', compact('dealers'));
     }
 
 
