@@ -141,14 +141,17 @@
                 { data: 'action', name: 'action', orderable: false, searchable: false },
                 { data: 'name', name: 'name' },
                 {
-                    data: 'image', name: 'image', render: function (data) {
-                        return '<img src="' + data + '" width="50" height="50">';
+                    data: 'image', name: 'image', render: function (data, type, row) {
+                        return '<img src="' + data + '" alt="Product Image" width="70">';
                     }
+                    , orderable: false, searchable: false
                 },
+
                 { data: 'price', name: 'price' },
-                { data: 'category_name', name: 'category_name' }, // Make sure this matches the server response
-                { data: 'brand_name', name: 'brand_name' }, // Make sure this matches the server response
-                { data: 'product_group_name', name: 'product_group_name' }, // Make sure this matches the server response
+                { data: 'category_name', name: 'category_name' },
+                { data: 'brand_name', name: 'brand_name' },
+                { data: 'product_group_name', name: 'product_group_name' },
+
                 { data: 'description', name: 'description' },
                 { data: 'offer_price', name: 'offer_price' },
                 { data: 'offer_expiry', name: 'offer_expiry' },

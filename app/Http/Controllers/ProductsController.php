@@ -14,7 +14,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductsController extends Controller
 {
-
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -39,11 +38,14 @@ class ProductsController extends Controller
                         return $row->productGroup ? $row->productGroup->name : 'N/A';
                     })
                     ->addColumn('status', function ($row) {
-                        $checked = $row->status == '1' ? 'checked' : '';
+                        $checked = $row->status ? 'checked' : '';
                         return '<label class="switch">
                                     <input type="checkbox" class="status-checkbox" data-id="' . $row->id . '" ' . $checked . '>
                                     <span class="slider round"></span>
                                 </label>';
+                    })
+                    ->addColumn('offer_expiry', function ($row) {
+                        return $row->offer_expiry->format('d M Y');
                     })
                     ->addColumn('created_at', function ($row) {
                         return $row->created_at->format('d M Y');
@@ -74,7 +76,9 @@ class ProductsController extends Controller
 
     public function getProducts(Request $request)
     {
-        $products = Products::select(['id', 'name', 'image', 'price', 'category', 'brand', 'product_group', 'description', 'offer_price', 'offer_expiry', 'status', 'created_at', 'updated_at']);
+        $products = Products::with(['category', 'brand', 'productGroup'])->select([
+            'id', 'name', 'image', 'price', 'category_id', 'brand_id', 'product_group_id', 'description', 'offer_price', 'offer_expiry', 'status', 'created_at', 'updated_at'
+        ]);
 
         // Filtering based on status if provided
         if ($request->has('status')) {
@@ -83,12 +87,14 @@ class ProductsController extends Controller
 
         return DataTables::of($products)
             ->editColumn('image', function ($product) {
-                return '<img src="' . $product->image . '" alt="Product Image" width="70">';
+                return $product->image ? '<img src="' . asset($product->image) . '" alt="Product Image" width="70">' : 'No Image';
+            })
+            ->editColumn('offer_expiry', function ($product) {
+                return $product->offer_expiry ? \Carbon\Carbon::parse($product->offer_expiry)->format('d M Y H:i') : 'No Expiry';
             })
             ->addIndexColumn()
             ->make(true);
     }
-
 
     public function create()
     {
@@ -103,7 +109,7 @@ class ProductsController extends Controller
         $brands = Brand::all();
         $productGroups = ProductsGroup::all();
         $categories = Category::all();
-        $product = Products::find($id);
+        $product = Products::findOrFail($id);
 
         return view('admin.pages.products.edit', compact('product', 'brands', 'productGroups', 'categories'));
     }
@@ -130,7 +136,7 @@ class ProductsController extends Controller
         $product->product_group_id = $request->input('product_group_id');
         $product->description = $request->input('description', ''); // Provide default value if not present
         $product->offer_price = $request->input('offer_price');
-        $product->offer_expiry = $request->input('offer_expiry');
+        $product->offer_expiry = $request->input('offer_expiry') ? \Carbon\Carbon::parse($request->input('offer_expiry'))->format('Y-m-d H:i:s') : null;
 
         if ($request->hasFile('image')) {
             // Remove old image if exists
@@ -179,7 +185,7 @@ class ProductsController extends Controller
         $product->brand_id = $validatedData['brand_id'];
         $product->product_group_id = $validatedData['product_group_id'];
         $product->offer_price = $validatedData['offer_price'];
-        $product->offer_expiry = $validatedData['offer_expiry'];
+        $product->offer_expiry = $validatedData['offer_expiry'] ? \Carbon\Carbon::parse($validatedData['offer_expiry'])->format('Y-m-d H:i:s') : null;
 
         // Handle the image file
         if ($request->hasFile('image')) {
@@ -205,104 +211,46 @@ class ProductsController extends Controller
 
     public function remove(Request $request, $id)
     {
-        $product = Products::find($id);
+        $product = Products::findOrFail($id);
 
         if ($product->delete()) {
-            return back()->with('success', 'Product deleted successfully!');
+            return response()->json(['status' => 'success', 'message' => 'Product deleted successfully.']);
         } else {
-            return back()->with('error', 'Something went wrong!');
+            return response()->json(['status' => 'error', 'message' => 'Something went wrong!']);
         }
     }
 
-    public function updateStatus($id, Request $request)
+    public function exportCsv()
     {
-        $request->validate([
-            'status' => 'required|boolean',
-        ]);
+        $products = Products::with(['category', 'brand', 'productGroup'])->get();
 
-        $product = Products::findOrFail($id);
-        if ($product) {
-            $product->status = $request->status;
-            $product->save();
-            return response()->json(['success' => true]);
-        } else {
-            return response()->json(['success' => false]);
+        $csvData = [];
+        foreach ($products as $product) {
+            $csvData[] = [
+                'Name' => $product->name,
+                'Category' => $product->category ? $product->category->name : 'N/A',
+                'Brand' => $product->brand ? $product->brand->name : 'N/A',
+                'Product Group' => $product->productGroup ? $product->productGroup->name : 'N/A',
+                'Price' => $product->price,
+                'Offer Price' => $product->offer_price,
+                'Offer Expiry' => $product->offer_expiry ? \Carbon\Carbon::parse($product->offer_expiry)->format('d M Y H:i') : 'No Expiry',
+                'Created At' => $product->created_at->format('d M Y'),
+                'Updated At' => $product->updated_at->format('d M Y'),
+            ];
         }
-    }
-
-    public function deleteSelected(Request $request)
-    {
-        $selectedProducts = $request->input('selected_products');
-        if (!empty($selectedProducts)) {
-            Products::whereIn('id', $selectedProducts)->delete();
-            return response()->json(['success' => true, 'message' => 'Selected products deleted successfully.']);
-        }
-        return response()->json(['success' => false, 'message' => 'No products selected for deletion.']);
-    }
-
-    public function import(Request $request)
-    {
-        $validate = $request->validate([
-            'csv_file' => 'required|file|mimes:csv,txt',
-        ]);
-
-        if ($validate == false) {
-            return redirect()->back();
-        }
-
-        $file = $request->file('csv_file');
-        $path = $file->getRealPath();
-        if (($handle = fopen($path, 'r')) !== false) {
-            fgetcsv($handle, 1000, ','); // Skip the header row
-
-            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-                Products::create([
-                    'name' => $data[0],
-                    'brand_id' => $data[1],
-                    'product_group_id' => $data[2],
-                    'status' => $data[3],
-                    'offer_price' => $data[4],
-                    'offer_expiry' => $data[5],
-                ]);
-            }
-
-            fclose($handle);
-            return redirect()->back()->with('success', 'Products imported successfully!');
-        }
-
-        return redirect()->back()->with('error', 'Failed to import products.');
-    }
-
-    public function export()
-    {
-        $products = Products::all();
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->fromArray([
-            ['ID', 'Name', 'Brand ID', 'Product Group ID', 'Status', 'Offer Price', 'Offer Expiry'],
-        ]);
-
-        foreach ($products as $product) {
-            $sheet->fromArray([
-                $product->id,
-                $product->name,
-                $product->brand_id,
-                $product->product_group_id,
-                $product->status,
-                $product->offer_price,
-                $product->offer_expiry ? $product->offer_expiry->format('d M Y') : '',
-            ], null, 'A' . ($products->search($product) + 2));
-        }
+        $sheet->fromArray(array_keys($csvData[0]), NULL, 'A1');
+        $sheet->fromArray($csvData, NULL, 'A2');
 
         $writer = new Csv($spreadsheet);
-        $filename = 'products_export_' . date('Y-m-d') . '.csv';
         $response = new StreamedResponse(function () use ($writer) {
             $writer->save('php://output');
         });
 
         $response->headers->set('Content-Type', 'text/csv');
-        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        $response->headers->set('Content-Disposition', 'attachment; filename="products.csv"');
 
         return $response;
     }
