@@ -203,13 +203,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/contact-persons/create', [ContactPersonController::class, 'create'])->name('admin.contactPersons.create');
     Route::post('admin/contact-persons/create', [DealersController::class, 'store'])->name('admin.contactPersons.create.post');
     Route::get('admin/contact-persons/edit/{id}', [ContactPersonController::class, 'edit'])->name('admin.contactPersons.edit');
-<<<<<<< HEAD
-    
-    
     Route::delete('admin/contact-persons/delete-selected', [ContactPersonController::class, 'deleteSelected'])->name('admin.contactPersons.deleteSelected');
     Route::get('admin/contact-persons/export', [ContactPersonController::class, 'export'])->name('admin.contactPersons.export');
     Route::post('admin/contact-persons/import', [ContactPersonController::class, 'import'])->name('admin.contactPersons.import');
-=======
     Route::delete('admin/contact-persons/delete-selected', [ContactPersonController::class, 'deleteSelected'])->name('admin.contactPersons.deleteSelected');
 
 
@@ -220,7 +216,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
 
 
->>>>>>> c172ff8f91d9b8b8d2b92d505c6b79de06bba0ce
 });
 
 
