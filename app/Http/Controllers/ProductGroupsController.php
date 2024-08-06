@@ -141,50 +141,55 @@ class ProductGroupsController extends Controller
         return response()->json(['success' => false, 'message' => 'No Product Groups selected for deletion.']);
     }
 
+
     public function import(Request $request)
     {
         $validate = $request->validate([
             'csv_file' => 'required|file|mimes:csv,txt',
         ]);
+
         if ($validate == false) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            return redirect()->back();
         }
+
         $file = $request->file('csv_file');
         $path = $file->getRealPath();
+
         if (($handle = fopen($path, 'r')) !== false) {
             $header = fgetcsv($handle, 1000, ','); // Skip the header row
 
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
                 ProductsGroup::create([
-                    'products_group_name' => $data[0],
+                    'id' => $data[0],
+                    'products_group_name' => $data[1],
                 ]);
             }
 
             fclose($handle);
         }
 
-        return redirect()->route('admin.brand')->with('success', 'Products Group imported successfully.');
-
+        return redirect()->route('admin.grouprelation')->with('success', 'productGroup imported successfully.');
     }
+
 
     public function export(Request $request)
     {
         $status = $request->query('status'); // Retrieve status from query parameters
-    
+
         $response = new StreamedResponse(function () use ($status) {
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
-    
+
             // Add headers for CSV
             $sheet->fromArray(['ID', 'Name'], null, 'A1');
-    
+
             // Fetch filtered products and add to sheet
             $query = ProductsGroup::query();
             if ($status !== null) {
                 $query->where('status', $status);
             }
             $productsgroups = $query->get();
-    
+
             $productsgroupsData = [];
             foreach ($productsgroups as $productsgroup) {
                 $productsgroupsData[] = [
@@ -193,20 +198,20 @@ class ProductGroupsController extends Controller
                 ];
             }
             $sheet->fromArray($productsgroupsData, null, 'A2');
-    
+
             // Write CSV to output
             $writer = new Csv($spreadsheet);
             $writer->setUseBOM(true);
             $writer->save('php://output');
         });
-    
+
         // Set headers for response
         $response->headers->set('Content-Type', 'text/csv');
         $response->headers->set('Content-Disposition', 'attachment; filename="productgroups.csv"');
-    
+
         return $response;
     }
-    
+
 
 
 }

@@ -1,3 +1,4 @@
+<!-- Create User Form -->
 @extends('layout.base')
 
 @section('content')
@@ -20,53 +21,62 @@
                     <div class="card-header">
                         <h5 class="card-title">Add User</h5>
                     </div>
+
                     <div class="card-body">
-                        <form action="{{ route('users.store') }}" method="POST">
+                        @if(session('error'))
+                            <div class="alert alert-danger">{{ session('error') }}</div>
+                        @endif
+
+                        <form action="{{route('admin.user.create.post')}}" method="POST">
                             @csrf
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Name</label>
-                                <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}">
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" name="name" class="form-control" value="{{ old('name') }}">
                                 @error('name')
-                                    <div class="text-danger">{{ $message }}</div>
+                                    <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
-                            <div class="mb-3">
-                                <label for="phone" class="form-label">Phone</label>
-                                <input type="text" class="form-control" id="phone" name="phone"
-                                    value="{{ old('phone') }}">
+
+                            <div class="form-group">
+                                <label for="phone">Phone</label>
+                                <input type="text" name="phone" class="form-control" value="{{ old('phone') }}">
                                 @error('phone')
-                                    <div class="text-danger">{{ $message }}</div>
+                                    <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email"
-                                    value="{{ old('email') }}">
+
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" name="email" class="form-control" value="{{ old('email') }}">
                                 @error('email')
-                                    <div class="text-danger">{{ $message }}</div>
+                                    <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password">
+
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" name="password" class="form-control">
                                 @error('password')
-                                    <div class="text-danger">{{ $message }}</div>
+                                    <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
-                            <div class="mb-3">
-                                <label for="role_id" class="form-label">Role</label>
-                                <select class="form-select" id="role_id" name="role_id">
+
+                            <div class="form-group">
+                                <label for="role_id">Role</label>
+                                <select name="role_id" class="form-control">
+                                    <option value="">Select Role</option>
                                     @foreach($roles as $role)
-                                        <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
-                                            {{ $role->name }}
-                                        </option>
+                                        <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
                                     @endforeach
                                 </select>
                                 @error('role_id')
-                                    <div class="text-danger">{{ $message }}</div>
+                                    <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
-                            <button type="submit" class="btn btn-primary">Add User</button>
+
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Add User</button>
+                            </div>
                         </form>
                     </div>
                 </div>

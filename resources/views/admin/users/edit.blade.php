@@ -21,7 +21,7 @@
                         <h5 class="card-title">Edit User</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('users.update', $user->id) }}" method="POST">
+                        <form action="{{ route('admin.user.edit.post', $user->id) }}" method="POST">
                             @csrf
                             @method('PUT')
                             <div class="mb-3">
@@ -47,6 +47,7 @@
                                 @error('email')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
+
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password (Leave blank to keep current

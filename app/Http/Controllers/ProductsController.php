@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\models\Products;
-use App\models\Brand; 
+use App\models\Brand;
 use App\models\Category;
 use App\models\ProductsGroup;
 
@@ -12,7 +13,8 @@ use DataTables;
 
 class ProductsController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         if ($request->ajax()) {
             $data = Products::latest()->get();
             return DataTables::of($data)
@@ -26,7 +28,7 @@ class ProductsController extends Controller
                     return '<label class="switch">
                                     <input type="checkbox" class="status-checkbox status-toggle" data-id="' . $row->id . '" ' . $checked . '>
                                     <span class="slider round status-text"></span>
-                                    <p>'.$text.'</p>
+                                    <p>' . $text . '</p>
                             </label>';
                 })
                 ->addColumn('created_at', function ($row) {
@@ -44,7 +46,7 @@ class ProductsController extends Controller
                                         <a href="' . route('admin.products.edit', $row->id) . '" class="dropdown-item">
                                             <i class="ph-pencil me-2"></i>Edit
                                         </a>
-                                        <a href="'.route('admin.products.delete', $row->id).'" data-id="' . $row->id . '" class="dropdown-item delete-button">
+                                        <a href="' . route('admin.products.delete', $row->id) . '" data-id="' . $row->id . '" class="dropdown-item delete-button">
                                             <i class="ph-trash me-2"></i>Delete
                                         </a>
                                     </div>
@@ -59,22 +61,25 @@ class ProductsController extends Controller
     }
 
 
-    public function create(){
+    public function create()
+    {
         $brands = Brand::whereNull('deleted_at')->get();
         $categories = Category::whereNull('deleted_at')->get();
         $productgroups = ProductsGroup::whereNull('deleted_at')->get();
         return view('admin.pages.products.create', compact('brands', 'categories', 'productgroups'));
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $validate = $request->validate([
-            'name' => 'required',
-            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif',
-            'amount'=> 'required',
-            'brand'=> 'required',
-            'category'=> 'required',
-            'product_group'=> 'required',
+            'name' => 'required|string|max:255',
+            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'amount' => 'required|numeric|min:0',
+            'brand' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'product_group' => 'required|string|max:255',
         ]);
+
         if (!empty($request->id)) {
             $product = Products::firstwhere('id', $request->id);
             $product->name = $request->input('name');
@@ -86,22 +91,20 @@ class ProductsController extends Controller
 
             if ($request->file('image')) {
                 $image = $request->file('image');
-                $imagename = time().'.'.$image->getClientOriginalName();
+                $imagename = time() . '.' . $image->getClientOriginalName();
                 $destination = public_path('uploads/products');
                 $image->move($destination, $imagename);
-    
-                $imagepath = 'uploads/products/'.$imagename;
+
+                $imagepath = 'uploads/products/' . $imagename;
                 $product->image = $imagepath;
             }
 
             if ($product->save()) {
                 return back()->with('success', 'Brand Updated Suuccessfully !!');
-            }
-            else{
+            } else {
                 return back()->with('error', 'Something went wrong !!');
             }
-        }
-        else{
+        } else {
             $product = new Products();
 
             $product->name = $request->input('name');
@@ -110,21 +113,20 @@ class ProductsController extends Controller
             $product->category_id = $request->input('category');
             $product->product_group_id = $request->input('product_group');
             $product->description = $request->input('desc');
-    
+
             if ($request->file('image')) {
                 $image = $request->file('image');
-                $imagename = time().'.'.$image->getClientOriginalName();
+                $imagename = time() . '.' . $image->getClientOriginalName();
                 $destination = public_path('uploads/products');
                 $image->move($destination, $imagename);
-    
-                $imagepath = 'uploads/products/'.$imagename;
+
+                $imagepath = 'uploads/products/' . $imagename;
                 $product->image = $imagepath;
             }
-    
+
             if ($product->save()) {
                 return back()->with('success', 'Product added Suuccessfully !!');
-            }
-            else{
+            } else {
                 return back()->with('error', 'Something went wrong !!');
             }
         }
@@ -136,13 +138,13 @@ class ProductsController extends Controller
 
 
 
-    public function remove(Request $request ,$id){
+    public function remove(Request $request, $id)
+    {
         $product = Products::firstwhere('id', $request->id);
 
         if ($product->delete()) {
             return back()->with('success', 'Product deleted Suuccessfully !!');
-        }
-        else{
+        } else {
             return back()->with('error', 'Something went wrong !!');
         }
     }
@@ -161,7 +163,8 @@ class ProductsController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function deleteSelected(Request $request){
+    public function deleteSelected(Request $request)
+    {
         $selectedProducts = $request->input('selected_products');
         if (!empty($selectedProducts)) {
             Products::whereIn('id', $selectedProducts)->delete();
