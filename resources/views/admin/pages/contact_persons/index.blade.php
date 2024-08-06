@@ -44,7 +44,7 @@
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a href="#" class="dropdown-item" data-toggle="modal"
                                         data-target="#importModal">Import Contact Persons</a>
-                                    <a href="#" class="dropdown-item" id="export-brands">Export Contact Persons</a>
+                                    <a href="#" class="dropdown-item" id="export-contacts">Export Contact Persons</a>
 
                                 </div>
                             </div>
@@ -86,13 +86,13 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="importModalLabel">Import Brands</h5>
+                <h5 class="modal-title" id="importModalLabel">Import Contact Persons</h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="importForm" action="{{route('admin.brand.import')}}" method="POST"
+                <form id="importForm" action="{{route('admin.contactPersons.import')}}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
                     <div class="form-group">
@@ -140,16 +140,17 @@
                 { data: 'status', name: 'status' },
                 {data: 'is_primary', name: 'is_primary',
                     render:function (data, type, row){
-                        return data == '1'? 'yes':'no'
+                        return data == '1'? 'Primary':''
                     }
                 },
             ],
 
             order: [[1, 'asc']],
+            // personsTable.ajax.reload();
             drawCallback: function (settings) {
                 $('#select-all').on('click', function () {
                     var isChecked = this.checked;
-                    $('#dealers-table .select-row').each(function () {
+                    $('#persons-table .select-row').each(function () {
                         $(this).prop('checked', isChecked);
                     });
                 });
@@ -175,7 +176,7 @@
                                     method: 'DELETE',
                                     data: { selected_persons: selectedIds },
                                     success: function (response) {
-                                        BrandTable.ajax.reload(); // Refresh the page
+                                        personsTable.ajax.reload(); // Refresh the page
                                         Swal.fire(
                                             'Deleted!',
                                             response.success,
@@ -198,7 +199,7 @@
                     else {
                         Swal.fire(
                             'Error!',
-                            'Please select at least one brand to delete.',
+                            'Please select at least one Contact to delete.',
                             'error'
                         );
                     }
@@ -215,13 +216,13 @@
         });
 
         $('#status').on('change', function () {
-            BrandTable.ajax.reload();
+            personsTable.ajax.reload();
         });
 
         $(document).ready(function () {
-            $('#export-brands').on('click', function () {
+            $('#export-contacts').on('click', function () {
                 var status = $('#status').val();
-                var url = "{{ route('admin.brand.export') }}";
+                var url = "{{ route('admin.contactPersons.export') }}";
                 if (status) {
                     url += "?status=" + status;
                 }
@@ -250,7 +251,7 @@
                         // alert('Status Updated !!');
 
                         // location.reload(); // Refresh the page
-                        BrandTable.ajax.reload();
+                        personsTable.ajax.reload();
                     } else {
                         alert('Failed to update status.');
                     }

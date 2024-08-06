@@ -26,7 +26,7 @@
                 {{--  Form --}}
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
-                        <h5 class="mb-0">Edit Your Dealers</h5>
+                        <h5 class="mb-0">Edit Your Contact Persons</h5>
                         <div class="hstack gap-2 ms-auto">
                             <a class="text-body" data-card-action="collapse">
                                 <i class="ph-caret-down"></i>
@@ -42,14 +42,13 @@
 
                     <div class="collapse show">
                         <div class="card-body">
-                            <form action="{{route('admin.dealers.edit.post',$dealer->id)}}" method="POST" enctype="multipart/form-data">
-
+                            <form action="{{route('admin.contactPersons.edit.post',$dealer->id)}}" method="POST" enctype="multipart/form-data">
                                         @csrf
-                                        <input type="hidden" name="id" id="id" value="{{$dealer->id}}">
+                                        <input type="hidden" name="id" id="id" value="{{$contactPersons->id}}">
                                         <div class="row mb-3">
                                             <div class="col-lg-4">
-                                                <label for="name">Dealer Name</label>
-                                                <input type="text" id="name" name="name" class="form-control" value="{{$dealer->business_name}}"  autofocus {{old('name')}}>
+                                                <label for="name">Name</label>
+                                                <input type="text" id="name" name="name" class="form-control" value="{{$contactPersons->name}}"  autofocus {{old('name')}}>
                                                 <span>
                                                     @error('name')
                                                     <span class="text-danger">{{$message}}</span>
@@ -57,8 +56,8 @@
                                                 </span>
                                             </div>
                                             <div class="col-lg-4">
-                                                <label for="name">Dealer Email</label>
-                                                <input type="email" id="email" name="email" class="form-control" value="{{$dealer->business_email}}"  autofocus {{old('email')}}>
+                                                <label for="name">Email</label>
+                                                <input type="email" id="email" name="email" class="form-control" value="{{$contactPersons->email}}"  autofocus {{old('email')}}>
                                                 <span>
                                                     @error('email')
                                                     <span class="text-danger">{{$message}}</span>

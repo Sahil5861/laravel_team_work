@@ -39,11 +39,6 @@ class DealersController extends Controller
                                     <span class="slider round status-text"></span>
                             </label>';
                 })
-                ->addColumn('contact_person', function ($row){
-                    
-                    return '<select class="form-control contact-person-select" data-dealer-id="' . $row->id . '"></select>';
-
-                })
                 ->addColumn('action', function ($row) {
                     return '<div class="dropdown">
                                     <a href="#" class="text-body" data-bs-toggle="dropdown">
@@ -59,7 +54,7 @@ class DealersController extends Controller
                                     </div>
                                 </div>';
                 })
-                ->rawColumns(['action', 'status', 'contact_person'])
+                ->rawColumns(['action', 'status'])
                 ->make(true);
             }
             $contactPersons = ContactPerson::where('status', 0)->get();
@@ -70,7 +65,7 @@ class DealersController extends Controller
 
     public function create()
     {
-        $contactPersons = ContactPerson::where('status', 1)->get();
+        $contactPersons = ContactPerson::where('is_primary', 0)->get();
         return view('admin.pages.dealers.create', compact('contactPersons'));
     }
 
@@ -234,6 +229,8 @@ class DealersController extends Controller
                 $dealers = $query->get();
                 $dealersData = [];
                 foreach ($dealers as $dealer) {
+                    $contactPerson = ContactPerson::where('id', $dealer->contact_person_id)->first();
+
                     $dealersData[] = [
                         $dealer->id,
                         $dealer->business_name,
@@ -242,9 +239,9 @@ class DealersController extends Controller
                         $dealer->city,
                         $dealer->state,
                         $dealer->country,
-                        $dealer->contact_person_id,
-                        $dealer->authenticated,
-                        $dealer->GST_number,
+                        $contactPerson ? $contactPerson->name : 'Not assigned', // Safely handle null case
+                        $dealer->authenticated ? 'Yes' : 'No',
+                        $dealer->GST_number ? $dealer->GST_number : 'Not Provided',
                     ];
                 }
                 $sheet->fromArray($dealersData, null, 'A2');

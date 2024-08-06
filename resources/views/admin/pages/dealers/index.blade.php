@@ -142,15 +142,15 @@
                 {data : 'address', 'name' : 'address', render:function (data, type, row){
                     return row.city + ', ' + row.state + ', ' + row.country;
                 }},
-                { data: 'contact_person', name: 'contact_person',
-                //  render: function (data, type, row){
-                //     if (row.contact_person_id == null) {
-                //         return 'Not Provided'
-                //     }
-                //     else {
-                //         return row.contact_person.name;
-                //     } 
-                // }
+                { data: 'contact_person_id', name: 'contact_person_id',
+                 render: function (data, type, row){
+                    if (row.contact_person_id == null) {
+                        return 'Not Provided'
+                    }
+                    else {
+                        return row.contact_person.name;
+                    } 
+                }
                 },
                 { data: 'authenticated', name: 'authenticated', render: function (data, type, row){
                     if(data == 1){
@@ -167,16 +167,6 @@
 
             order: [[1, 'asc']],
             drawCallback: function (settings) {
-                $('.contact-person-select').each(function() {
-                var dealerId = $(this).data('dealer-id');
-                var $select = $(this);
-                $select.empty();
-
-                $select.append('<option>Select Contact Person</option>');
-                contactPersons.forEach(function(person) {
-                    $select.append('<option value="' + person.id + '">' + person.name + '</option>');
-                });
-            });
                 $('#select-all').on('click', function () {
                     var isChecked = this.checked;
                     $('#dealers-table .select-row').each(function () {

@@ -182,6 +182,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('admin/contact-persons/create', [DealersController::class, 'store'])->name('admin.contactPersons.create.post');
     Route::get('admin/contact-persons/edit/{id}', [ContactPersonController::class, 'edit'])->name('admin.contactPersons.edit');
     
-
+    
     Route::delete('admin/contact-persons/delete-selected', [ContactPersonController::class, 'deleteSelected'])->name('admin.contactPersons.deleteSelected');
+    Route::get('admin/contact-persons/export', [ContactPersonController::class, 'export'])->name('admin.contactPersons.export');
+    Route::post('admin/contact-persons/import', [ContactPersonController::class, 'import'])->name('admin.contactPersons.import');
 });

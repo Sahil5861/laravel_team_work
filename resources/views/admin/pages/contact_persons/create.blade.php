@@ -67,9 +67,9 @@
                                             </div>
                                             <div class="col-lg-6">
                                                 <label for="name">Designation</label>
-                                                <input type="text" id="designatin" name="designatin" class="form-control" placeholder="Enter Contact Persons Designation"  autofocus {{old('designatin')}} >
+                                                <input type="text" id="designation" name="designation" class="form-control" placeholder="Enter Contact Persons Designation"  autofocus {{old('designation')}} >
                                                 <span>
-                                                    @error('designatin')
+                                                    @error('designation')
                                                     <span class="text-danger">{{$message}}</span>
                                                     @enderror
                                                 </span>
