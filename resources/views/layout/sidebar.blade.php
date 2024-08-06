@@ -74,26 +74,26 @@
                             </a>
                         </li>
 
-                        {{-- <li class="nav-item nav-item-submenu">
+                        <li class="nav-item nav-item-submenu">
                             <a href="#" class="nav-link">
                                 <i class="ph-layout"></i>
-                                <span>Manage Examples</span>
+                                <span>Dealers</span>
                             </a>
                             <ul class="nav-group-sub collapse">
                                 <li class="nav-item">
-                                    <a href="{{ route('role.index') }}" class="nav-link">
+                                    <a href="{{ route('admin.dealers') }}" class="nav-link">
                                         <i class="ph-layout"></i>
-                                        <span>Example</span>
+                                        <span>Manage Dealers</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                    <a href="{{route('admin.contactPersons')}}" class="nav-link">
                                         <i class="ph-layout"></i>
-                                        <span>Example 2</span>
+                                        <span>Manage contact Persons</span>
                                     </a>
                                 </li>
                             </ul>
-                        </li> --}}
+                        </li>
 
                         <li class="nav-item">
                             <a href="{{route('admin.brand')}}" class="nav-link">
