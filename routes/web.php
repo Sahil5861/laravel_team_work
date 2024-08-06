@@ -39,10 +39,25 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/logout', [LoginUserController::class, 'logout'])->name('logout.get');
 
 
-    Route::resource('users', UserController::class);
-    Route::post('users/delete-selected', [UserController::class, 'deleteSelected'])->name('users.deleteSelected');
-    Route::post('users/activate-selected', [UserController::class, 'activateSelected'])->name('users.activateSelected');
-    Route::post('users/deactivate-selected', [UserController::class, 'deactivateSelected'])->name('users.deactivateSelected');
+
+
+
+    Route::get('admin/user', [UserController::class, 'index'])->name('admin.user');
+    Route::post('admin/user/update-status/{id}', [UserController::class, 'updateStatus'])->name('admin.user.status');
+    Route::get('admin/user/create', [UserController::class, 'create'])->name('admin.user.create');
+    Route::get('admin/user/edit/{id}', [UserController::class, 'edit'])->name('admin.user.edit');
+    Route::get('admin/user/delete/{id}', [UserController::class, 'remove'])->name('admin.user.delete');
+    Route::delete('admin/user/delete/{id}', [UserController::class, 'destroy'])->name('admin.user.destroy');
+    Route::post('admin/user/create', [UserController::class, 'store'])->name('admin.user.create.post');
+    Route::put('admin/user/{user}', [UserController::class, 'update'])->name('admin.user.edit.post');
+    Route::delete('admin/user/delete-selected', [UserController::class, 'deleteSelected'])->name('admin.user.deleteSelected');
+    Route::post('admin/user/import', [UserController::class, 'import'])->name('admin.user.import');
+    Route::get('admin/user/export', [UserController::class, 'export'])->name('admin.user.export');
+
+
+
+
+
 
 
     Route::get('admin/role', [RoleController::class, 'index'])->name('admin.role');
@@ -80,8 +95,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('admin/colours/bulk-delete', [ColourController::class, 'bulkDelete'])->name('colours.bulkDelete');
     Route::delete('admin/colours/delete-selected', [ColourController::class, 'deleteSelected'])->name('admin.colours.deleteSelected');
 
-    Route::resource('blogs', BlogController::class);
-    Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
+
+
 
 
 
@@ -150,14 +165,18 @@ Route::middleware(['auth'])->group(function () {
 
     // -------------------------------------Product Routes---------------------------------------
 
-    Route::get('admin/products', [ProductsController::class, 'index'])->name('admin.products');
-    Route::post('admin/products/update-status/{id}', [ProductsController::class, 'updateStatus'])->name('admin.products.status');
-    Route::get('admin/products/create', [ProductsController::class, 'create'])->name('admin.products.create');
-    Route::get('admin/products/edit/{id}', [ProductsController::class, 'edit'])->name('admin.products.edit');
-    Route::get('admin/products/delete/{id}', [ProductsController::class, 'remove'])->name('admin.products.delete');
-    Route::post('admin/products/create', [ProductsController::class, 'store'])->name('admin.products.create.post');
-    Route::post('admin/products/edit/{id}', [ProductsController::class, 'store'])->name('admin.products.edit.post');
-    Route::delete('admin/products/delete-selected', [ProductsController::class, 'deleteSelected'])->name('admin.products.deleteSelected');
+
+    Route::get('admin/product', [ProductsController::class, 'index'])->name('admin.product');
+    Route::post('admin/product/update-status/{id}', [ProductsController::class, 'updateStatus'])->name('admin.product.status');
+    Route::get('admin/product/create', [ProductsController::class, 'create'])->name('admin.product.create');
+    Route::get('admin/product/edit/{id}', [ProductsController::class, 'edit'])->name('admin.product.edit');
+    Route::get('admin/product/delete/{id}', [ProductsController::class, 'remove'])->name('admin.product.delete');
+    Route::post('admin/product/create', [ProductsController::class, 'store'])->name('admin.product.create.post');
+    Route::put('admin/product/edit/{id}', [ProductsController::class, 'update'])->name('admin.product.edit.post');
+    Route::delete('admin/product/delete-selected', [ProductsController::class, 'deleteSelected'])->name('admin.product.deleteSelected');
+    Route::get('admin/product/export', [ProductsController::class, 'export'])->name('admin.product.export');
+    Route::post('admin/product/import', [ProductsController::class, 'import'])->name('admin.product.import');
+
 
 
     // ------------------------------------Dealers Routes----------------------------------------
@@ -178,15 +197,35 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('admin/dealers/{id}/update-primary-contact', [DealersController::class,'updatePrimaryContact'])->name('admin.dealers.updatePrimary');
     //-------------------------------------Conatact Persons--------------------------------------
-    
+
     Route::get('admin/contact-persons', [ContactPersonController::class, 'index'])->name('admin.contactPersons');
     Route::post('admin/contact-persons/update-status/{id}', [ContactPersonController::class, 'updateStatus'])->name('admin.contactPersons.status');
     Route::get('admin/contact-persons/create', [ContactPersonController::class, 'create'])->name('admin.contactPersons.create');
     Route::post('admin/contact-persons/create', [DealersController::class, 'store'])->name('admin.contactPersons.create.post');
     Route::get('admin/contact-persons/edit/{id}', [ContactPersonController::class, 'edit'])->name('admin.contactPersons.edit');
+<<<<<<< HEAD
     
     
     Route::delete('admin/contact-persons/delete-selected', [ContactPersonController::class, 'deleteSelected'])->name('admin.contactPersons.deleteSelected');
     Route::get('admin/contact-persons/export', [ContactPersonController::class, 'export'])->name('admin.contactPersons.export');
     Route::post('admin/contact-persons/import', [ContactPersonController::class, 'import'])->name('admin.contactPersons.import');
+=======
+    Route::delete('admin/contact-persons/delete-selected', [ContactPersonController::class, 'deleteSelected'])->name('admin.contactPersons.deleteSelected');
+
+
+
+
+
+    Route::resource('blogs', BlogController::class);
+    Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
+
+
+>>>>>>> c172ff8f91d9b8b8d2b92d505c6b79de06bba0ce
 });
+
+
+
+
+
+
+

@@ -43,7 +43,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('users.index') }}" class="nav-link">
+                    <a href="{{ route('admin.user') }}" class="nav-link">
                         <i class="ph-layout"></i>
                         <span>Manage Users</span>
                     </a>
@@ -120,7 +120,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{route('admin.products')}}" class="nav-link">
+                            <a href="{{route('admin.product')}}" class="nav-link">
                                 <i class="ph-layout"></i>
                                 <span>Manage Product</span>
                             </a>
