@@ -67,6 +67,10 @@
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Phone</th>
+<<<<<<< HEAD
+=======
+                                        <th>Status</th>
+>>>>>>> 9021d0a439904143981df9aa966756f289ba0c59
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -98,8 +102,13 @@
                         <label for="csv_file">Select CSV File</label>
                         <input type="file" name="csv_file" class="form-control" required value="{{old('csv_file')}}">
                     </div>
+<<<<<<< HEAD
                     <a class="btn btn-success csvSample" href="{{ route('sample-file-download-contactpersons') }}">Download
                         Sample</a>
+=======
+                    <a class="btn btn-success csvSample" href="{{ route('sample-file-download-contactperson') }}">Download
+                    Sample</a>
+>>>>>>> 9021d0a439904143981df9aa966756f289ba0c59
                 </form>
             </div>
             <div class="modal-footer">
@@ -138,6 +147,10 @@
                 { data: 'name', name: 'name' },
                 { data: 'email', name: 'email' },
                 { data: 'phone', name: 'phone' },
+<<<<<<< HEAD
+=======
+                { data: 'status', name: 'status' },
+>>>>>>> 9021d0a439904143981df9aa966756f289ba0c59
             ],
 
             order: [[1, 'asc']],
