@@ -144,9 +144,9 @@ class ContactPersonController extends Controller
 
     public function deleteSelected(Request $request)
     {
-        $selectedDealers = $request->input('selected_dealers');
-        if (!empty($selectedDealers)) {
-            ContactPerson::whereIn('id', $selected_persons)->delete();
+        $contactPersons = $request->input('selected_dealers');
+        if (!empty($contactPersons)) {
+            ContactPerson::whereIn('id', $contactPersons)->delete();
             return response()->json(['success' => true, 'message' => 'Selected Records deleted successfully.']);
         }
         return response()->json(['success' => false, 'message' => 'No records selected for deletion.']);
@@ -248,5 +248,24 @@ class ContactPersonController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+
+    public function sampleFileDownloadContactPerson()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="contactperson_csv_sample.csv"',
+        ];
+
+        $columns = ['ID', 'Name', 'Email','Role', 'Phone', 'Real Password','Dealer Name'];
+
+        $callback = function () use ($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }
