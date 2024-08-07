@@ -63,7 +63,7 @@
                                         <th><input type="checkbox" id="select-all"></th>
                                         <th>ID</th>
                                         <th>Action</th>
-                                        <th>Status</th>
+                                        {{-- <th>Status</th> --}}
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Phone</th>
@@ -134,7 +134,7 @@
                 },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
-                { data: 'status', name: 'status' },
+                // { data: 'status', name: 'status' },
                 { data: 'name', name: 'name' },
                 { data: 'email', name: 'email' },
                 { data: 'phone', name: 'phone' },

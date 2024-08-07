@@ -30,14 +30,14 @@ class ContactPersonController extends Controller
 
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->addColumn('status', function ($row) {
-                    $checked = $row->status == '1' ? 'checked' : '';
-                    $text = $checked ? 'Active' : 'Inactive';
-                    return '<label class="switch">
-                                    <input type="checkbox" class="status-checkbox status-toggle" data-id="' . $row->id . '" ' . $checked . '>
-                                    <span class="slider round status-text"></span>
-                            </label>';
-                })
+                // ->addColumn('status', function ($row) {
+                //     $checked = $row->status == '1' ? 'checked' : '';
+                //     $text = $checked ? 'Active' : 'Inactive';
+                //     return '<label class="switch">
+                //                     <input type="checkbox" class="status-checkbox status-toggle" data-id="' . $row->id . '" ' . $checked . '>
+                //                     <span class="slider round status-text"></span>
+                //             </label>';
+                // })
                 ->addColumn('action', function ($row) {
                     return '<div class="dropdown">
                                     <a href="#" class="text-body" data-bs-toggle="dropdown">
