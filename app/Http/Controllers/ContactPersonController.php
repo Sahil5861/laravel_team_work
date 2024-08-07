@@ -81,7 +81,7 @@ class ContactPersonController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'phone' => 'required|string|max:20',
-            'role' => 'required|string',
+            'role_id' => 'required|',
             'pass1' => 'required|min:8|confirmed',
             'pass2' => 'required',
             'dealer_id' => 'required|string',
