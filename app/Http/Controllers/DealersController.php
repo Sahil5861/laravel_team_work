@@ -39,27 +39,25 @@ class DealersController extends Controller
                                     <span class="slider round status-text"></span>
                             </label>';
                 })
-                ->addColumn('contact_person', function ($row){
-                    
-                    return '<select class="form-control contact-person-select" data-dealer-id="' . $row->id . '"></select>';
-
+                ->addColumn('view', function ($row){
+                    return '<a href="' . route('admin.dealers.view', $row->id) . '" class="text-primary"><i class="ph-eye me-2"></i></a>';
                 })
                 ->addColumn('action', function ($row) {
                     return '<div class="dropdown">
-                                    <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                        <i class="ph-list"></i>
+                                <a href="#" class="text-body" data-bs-toggle="dropdown">
+                                    <i class="ph-list"></i>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <a href="' . route('admin.dealers.edit', $row->id) . '" class="dropdown-item">
+                                        <i class="ph-pencil me-2"></i>Edit
                                     </a>
-                                    <div class="dropdown-menu dropdown-menu-end">
-                                        <a href="' . route('admin.dealers.edit', $row->id) . '" class="dropdown-item">
-                                            <i class="ph-pencil me-2"></i>Edit
-                                        </a>
-                                        <a href="' . route('admin.dealers.delete', $row->id) . '" data-id="' . $row->id . '" class="dropdown-item delete-button">
-                                            <i class="ph-trash me-2"></i>Delete
-                                        </a>
-                                    </div>
-                                </div>';
+                                    <a href="' . route('admin.dealers.delete', $row->id) . '" data-id="' . $row->id . '" class="dropdown-item delete-button">
+                                        <i class="ph-trash me-2"></i>Delete
+                                    </a>
+                                </div>
+                            </div>';
                 })
-                ->rawColumns(['action', 'status', 'contact_person'])
+                ->rawColumns(['action', 'status', 'view'])
                 ->make(true);
             }
             $contactPersons = ContactPerson::where('status', 0)->get();
@@ -67,10 +65,14 @@ class DealersController extends Controller
         return view('admin.pages.dealers.index', compact('contactPersons'));
     }
 
+    public function view($id){
+        $dealer = Dealer::find($id);
+        return view('admin.pages.dealers.view', compact('dealer'));
+    }
 
     public function create()
     {
-        $contactPersons = ContactPerson::where('status', 1)->get();
+        $contactPersons = ContactPerson::where('is_primary', 0)->get();
         return view('admin.pages.dealers.create', compact('contactPersons'));
     }
 
@@ -234,6 +236,8 @@ class DealersController extends Controller
                 $dealers = $query->get();
                 $dealersData = [];
                 foreach ($dealers as $dealer) {
+                    $contactPerson = ContactPerson::where('id', $dealer->contact_person_id)->first();
+
                     $dealersData[] = [
                         $dealer->id,
                         $dealer->business_name,
@@ -242,9 +246,9 @@ class DealersController extends Controller
                         $dealer->city,
                         $dealer->state,
                         $dealer->country,
-                        $dealer->contact_person_id,
-                        $dealer->authenticated,
-                        $dealer->GST_number,
+                        $contactPerson ? $contactPerson->name : 'Not assigned', // Safely handle null case
+                        $dealer->authenticated ? 'Yes' : 'No',
+                        $dealer->GST_number ? $dealer->GST_number : 'Not Provided',
                     ];
                 }
                 $sheet->fromArray($dealersData, null, 'A2');

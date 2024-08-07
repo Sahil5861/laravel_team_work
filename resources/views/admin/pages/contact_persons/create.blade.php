@@ -35,41 +35,76 @@
                                 <div class="card-body">
                                     <form action="{{route('admin.contactPersons.create.post')}}" method="POST" enctype="multipart/form-data">
                                         @csrf
-                                        <div class="row mb-3">
-                                            <div class="col-lg-6">
+                                        <div class="row mb-4">
+                                            <div class="col-lg-4">
                                                 <label for="name">Contact Person Name</label>
-                                                <input type="text" id="name" name="name" class="form-control" placeholder="Enter Dealer's Name"  autofocus {{old('name')}}>
+                                                <input type="text" id="name" name="name" class="form-control" placeholder="Username"  autofocus value="{{old('name')}}">
                                                 <span>
                                                     @error('name')
                                                     <span class="text-danger">{{$message}}</span>
                                                     @enderror
                                                 </span>
                                             </div>
-                                            <div class="col-lg-6">
+                                            <div class="col-lg-4">
                                                 <label for="name">Conatct Person Email</label>
-                                                <input type="email" id="email" name="email" class="form-control" placeholder="Enter Dealer's Email"  autofocus {{old('email')}}>
+                                                <input type="email" id="email" name="email" class="form-control" placeholder="Email Id" value="{{old('email')}}">
                                                 <span>
                                                     @error('email')
                                                     <span class="text-danger">{{$message}}</span>
                                                     @enderror
                                                 </span>
                                             </div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-lg-6">
+
+                                            <div class="col-lg-4">
                                                 <label for="name">Contact Person Phone</label>
-                                                <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter Dealer's Phone Number"  autofocus {{old('phone')}} >
+                                                <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter Phone Number" value="{{old('phone')}}" >
                                                 <span>
                                                     @error('phone')
                                                     <span class="text-danger">{{$message}}</span>
                                                     @enderror
                                                 </span>
                                             </div>
-                                            <div class="col-lg-6">
-                                                <label for="name">Designation</label>
-                                                <input type="text" id="designatin" name="designatin" class="form-control" placeholder="Enter Contact Persons Designation"  autofocus {{old('designatin')}} >
+                                            
+                                            
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-lg-3">
+                                                <label for="name">Conatct Person Role</label>
+                                                <input type="text" id="role" name="role" class="form-control bg-dark text-white" placeholder="Enter Dealer's Email" value="Contact Person" readonly>
                                                 <span>
-                                                    @error('designatin')
+                                                    @error('role')
+                                                    <span class="text-danger">{{$message}}</span>
+                                                    @enderror
+                                                </span>
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <label for="password">Create Password</label>
+                                                <input type="password" id="pass1" name="pass1" class="form-control" placeholder="Create Password" value="{{old('pass1')}}">
+                                                <span>
+                                                    @error('pass1')
+                                                    <span class="text-danger">{{$message}}</span>
+                                                    @enderror
+                                                </span>
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <label for="name">Confirm Password</label>
+                                                <input type="password" id="pass2" name="pass2" class="form-control" placeholder="Create Password" value="{{old('pass2')}}">
+                                                <span>
+                                                    @error('pass2')
+                                                    <span class="text-danger">{{$message}}</span>
+                                                    @enderror
+                                                </span>
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <label for="name">Dealer</label>
+                                                <select name="dealer_id" id="dealer_id" class="form-control">
+                                                    <option value="">--Select Dealer--</option>
+                                                    @foreach ($dealers as $dealer)
+                                                        <option value="{{$dealer->id}}">{{$dealer->business_name}}</option>
+                                                    @endforeach
+                                                </select>
+                                                <span>
+                                                    @error('dealer_id')
                                                     <span class="text-danger">{{$message}}</span>
                                                     @enderror
                                                 </span>
@@ -77,7 +112,7 @@
                                         </div>
                                         <div class="row mb-3">
                                             <div class=" col-lg-4">
-                                                <button type="submit" class="btn btn-primary">Create </button>
+                                                <button type="submit" class="btn btn-primary btn-block">Create </button>
                                             </div>
                                         </div>
         

@@ -3,8 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 use App\Models\ContactPerson;
+use App\Models\User;
+use App\Models\Dealer;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 use DataTables;
 
@@ -55,7 +61,8 @@ class ContactPersonController extends Controller
 
     public function create()
     {
-        return view('admin.pages.contact_persons.create');
+        $dealers = Dealer::where('status', 1)->get();
+        return view('admin.pages.contact_persons.create', compact('dealers'));
     }
 
 
@@ -74,15 +81,21 @@ class ContactPersonController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'phone' => 'required|string|max:20',
-            'designatin' => 'required|string',
+            'role_id' => 'required|',
+            'pass1' => 'required|min:8|confirmed',
+            'pass2' => 'required',
+            'dealer_id' => 'required|string',
 
         ]);
         if (!empty($request->id)) {
-            $person = ContactPerson::firstwhere('id', $request->id);
+            $person = User::firstwhere('id', $request->id);
             $person->name = $request->input('name');
             $person->email = $request->input('email');
             $person->phone = $request->input('phone');
-            $person->designatin = $request->input('designatin');
+            $person->role = $request->input('role');
+            $person->password = Hash::make($request->input('pass1'));
+            $person->real_password = $request->input('pass1');
+            $person->dealer_id = $request->input('dealer_id');
 
             if ($person->save()) {
                 return redirect()->route('admin.contactPersons')->with('success', 'Person '.$request->id.' Updated Suuccessfully !!');
@@ -91,12 +104,15 @@ class ContactPersonController extends Controller
             }
         } else {
 
-            $person = new ContactPerson();
+            $person = new User();
 
             $person->name = $request->input('name');
             $person->email = $request->input('email');
             $person->phone = $request->input('phone');
-            $person->designatin = $request->input('designatin');
+            $person->role_id = $request->input('role');
+            $person->password =Hash::make($request->input('pass1'));
+            $person->real_password = $request->input('pass1');
+            $person->dealer_id = $request->input('dealer_id');
 
             if ($person->save()) {
                 return redirect()->route('admin.contactPersons')->with('success', 'Person added Suuccessfully !!');
@@ -132,5 +148,85 @@ class ContactPersonController extends Controller
             return response()->json(['success' => true, 'message' => 'Selected Records deleted successfully.']);
         }
         return response()->json(['success' => false, 'message' => 'No records selected for deletion.']);
+    }
+
+    // Import And Exports--------------------------------------------------------------------
+    public function import(Request $request)
+    {
+        $validate = $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt',
+        ]);
+        if ($validate == false) {
+            return redirect()->back();
+        }
+        $file = $request->file('csv_file');
+        $path = $file->getRealPath();
+        if (($handle = fopen($path, 'r')) !== false) {
+            $header = fgetcsv($handle, 1000, ','); // Skip the header row
+
+            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+                ContactPerson::create([
+                    'id' => $data[0],
+                    'name' => $data[1],
+                    'email' => $data[2],
+                    'phone' => $data[3],
+                    'designation' => $data[4],
+                    'is_primary' => $data[5],
+                ]);
+            }
+
+            fclose($handle);
+        }
+
+        return redirect()->route('admin.contactPersons')->with('success', 'Contact Persons imported successfully.');
+
+    }
+
+
+    public function export(Request $request)
+    {
+        try {
+            $status = $request->query('status', null); // Get status from query parameters
+
+            $response = new StreamedResponse(function () use ($status) {
+                $spreadsheet = new Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
+
+                // Add headers for CSV
+                $sheet->fromArray(['ID', 'Name', 'Email', 'Phone', 'Designation', 'Is Primary'], null, 'A1');
+
+                // Fetch contacts based on status
+                $query = ContactPerson::query();
+                if ($status !== null) {
+                    $query->where('status', $status);
+                }
+                $persons = $query->get();
+                $personsData = [];
+                foreach ($persons as $person) {
+                    $personsData[] = [
+                        $person->id,
+                        $person->name,
+                        $person->email,
+                        $person->phone,
+                        $person->designation,
+                        $person->is_primary ? 'YES' : 'NO',
+                    ];
+                }
+                $sheet->fromArray($personsData, null, 'A2');
+
+                // Write CSV to output
+                $writer = new Csv($spreadsheet);
+                $writer->setUseBOM(true);
+                $writer->save('php://output');
+            });
+
+            // Set headers for response
+            $response->headers->set('Content-Type', 'text/csv');
+            $response->headers->set('Content-Disposition', 'attachment; filename="contactPersons.csv"');
+
+            return $response;
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

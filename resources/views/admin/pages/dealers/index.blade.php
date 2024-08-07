@@ -61,15 +61,12 @@
                                     <tr>
                                         <th><input type="checkbox" id="select-all"></th>
                                         <th>ID</th>
+                                        <th>Status</th>
                                         <th>Actions</th>
                                         <th>Dealers Name</th>
                                         <th>Dealers Email</th>
                                         <th>Dealers Phone</th>
-                                        <th>Address</th>
-                                        <th>Conatct Person</th>
-                                        <th>Is Authorized</th>
-                                        <th>GST Number</th>
-                                        <th>Status</th>
+                                        <th>View</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -135,48 +132,16 @@
                     }
                 },
                 { data: 'id', name: 'id' },
+                { data: 'status', name: 'status' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
                 { data: 'business_name', name: 'business_name' },
                 { data: 'business_email', name: 'business_email' },
                 { data: 'phone_number', name: 'phone_number' },
-                {data : 'address', 'name' : 'address', render:function (data, type, row){
-                    return row.city + ', ' + row.state + ', ' + row.country;
-                }},
-                { data: 'contact_person', name: 'contact_person',
-                //  render: function (data, type, row){
-                //     if (row.contact_person_id == null) {
-                //         return 'Not Provided'
-                //     }
-                //     else {
-                //         return row.contact_person.name;
-                //     } 
-                // }
-                },
-                { data: 'authenticated', name: 'authenticated', render: function (data, type, row){
-                    if(data == 1){
-                        return 'Yes';
-                    } 
-                    else{
-                        return 'No';
-                    }
-
-                }},
-                {data: 'GST_number', name: 'GST_number'},
-                { data: 'status', name: 'status' },
+                { data: 'view', name: 'view', orderable: false, searchable: false },
             ],
 
             order: [[1, 'asc']],
             drawCallback: function (settings) {
-                $('.contact-person-select').each(function() {
-                var dealerId = $(this).data('dealer-id');
-                var $select = $(this);
-                $select.empty();
-
-                $select.append('<option>Select Contact Person</option>');
-                contactPersons.forEach(function(person) {
-                    $select.append('<option value="' + person.id + '">' + person.name + '</option>');
-                });
-            });
                 $('#select-all').on('click', function () {
                     var isChecked = this.checked;
                     $('#dealers-table .select-row').each(function () {

@@ -9,13 +9,8 @@
                 <div class="page-header-content d-lg-flex">
                     <div class="d-flex">
                         <h4 class="page-title mb-0">
-                            Dashboard - <span class="fw-normal">Conatct Persons</span>
+                            Dashboard - <span class="fw-normal">Dealers</span>
                         </h4>
-                        <a href="#page_header"
-                            class="btn btn-light align-self-center collapsed d-lg-none border-transparent rounded-pill p-0 ms-auto"
-                            data-bs-toggle="collapse">
-                            <i class="ph-caret-down collapsible-indicator ph-sm m-1"></i>
-                        </a>
                     </div>
                 </div>
             </div>
@@ -23,56 +18,63 @@
             <div class="content">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title">Conatct Persons</h5>
-                        <div class="card-tools text-end"
-                            style="display: flex; align-items:center; justify-content: space-between;">
-                            <div class="btns">
-                                <a href="{{ route('admin.contactPersons.create') }}" class="text-dark btn btn-primary">Add
-                                    Conatct Persons</a>
-                                <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
-                                <br><br>
-                                <select name="status" id="status" class="form-control">
-                                    <option value="">All</option>
-                                    <option value="1">Active</option>
-                                    <option value="0">Inactive</option>
-                                </select>
+                        <div class="row">
+                            <div class="col-lg-11">
+                                <h5 class="card-title">Dealers</h5>
                             </div>
-                            <div class="dropdown">
-                                <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                    <i class="ph-list"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="#" class="dropdown-item" data-toggle="modal"
-                                        data-target="#importModal">Import Contact Persons</a>
-                                    <a href="#" class="dropdown-item" id="export-contacts">Export Contact Persons</a>
-
-                                </div>
+                            <div class="col-lg-1">
+                                <a href="{{route('admin.dealers')}}" class="text-dark btn btn-info text-white">Back</a>  
                             </div>
-
                         </div>
+                        
                     </div>
                     <div class="card-body">
                         @if(session('success'))
                             <div class="alert alert-success">{{ session('success') }}</div>
                         @endif
-                        <div class="table-responsive">
-                            <table class="table table-bordered text-center" id="persons-table">
-                                <thead>
-                                    <tr>
-                                        <th><input type="checkbox" id="select-all"></th>
-                                        <th>ID</th>
-                                        <th>Action</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Designation</th>
-                                        <th>Phone</th>
-                                        <th>Status</th>
-                                        <th>Is Primary</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Dealer</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <table class="table table-striped table-borderless">
+                                            <tr>
+                                                <th>Dealer Name</th>
+                                                <td>{{$dealer->business_name}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Dealer Email</th>
+                                                <td class="text-primary">{{$dealer->business_email}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Dealer Phone</th>
+                                                <td>{{$dealer->phone_number}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Address</th>
+                                                <td>{{$dealer->city}}, {{$dealer->state}}, {{$dealer->country}}</td>
+                                           </tr>
+                                           <tr>
+                                            
+                                                <th>GST Number</th>
+                                                <td class="text-primary">{{$dealer->GST_number ? $dealer->GST_number : "----------"}}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <div class="col-md-6 ml md-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Contact Persons</h3>
+                                    </div>
+                                </div>
+                                
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -86,13 +88,13 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="importModalLabel">Import Contact Persons</h5>
+                <h5 class="modal-title" id="importModalLabel">Import Brands</h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="importForm" action="{{route('admin.contactPersons.import')}}" method="POST"
+                <form id="importForm" action="{{route('admin.brand.import')}}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
                     <div class="form-group">
@@ -112,11 +114,11 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
-        var personsTable = $('#persons-table').DataTable({
+        var dealersTable = $('#dealers-table').DataTable({
             processing: true,
             serverSide: true,
             ajax: {
-                url: "{{ route('admin.contactPersons') }}",
+                url: "{{ route('admin.dealers') }}",
                 data: function (d) {
                     d.status = $('#status').val();
                 }
@@ -131,26 +133,20 @@
                         return '<input type="checkbox" class="select-row" value="' + row.id + '">';
                     }
                 },
-                { data: 'DT_RowIndex', name: 'DT_RowIndex' },
-                { data: 'action', name: 'action', orderable: false, searchable: false },
-                { data: 'name', name: 'name' },
-                { data: 'email', name: 'email' },
-                {data: 'designation', name: 'designation'},
-                { data: 'phone', name: 'phone' },
+                { data: 'id', name: 'id' },
                 { data: 'status', name: 'status' },
-                {data: 'is_primary', name: 'is_primary',
-                    render:function (data, type, row){
-                        return data == '1'? 'Primary':''
-                    }
-                },
+                { data: 'action', name: 'action', orderable: false, searchable: false },
+                { data: 'business_name', name: 'business_name' },
+                { data: 'business_email', name: 'business_email' },
+                { data: 'phone_number', name: 'phone_number' },
+                { data: 'view', name: 'view', orderable: false, searchable: false },
             ],
 
             order: [[1, 'asc']],
-            // personsTable.ajax.reload();
             drawCallback: function (settings) {
                 $('#select-all').on('click', function () {
                     var isChecked = this.checked;
-                    $('#persons-table .select-row').each(function () {
+                    $('#dealers-table .select-row').each(function () {
                         $(this).prop('checked', isChecked);
                     });
                 });
@@ -172,11 +168,11 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: "{{ route('admin.contactPersons.deleteSelected') }}",
+                                    url: "{{ route('admin.dealers.deleteSelected') }}",
                                     method: 'DELETE',
-                                    data: { selected_persons: selectedIds },
+                                    data: { selected_dealers: selectedIds },
                                     success: function (response) {
-                                        personsTable.ajax.reload(); // Refresh the page
+                                        BrandTable.ajax.reload(); // Refresh the page
                                         Swal.fire(
                                             'Deleted!',
                                             response.success,
@@ -199,15 +195,15 @@
                     else {
                         Swal.fire(
                             'Error!',
-                            'Please select at least one Contact to delete.',
+                            'Please select at least one brand to delete.',
                             'error'
                         );
                     }
                 })
                 $('.status-toggle').on('click', function () {
-                    var conatctPersonId = $(this).data('id');
+                    var dealerId = $(this).data('id');
                     var status = $(this).is(':checked') ? 1 : 0;
-                    updateStatus(conatctPersonId, status);
+                    updateStatus(dealerId, status);
                 });
             }
 
@@ -216,13 +212,13 @@
         });
 
         $('#status').on('change', function () {
-            personsTable.ajax.reload();
+            dealersTable.ajax.reload();
         });
 
         $(document).ready(function () {
-            $('#export-contacts').on('click', function () {
+            $('#export-dealers').on('click', function () {
                 var status = $('#status').val();
-                var url = "{{ route('admin.contactPersons.export') }}";
+                var url = "{{ route('admin.dealers.export') }}";
                 if (status) {
                     url += "?status=" + status;
                 }
@@ -230,10 +226,12 @@
             });
         });
 
+    });
 
-        function updateStatus(conatctPersonId, status) {
+
+        function updateStatus(brandId, status) {
             $.ajax({
-                url: `{{ url('admin/contact-persons/update-status') }}/${conatctPersonId}`,
+                url: `{{ url('admin/dealer/update-status') }}/${brandId}`,
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -251,7 +249,7 @@
                         // alert('Status Updated !!');
 
                         // location.reload(); // Refresh the page
-                        personsTable.ajax.reload();
+                        BrandTable.ajax.reload();
                     } else {
                         alert('Failed to update status.');
                     }

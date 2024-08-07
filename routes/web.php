@@ -191,6 +191,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('admin/dealers/delete-selected', [DealersController::class, 'deleteSelected'])->name('admin.dealers.deleteSelected');
     Route::get('admin/dealers/export', [DealersController::class, 'export'])->name('admin.dealers.export');
     Route::post('admin/dealers/import', [DealersController::class, 'import'])->name('admin.dealers.import');
+    Route::get('admin/dealers/view/{id}', [DealersController::class, 'view'])->name('admin.dealers.view');
+    
+
 
     Route::post('admin/dealers/{id}/update-primary-contact', [DealersController::class,'updatePrimaryContact'])->name('admin.dealers.updatePrimary');
     //-------------------------------------Conatact Persons--------------------------------------
@@ -198,8 +201,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/contact-persons', [ContactPersonController::class, 'index'])->name('admin.contactPersons');
     Route::post('admin/contact-persons/update-status/{id}', [ContactPersonController::class, 'updateStatus'])->name('admin.contactPersons.status');
     Route::get('admin/contact-persons/create', [ContactPersonController::class, 'create'])->name('admin.contactPersons.create');
-    Route::post('admin/contact-persons/create', [DealersController::class, 'store'])->name('admin.contactPersons.create.post');
+    Route::post('admin/contact-persons/create', [ContactPersonController::class, 'store'])->name('admin.contactPersons.create.post');
     Route::get('admin/contact-persons/edit/{id}', [ContactPersonController::class, 'edit'])->name('admin.contactPersons.edit');
+    Route::delete('admin/contact-persons/delete-selected', [ContactPersonController::class, 'deleteSelected'])->name('admin.contactPersons.deleteSelected');
+    Route::get('admin/contact-persons/export', [ContactPersonController::class, 'export'])->name('admin.contactPersons.export');
+    Route::post('admin/contact-persons/import', [ContactPersonController::class, 'import'])->name('admin.contactPersons.import');
     Route::delete('admin/contact-persons/delete-selected', [ContactPersonController::class, 'deleteSelected'])->name('admin.contactPersons.deleteSelected');
 
 
