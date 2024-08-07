@@ -62,9 +62,9 @@
                                         <th><input type="checkbox" id="select-all"></th>
                                         <th>ID</th>
                                         <th>Actions</th>
+                                        <th>Status</th>
                                         <th>Product Group Name</th>
                                         <th>Created At</th>
-                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -131,9 +131,9 @@
                 },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
+                { data: 'status', name: 'status', orderable: false, searchable: false },
                 { data: 'products_group_name', name: 'products_group_name' },
                 { data: 'created_at', name: 'created_at' },
-                { data: 'status', name: 'status', orderable: false, searchable: false },
             ],
             order: [[1, 'asc']],
             drawCallback: function (settings) {

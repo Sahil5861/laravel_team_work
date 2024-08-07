@@ -63,8 +63,8 @@
                                         <th><input type="checkbox" id="select-all"></th>
                                         <th>ID</th>
                                         <th class="text-center">Actions</th>
-                                        <th>Name</th>
                                         <th>Status</th>
+                                        <th>Name</th>
                                         <th>Created At</th>
                                         <th>Updated At</th>
                                     </tr>
@@ -133,8 +133,8 @@
                 },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
-                { data: 'name', name: 'name' },
                 { data: 'status', name: 'status' },
+                { data: 'name', name: 'name' },
                 { data: 'created_at', name: 'created_at' },
                 { data: 'updated_at', name: 'updated_at' },
             ],

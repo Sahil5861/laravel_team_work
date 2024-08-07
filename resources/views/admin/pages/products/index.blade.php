@@ -61,6 +61,7 @@
                                         <th><input type="checkbox" id="select-all"></th>
                                         <th>ID</th>
                                         <th class="text-center">Actions</th>
+                                        <th>Status</th>
                                         <th>Name</th>
                                         <th>Image</th>
                                         <th>Price</th>
@@ -70,7 +71,6 @@
                                         <th>Description</th>
                                         <th>Offer Price</th>
                                         <th>Offer Expiry</th>
-                                        <th>Status</th>
                                         <th>Created Date</th>
                                         <th>Updated Date</th>
                                     </tr>
@@ -139,6 +139,7 @@
                 },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
+                { data: 'status', name: 'status' },
                 { data: 'name', name: 'name' },
                 {
                     data: 'image', name: 'image', render: function (data, type, row) {
@@ -146,7 +147,6 @@
                     }
                     , orderable: false, searchable: false
                 },
-
                 { data: 'price', name: 'price' },
                 { data: 'category', name: 'category' },
                 { data: 'brand', name: 'brand' },
@@ -155,7 +155,6 @@
                 { data: 'description', name: 'description' },
                 { data: 'offer_price', name: 'offer_price' },
                 { data: 'offer_expiry', name: 'offer_expiry' },
-                { data: 'status', name: 'status' },
                 { data: 'created_at', name: 'created_at' },
                 { data: 'updated_at', name: 'updated_at' },
             ],

@@ -63,13 +63,13 @@
                                         <th><input type="checkbox" id="select-all"></th>
                                         <th>ID</th>
                                         <th>Actions</th>
+                                        <th>Status</th>
                                         <th>Plan Name</th>
                                         <th>Description</th>
                                         <th>Image</th>
                                         <th>Price</th>
                                         <th>Special Price</th>
                                         <th>Expiry Date</th>
-                                        <th>Status</th>
                                         <th>Created At</th>
                                     </tr>
                                 </thead>
@@ -136,6 +136,7 @@
                 },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
+                { data: 'status', name: 'status' },
                 { data: 'name', name: 'name' },
                 { data: 'description', name: 'description' },
                 {
@@ -147,7 +148,6 @@
                 { data: 'price', name: 'price' },
                 { data: 'special_price', name: 'special_price' },
                 { data: 'expiry_date', name: 'expiry_date' },
-                { data: 'status', name: 'status' },
                 { data: 'created_at', name: 'created_at' },
             ],
 

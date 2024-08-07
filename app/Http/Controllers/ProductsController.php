@@ -27,6 +27,14 @@ class ProductsController extends Controller
                 $data = $query->get();
                 return DataTables::of($data)
                     ->addIndexColumn()
+                    ->addColumn('status', function ($row) {
+                        $checked = $row->status == '1' ? 'checked' : '';
+                        $text = $checked ? 'Active' : 'Inactive';
+                        return '<label class="switch">
+                                        <input type="checkbox" class="status-checkbox status-toggle" data-id="' . $row->id . '" ' . $checked . '>
+                                        <span class="slider round status-text"></span>
+                                </label>';
+                    })
                     ->addColumn('action', function ($row) {
                         return '<div class="dropdown">
                                         <a href="#" class="text-body" data-bs-toggle="dropdown">
@@ -51,14 +59,7 @@ class ProductsController extends Controller
                     ->addColumn('product_groups', function ($row) {
                         return $row->productGroup->products_group_name ?? 'N/A';
                     })
-                    ->addColumn('status', function ($row) {
-                        $checked = $row->status == '1' ? 'checked' : '';
-                        $text = $checked ? 'Active' : 'Inactive';
-                        return '<label class="switch">
-                                        <input type="checkbox" class="status-checkbox status-toggle" data-id="' . $row->id . '" ' . $checked . '>
-                                        <span class="slider round status-text"></span>
-                                </label>';
-                    })
+                 
                     ->addColumn('offer_expiry', function ($row) {
                         return $row->offer_expiry ? $row->offer_expiry->format('d M Y') : 'N/A';
                     })
