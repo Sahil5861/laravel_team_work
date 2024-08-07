@@ -102,7 +102,7 @@ class ViewsController extends Controller
         $person->dealers_id = $id;
 
         if ($person->save()) {
-            return redirect()->route('admin.dealers.view',$id)->with('success', 'New Person added Suuccessfully  for Dealer!!'. $id);
+            return redirect()->route('admin.dealers.viewdata',$id)->with('success', 'New Person added Suuccessfully  for Dealer!!'. $id);
         } else {
             return back()->with('error', 'Something went wrong !!');
         }

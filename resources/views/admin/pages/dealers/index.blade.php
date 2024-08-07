@@ -85,13 +85,13 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="importModalLabel">Import Brands</h5>
+                <h5 class="modal-title" id="importModalLabel">Import Dealers</h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="importForm" action="{{route('admin.contactPersons.import')}}" method="POST"
+                <form id="importForm" action="{{route('admin.dealers.import')}}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
                     <div class="form-group">
