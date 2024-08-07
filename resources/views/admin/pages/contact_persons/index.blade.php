@@ -64,10 +64,8 @@
                                         <th>Action</th>
                                         <th>Name</th>
                                         <th>Email</th>
-                                        <th>Designation</th>
                                         <th>Phone</th>
                                         <th>Status</th>
-                                        <th>Is Primary</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -135,14 +133,8 @@
                 { data: 'action', name: 'action', orderable: false, searchable: false },
                 { data: 'name', name: 'name' },
                 { data: 'email', name: 'email' },
-                {data: 'designation', name: 'designation'},
                 { data: 'phone', name: 'phone' },
                 { data: 'status', name: 'status' },
-                {data: 'is_primary', name: 'is_primary',
-                    render:function (data, type, row){
-                        return data == '1'? 'Primary':''
-                    }
-                },
             ],
 
             order: [[1, 'asc']],

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\ContactPerson;
 use App\Models\User;
 use App\Models\Dealer;
+use App\Models\Role;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -19,13 +20,13 @@ class ContactPersonController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $query = ContactPerson::query();
+            $query = User::query();
 
             if ($request->has('status') && $request->status != '') {
                 $query->where('status', $request->status);
             }
 
-            $data = $query->latest()->get();
+            $data = $query->where('role_id', 3)->latest()->get();
 
             return DataTables::of($data)
                 ->addIndexColumn()
@@ -62,7 +63,8 @@ class ContactPersonController extends Controller
     public function create()
     {
         $dealers = Dealer::where('status', 1)->get();
-        return view('admin.pages.contact_persons.create', compact('dealers'));
+        $roles = Role::where('status', 1)->get();
+        return view('admin.pages.contact_persons.create', compact('dealers', 'roles'));
     }
 
 
@@ -81,9 +83,9 @@ class ContactPersonController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'phone' => 'required|string|max:20',
-            'role_id' => 'required|',
-            'pass1' => 'required|min:8|confirmed',
-            'pass2' => 'required',
+            'role' => 'required|',
+            'password' => 'required|min:8|confirmed',
+            'password_confirmation' => 'required|min:8',
             'dealer_id' => 'required|string',
 
         ]);
@@ -95,7 +97,7 @@ class ContactPersonController extends Controller
             $person->role = $request->input('role');
             $person->password = Hash::make($request->input('pass1'));
             $person->real_password = $request->input('pass1');
-            $person->dealer_id = $request->input('dealer_id');
+            $person->dealers_id = $request->input('dealer_id');
 
             if ($person->save()) {
                 return redirect()->route('admin.contactPersons')->with('success', 'Person '.$request->id.' Updated Suuccessfully !!');
@@ -110,9 +112,9 @@ class ContactPersonController extends Controller
             $person->email = $request->input('email');
             $person->phone = $request->input('phone');
             $person->role_id = $request->input('role');
-            $person->password =Hash::make($request->input('pass1'));
-            $person->real_password = $request->input('pass1');
-            $person->dealer_id = $request->input('dealer_id');
+            $person->password =Hash::make($request->input('password'));
+            $person->real_password = $request->input('password');
+            $person->dealers_id = $request->input('dealer_id');
 
             if ($person->save()) {
                 return redirect()->route('admin.contactPersons')->with('success', 'Person added Suuccessfully !!');

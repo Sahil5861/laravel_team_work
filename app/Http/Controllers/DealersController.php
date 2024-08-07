@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Dealer;
+use App\Models\User;
 use App\Models\ContactPerson;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
@@ -40,7 +41,7 @@ class DealersController extends Controller
                             </label>';
                 })
                 ->addColumn('view', function ($row){
-                    return '<a href="' . route('admin.dealers.view', $row->id) . '" class="text-primary"><i class="ph-eye me-2"></i></a>';
+                    return '<a href="' . route('admin.dealers.viewdata', $row->id) . '" class="text-primary"><i class="ph-eye me-2"></i></a>';
                 })
                 ->addColumn('action', function ($row) {
                     return '<div class="dropdown">
@@ -67,7 +68,9 @@ class DealersController extends Controller
 
     public function view($id){
         $dealer = Dealer::find($id);
-        return view('admin.pages.dealers.view', compact('dealer'));
+        $users = User::where('role_id', 3)->where('dealers_id', $id)->get();
+
+        return view('admin.pages.dealers.view', compact('dealer', 'users'));
     }
 
     public function create()

@@ -13,6 +13,7 @@ use App\Http\Controllers\SizeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\DealersController;
+use App\Http\Controllers\ViewsController;
 use App\Http\Controllers\ContactPersonController;
 use Illuminate\Support\Facades\Route;
 
@@ -191,8 +192,13 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('admin/dealers/delete-selected', [DealersController::class, 'deleteSelected'])->name('admin.dealers.deleteSelected');
     Route::get('admin/dealers/export', [DealersController::class, 'export'])->name('admin.dealers.export');
     Route::post('admin/dealers/import', [DealersController::class, 'import'])->name('admin.dealers.import');
-    Route::get('admin/dealers/view/{id}', [DealersController::class, 'view'])->name('admin.dealers.view');
+    // Route::get('admin/dealers/view/{id}', [DealersController::class, 'view'])->name('admin.dealers.view');
     
+
+
+    // -------------------------------------Dealers View Routes----------------------------------
+    Route::get('admin/dealers/view/{id}', [ViewsController::class, 'getData'])->name('admin.dealers.viewdata');
+    Route::post('admin/dealers/view/create/{id}', [ViewsController::class, 'store'])->name('admin.dealers.view.create.post');
 
 
     Route::post('admin/dealers/{id}/update-primary-contact', [DealersController::class,'updatePrimaryContact'])->name('admin.dealers.updatePrimary');

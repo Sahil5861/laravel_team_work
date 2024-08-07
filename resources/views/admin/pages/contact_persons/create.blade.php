@@ -46,7 +46,7 @@
                                                 </span>
                                             </div>
                                             <div class="col-lg-4">
-                                                <label for="name">Conatct Person Email</label>
+                                                <label for="email">Conatct Person Email</label>
                                                 <input type="email" id="email" name="email" class="form-control" placeholder="Email Id" value="{{old('email')}}">
                                                 <span>
                                                     @error('email')
@@ -56,7 +56,7 @@
                                             </div>
 
                                             <div class="col-lg-4">
-                                                <label for="name">Contact Person Phone</label>
+                                                <label for="phone">Contact Person Phone</label>
                                                 <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter Phone Number" value="{{old('phone')}}" >
                                                 <span>
                                                     @error('phone')
@@ -69,8 +69,13 @@
                                         </div>
                                         <div class="row mb-3">
                                             <div class="col-lg-3">
-                                                <label for="name">Conatct Person Role</label>
-                                                <input type="text" id="role" name="role" class="form-control bg-dark text-white" placeholder="Enter Dealer's Email" value="Contact Person" readonly>
+                                                <label for="role">Conatct Person Role</label>
+                                                {{-- <input type="text" id="role" name="role" class="form-control bg-dark text-white" placeholder="Enter Dealer's Email" value="Contact Person" readonly> --}}
+                                                <select name="role" id="role" class="form-control bg-dark text-white">
+                                                    @foreach ($roles as $role)
+                                                        <option value="{{$role->id}}" {{$role->id == 3 ? 'selected': 'disabled'}}>{{$role->name}}</option>
+                                                    @endforeach
+                                                </select>
                                                 <span>
                                                     @error('role')
                                                     <span class="text-danger">{{$message}}</span>
@@ -78,8 +83,8 @@
                                                 </span>
                                             </div>
                                             <div class="col-lg-3">
-                                                <label for="password">Create Password</label>
-                                                <input type="password" id="pass1" name="pass1" class="form-control" placeholder="Create Password" value="{{old('pass1')}}">
+                                                <label for="pass1">Create Password</label>
+                                                <input type="password" id="password" name="password" class="form-control" placeholder="Create Password" value="{{old('pass1')}}">
                                                 <span>
                                                     @error('pass1')
                                                     <span class="text-danger">{{$message}}</span>
@@ -87,8 +92,8 @@
                                                 </span>
                                             </div>
                                             <div class="col-lg-3">
-                                                <label for="name">Confirm Password</label>
-                                                <input type="password" id="pass2" name="pass2" class="form-control" placeholder="Create Password" value="{{old('pass2')}}">
+                                                <label for="password_confirmation">Confirm Password</label>
+                                                <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" placeholder="Create Password" value="{{old('pass2')}}">
                                                 <span>
                                                     @error('pass2')
                                                     <span class="text-danger">{{$message}}</span>
@@ -96,11 +101,13 @@
                                                 </span>
                                             </div>
                                             <div class="col-lg-3">
-                                                <label for="name">Dealer</label>
+                                                <label for="dealer_id">Dealer</label>
                                                 <select name="dealer_id" id="dealer_id" class="form-control">
                                                     <option value="">--Select Dealer--</option>
                                                     @foreach ($dealers as $dealer)
-                                                        <option value="{{$dealer->id}}">{{$dealer->business_name}}</option>
+                                                        <option value="{{$dealer->id}}"
+                                                            {{old('dealer_id') ==$dealer->id ? 'selected' : ''}}
+                                                            >{{$dealer->business_name}}</option>
                                                     @endforeach
                                                 </select>
                                                 <span>
