@@ -148,39 +148,107 @@
                 },
 
                 { data: 'price', name: 'price' },
-                { data: 'category_name', name: 'category_name' },
-                { data: 'brand_name', name: 'brand_name' },
-                { data: 'product_group_name', name: 'product_group_name' },
+                { data: 'category', name: 'category' },
+                { data: 'brand', name: 'brand' },
+                { data: 'product_groups', name: 'product_groups' },
 
                 { data: 'description', name: 'description' },
                 { data: 'offer_price', name: 'offer_price' },
                 { data: 'offer_expiry', name: 'offer_expiry' },
-                { data: 'status', name: 'status', orderable: false, searchable: false },
+                { data: 'status', name: 'status' },
                 { data: 'created_at', name: 'created_at' },
                 { data: 'updated_at', name: 'updated_at' },
             ],
             order: [[1, 'asc']],
             drawCallback: function (settings) {
-                // Your callback code
+                $('#select-all').on('click', function () {
+                    var isChecked = this.checked;
+                    $('#product-table .select-row').each(function () {
+                        $(this).prop('checked', isChecked);
+                    });
+                });
+
+                $('#delete-selected').on('click', function () {
+                    var selectedIds = $('.select-row:checked').map(function () {
+                        return this.value;
+                    }).get();
+
+                    if (selectedIds.length > 0) {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "{{ route('admin.product.deleteSelected') }}",
+                                    method: 'DELETE',
+                                    data: { selected_products: selectedIds },
+                                    success: function (response) {
+                                        ProductTable.ajax.reload(); // Refresh the page
+                                        Swal.fire(
+                                            'Deleted!',
+                                            response.success,
+                                            'success'
+                                        );
+                                    },
+                                    error: function (xhr) {
+                                        Swal.fire(
+                                            'Error!',
+                                            'Something went wrong.',
+                                            'error'
+                                        );
+                                    }
+                                });
+                            }
+                        })
+
+
+                    }
+                    else {
+                        Swal.fire(
+                            'Error!',
+                            'Please select at least one product to delete.',
+                            'error'
+                        );
+                    }
+                })
+
+
+                $('.status-toggle').on('click', function () {
+                    var productId = $(this).data('id');
+                    var status = $(this).is(':checked') ? 1 : 0;
+                    updateStatus(productId, status);
+                });
             }
+
+
+
         });
 
         $('#status').on('change', function () {
             ProductTable.ajax.reload();
         });
 
-        $('#export-products').on('click', function () {
-            var status = $('#status').val();
-            var url = "{{ route('admin.product.export') }}";
-            if (status) {
-                url += "?status=" + status;
-            }
-            window.location.href = url;
+        $(document).ready(function () {
+            $('#export-products').on('click', function () {
+                var status = $('#status').val();
+                var url = "{{ route('admin.product.export') }}";
+                if (status) {
+                    url += "?status=" + status;
+                }
+                window.location.href = url;
+            });
         });
 
-        function updateStatus(groupId, status) {
+
+        function updateStatus(productId, status) {
             $.ajax({
-                url: `{{ url('admin/product/update-status') }}/${groupId}`,
+                url: `{{ url('admin/product/update-status') }}/${productId}`,   
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -198,7 +266,7 @@
                         // alert('Status Updated !!');
 
                         // location.reload(); // Refresh the page
-                        ProductGroupTable.ajax.reload();
+                        ProductTable.ajax.reload();
                     } else {
                         alert('Failed to update status.');
                     }
@@ -210,7 +278,6 @@
             });
         }
     });
-
 
 
 </script>

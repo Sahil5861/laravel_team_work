@@ -11,7 +11,7 @@ class Products extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = "products";
-    protected $dates = ['deleted_at'];
+    protected $dates = ['offer_expiry', 'created_at', 'updated_at', 'deleted_at'];
 
     protected $fillable = [
         'name',
@@ -26,11 +26,7 @@ class Products extends Model
         'offer_expiry'
     ];
 
-    protected $casts = [
-        'offer_expiry' => 'datetime',
-    ];
-
-    // In Product model
+    // Define relationships
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -45,5 +41,4 @@ class Products extends Model
     {
         return $this->belongsTo(ProductsGroup::class);
     }
-
 }

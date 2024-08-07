@@ -20,4 +20,5 @@ class ProductsGroup extends Model
     {
         return $this->hasMany(Products::class);
     }
+    
 }

@@ -46,18 +46,26 @@
                                         @enderror
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label for="image" class="form-label">Image</label>
-                                        <input type="file" name="image" id="image" class="form-control">
-                                        @if($product->image)
-                                            <img src="{{ asset('storage/' . $product->image) }}" alt="Product Image"
-                                                class="img-thumbnail mt-2" style="max-width: 150px;">
-                                        @endif
-                                        @error('image')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="col-lg-2">
+                                                @if($product->image)
+                                                    <div class="img mb-2">
+                                                        <img src="{{ asset($product->image) }}" alt="Current Image"
+                                                            style="max-width: 100%; height: auto;">
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="col-lg-10">
+                                                <label for="image">Update Image</label>
+                                                <input type="file" name="image" id="image" placeholder="Choose Image"
+                                                    class="form-control">
+                                                @error('image')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
                                     </div>
-
                                     <div class="mb-3">
                                         <label for="description" class="form-label">Description</label>
                                         <textarea name="description" id="description"
@@ -116,7 +124,8 @@
                                     <div class="mb-3">
                                         <label for="offer_price" class="form-label">Offer Price</label>
                                         <input type="number" step="0.01" name="offer_price" id="offer_price"
-                                            class="form-control" value="{{ old('offer_price', $product->offer_price) }}">
+                                            class="form-control"
+                                            value="{{ old('offer_price', $product->offer_price) }}">
                                         @error('offer_price')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror

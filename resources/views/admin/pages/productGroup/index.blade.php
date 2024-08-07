@@ -31,7 +31,7 @@
                                 <a href="{{ route('admin.grouprelation.create') }}" class="text-dark btn btn-primary">+
                                     Add Product Groups</a>
                                 <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
-                                <select name="status" id="status" class="form-control mt-3">
+                                <select name="status" id="status" class="form-control">
                                     <option value="">All</option>
                                     <option value="1">Active</option>
                                     <option value="0">Inactive</option>
@@ -113,9 +113,8 @@
         var ProductGroupTable = $('#group-table').DataTable({
             processing: true,
             serverSide: true,
-
             ajax: {
-                url: "{{ route('admin.grouprelation') }}",
+             url: "{{ route('admin.grouprelation') }}",
                 data: function (d) {
                     d.status = $('#status').val();
                 }
