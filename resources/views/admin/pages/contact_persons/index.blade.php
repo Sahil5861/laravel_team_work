@@ -66,11 +66,6 @@
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Phone</th>
-<<<<<<< HEAD
-                                        <th>Status</th>
-=======
-                                        <th>Is Primary</th>
->>>>>>> 2d53ff2925941769405c36f26875da3f518cc89a
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -140,15 +135,6 @@
                 { data: 'name', name: 'name' },
                 { data: 'email', name: 'email' },
                 { data: 'phone', name: 'phone' },
-<<<<<<< HEAD
-                { data: 'status', name: 'status' },
-=======
-                {data: 'is_primary', name: 'is_primary',
-                    render:function (data, type, row){
-                        return data == '1'? 'Primary':''
-                    }
-                },
->>>>>>> 2d53ff2925941769405c36f26875da3f518cc89a
             ],
 
             order: [[1, 'asc']],

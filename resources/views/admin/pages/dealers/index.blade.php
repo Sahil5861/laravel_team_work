@@ -91,7 +91,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="importForm" action="{{route('admin.brand.import')}}" method="POST"
+                <form id="importForm" action="{{route('admin.contactPersons.import')}}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
                     <div class="form-group">

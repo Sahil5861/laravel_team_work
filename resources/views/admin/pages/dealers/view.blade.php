@@ -73,7 +73,7 @@
                                         <table class="table table-striped table-borderless" id="persons-table">
                                             <thead>
                                                 <tr>
-                                                    <th>Status</th>
+                                                    {{-- <th>Status</th> --}}
                                                     <th>Action</th>
                                                     <th>Name</th>
                                                     <th>Email</th>
@@ -190,23 +190,47 @@
                 }
             },
             columns: [
-                {
-                    data: null,
-                    name: 'select',
-                    orderable: false,
-                    searchable: false,
-                    render: function (data, type, row) {
-                        return '<input type="checkbox" class="select-row" value="' + row.id + '">';
-                    }
-                },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
                 { data: 'name', name: 'name' },
                 { data: 'email', name: 'email' },
                 { data: 'phone', name: 'phone' },
                 { data: 'real_password', name: 'real_password' },
             ],
-            order: [[1, 'asc']],
-            drawCallback: function (settings) {
+            order: [[0, 'asc']],
+            drawCallback: function (settings) {  
+                
+                $('.set-primary-button').on('click', function (e){
+                    e.preventDefault();
+                    var userId = $(this).data('id');
+                    var dealerId = "{{ $dealer->id }}";
+
+                    console.log(userId, dealerId);
+                    
+
+                    $.ajax({
+                        url: "{{ route('admin.dealers.view.contact.setprimary')}}", // Update with your route
+                        method: 'POST',
+                        data: {
+                        _token: "{{ csrf_token() }}",
+                        user_id: userId,
+                        dealer_id: dealerId
+                        },
+                    success: function(response) {
+                    if (response.success) {
+                        // Reload the DataTable to reflect changes
+                        alert('Primary set');
+                        
+                        personsTable.ajax.reload();
+                    } else {
+                        alert('An error occurred.');
+                        }
+                    },
+                });
+
+                });
+                    
+
+                    
                 $('#select-all').on('click', function () {
                     var isChecked = this.checked;
                     $('#dealers-table .select-row').each(function () {

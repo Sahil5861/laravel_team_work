@@ -199,6 +199,8 @@ Route::middleware(['auth'])->group(function () {
     // -------------------------------------Dealers View Routes----------------------------------
     Route::get('admin/dealers/view/{id}', [ViewsController::class, 'getData'])->name('admin.dealers.viewdata');
     Route::post('admin/dealers/view/create/{id}', [ViewsController::class, 'store'])->name('admin.dealers.view.create.post');
+    Route::post('admin/dealers/view/setprimary', [ViewsController::class, 'setPrimary'])->name('admin.dealers.view.contact.setprimary');
+
 
 
     Route::post('admin/dealers/{id}/update-primary-contact', [DealersController::class,'updatePrimaryContact'])->name('admin.dealers.updatePrimary');

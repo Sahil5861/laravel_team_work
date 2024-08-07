@@ -198,14 +198,14 @@ class DealersController extends Controller
             $header = fgetcsv($handle, 1000, ','); // Skip the header row
 
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-                Brand::create([
+                Dealer::create([
                     'id' => $data[0],
-                    'business' => $data[1],
+                    'business_name' => $data[1],
                     'business_email' => $data[2],
                     'city' => $data[3],
                     'state' => $data[4],
                     'country' => $data[5],
-                    'conatact_person_id' => $data[6],
+                    'contact_person_id' => $data[6],
                     'authenticated' => $data[7],
                     'GST_number' => $data[8],
                 ]);

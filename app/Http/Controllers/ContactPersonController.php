@@ -163,22 +163,40 @@ class ContactPersonController extends Controller
         }
         $file = $request->file('csv_file');
         $path = $file->getRealPath();
-        if (($handle = fopen($path, 'r')) !== false) {
-            $header = fgetcsv($handle, 1000, ','); // Skip the header row
+        if (($handle = fopen($path, 'r', "\t")) !== false) {
+            $header = fgetcsv($handle, 1000, "\t"); // Adjusted to tab delimiter
+        
+            while (($data = fgetcsv($handle, 1000, "\t")) !== false) { // Adjusted to tab delimiter
+                // Ensure there are enough columns in the CSV row
+        
+                // Find the dealer by name
+                $dealer = Dealer::where('business_name', trim($data[4]))->first();
 
-            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-                ContactPerson::create([
-                    'id' => $data[0],
-                    'name' => $data[1],
-                    'email' => $data[2],
-                    'phone' => $data[3],
-                    'designation' => $data[4],
-                    'is_primary' => $data[5],
-                ]);
+                // dd($dealer);
+                // exit;
+        
+                if ($dealer) {
+                    // Create the ContactPerson record with the correct dealer_id
+                    $user = new User();
+                    $user->id = trim($data[0]);
+                    $user->name = trim($data[1]);
+                    $user->email = trim($data[2]);
+                    $user->phone = trim($data[3]);
+                    $user->dealers_id = $dealer->id;
+                    $user->role_id = trim($data[5]);
+                    $user->password = trim($data[])
+
+                    $user->save();
+                    
+                } else {
+                    // Optionally handle the case where the dealer name doesn't exist
+                    continue; // Skip this row if dealer not found
+                }
             }
-
+        
             fclose($handle);
         }
+        
 
         return redirect()->route('admin.contactPersons')->with('success', 'Contact Persons imported successfully.');
 
@@ -195,25 +213,27 @@ class ContactPersonController extends Controller
                 $sheet = $spreadsheet->getActiveSheet();
 
                 // Add headers for CSV
-                $sheet->fromArray(['ID', 'Name', 'Email', 'Phone', 'Designation', 'Is Primary'], null, 'A1');
+                $sheet->fromArray(['ID', 'Name', 'Email','Role', 'Phone', 'Real Password','Dealer Name'], null, 'A1');
 
                 // Fetch contacts based on status
-                $query = ContactPerson::query();
-                if ($status !== null) {
-                    $query->where('status', $status);
-                }
-                $persons = $query->get();
+                
+                $persons = User::where('role_id', 3)->get();
                 $personsData = [];
                 foreach ($persons as $person) {
+                    $dealer = Dealer::where('id', $person->dealers_id)->first();
+                    $dealername = $dealer ? $dealer->business_name : 'N/A';
                     $personsData[] = [
                         $person->id,
                         $person->name,
                         $person->email,
+                        $person->role_id,
                         $person->phone,
-                        $person->designation,
-                        $person->is_primary ? 'YES' : 'NO',
+                        $person->real_password,
+                        $dealername,
                     ];
                 }
+                
+                
                 $sheet->fromArray($personsData, null, 'A2');
 
                 // Write CSV to output
