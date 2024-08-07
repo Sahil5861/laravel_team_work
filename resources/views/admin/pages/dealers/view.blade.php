@@ -74,11 +74,13 @@
                                             <thead>
                                                 <tr>
                                                     {{-- <th>Status</th> --}}
+                                                    <th><input type="checkbox" id="select-all"></th>
                                                     <th>Action</th>
                                                     <th>Name</th>
                                                     <th>Email</th>
                                                     <th>Phone Number</th>
                                                     <th>Password</th>
+
                                                 </tr>
                                             </thead>
                                             <tbody></tbody>
@@ -190,6 +192,15 @@
                 }
             },
             columns: [
+                {
+                    data: null,
+                    name: 'select',
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return '<input type="checkbox" class="select-row" value="' + row.id + '">';
+                    }
+                },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
                 { data: 'name', name: 'name' },
                 { data: 'email', name: 'email' },
@@ -219,7 +230,7 @@
                     if (response.success) {
                         // Reload the DataTable to reflect changes
                         alert('Primary set');
-                        
+
                         personsTable.ajax.reload();
                     } else {
                         alert('An error occurred.');

@@ -249,4 +249,23 @@ class ContactPersonController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function sampleFileDownloadDealer()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="contact_persons.csv"',
+        ];
+
+        $columns = ['ID', 'Name', 'Email','Role', 'Phone', 'Real Password','Dealer Name'];
+
+        $callback = function () use ($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
 }

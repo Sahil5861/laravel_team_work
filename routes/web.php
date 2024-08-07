@@ -232,7 +232,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/contact-persons/export', [ContactPersonController::class, 'export'])->name('admin.contactPersons.export');
     Route::post('admin/contact-persons/import', [ContactPersonController::class, 'import'])->name('admin.contactPersons.import');
     Route::delete('admin/contact-persons/delete-selected', [ContactPersonController::class, 'deleteSelected'])->name('admin.contactPersons.deleteSelected');
-
+    Route::get('/sample-file-download-contactpersons', [ContactPersonController::class, 'sampleFileDownloadDealer'])->name('sample-file-download-contactpersons');
 
 
 
