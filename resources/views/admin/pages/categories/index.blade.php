@@ -63,10 +63,10 @@
                                         <th><input type="checkbox" id="select-all"></th>
                                         <th>Id</th>
                                         <th>Actions</th>
+                                        <th>Status</th>
                                         <th>Category Name</th>
                                         <th>Image</th>
                                         <th>Created At</th>
-                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-body">
@@ -131,6 +131,7 @@
                 },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
+                { data: 'status', name: 'status' },
                 { data: 'category_name', name: 'category_name' },
                 {
                     data: 'image', name: 'image', render: function (data, type, row) {
@@ -139,7 +140,6 @@
                     , orderable: false, searchable: false
                 },
                 { data: 'created_at', name: 'created_at' },
-                { data: 'status', name: 'status' },
             ],
             order: [[1, 'asc']],
             drawCallback: function (settings) {

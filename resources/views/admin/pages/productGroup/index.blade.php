@@ -31,7 +31,8 @@
                                 <a href="{{ route('admin.grouprelation.create') }}" class="text-dark btn btn-primary">+
                                     Add Product Groups</a>
                                 <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
-                                <select name="status" id="status" class="form-control mt-3">
+                                <br><br>
+                                <select name="status" id="status" class="form-control">
                                     <option value="">All</option>
                                     <option value="1">Active</option>
                                     <option value="0">Inactive</option>
@@ -62,9 +63,9 @@
                                         <th><input type="checkbox" id="select-all"></th>
                                         <th>ID</th>
                                         <th>Actions</th>
+                                        <th>Status</th>
                                         <th>Product Group Name</th>
                                         <th>Created At</th>
-                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -113,9 +114,8 @@
         var ProductGroupTable = $('#group-table').DataTable({
             processing: true,
             serverSide: true,
-
             ajax: {
-                url: "{{ route('admin.grouprelation') }}",
+             url: "{{ route('admin.grouprelation') }}",
                 data: function (d) {
                     d.status = $('#status').val();
                 }
@@ -132,9 +132,9 @@
                 },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
+                { data: 'status', name: 'status', orderable: false, searchable: false },
                 { data: 'products_group_name', name: 'products_group_name' },
                 { data: 'created_at', name: 'created_at' },
-                { data: 'status', name: 'status', orderable: false, searchable: false },
             ],
             order: [[1, 'asc']],
             drawCallback: function (settings) {

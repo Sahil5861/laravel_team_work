@@ -62,10 +62,15 @@
                                         <th><input type="checkbox" id="select-all"></th>
                                         <th>ID</th>
                                         <th>Action</th>
+                                        <th>Status</th>
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Phone</th>
+<<<<<<< HEAD
                                         <th>Status</th>
+=======
+                                        <th>Is Primary</th>
+>>>>>>> 2d53ff2925941769405c36f26875da3f518cc89a
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -131,10 +136,19 @@
                 },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
+                { data: 'status', name: 'status' },
                 { data: 'name', name: 'name' },
                 { data: 'email', name: 'email' },
                 { data: 'phone', name: 'phone' },
+<<<<<<< HEAD
                 { data: 'status', name: 'status' },
+=======
+                {data: 'is_primary', name: 'is_primary',
+                    render:function (data, type, row){
+                        return data == '1'? 'Primary':''
+                    }
+                },
+>>>>>>> 2d53ff2925941769405c36f26875da3f518cc89a
             ],
 
             order: [[1, 'asc']],

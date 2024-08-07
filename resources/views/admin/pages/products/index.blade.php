@@ -45,6 +45,9 @@
                                     <a href="#" class="dropdown-item" data-toggle="modal"
                                         data-target="#importModal">Import Products</a>
                                     <a href="#" class="dropdown-item" id="export-products">Export Products</a>
+
+                                    <a href="#" class="dropdown-item" data-toggle="modal"
+                                        data-target="#specificationModal">Specification</a>
                                 </div>
                             </div>
                         </div>
@@ -61,6 +64,7 @@
                                         <th><input type="checkbox" id="select-all"></th>
                                         <th>ID</th>
                                         <th class="text-center">Actions</th>
+                                        <th>Status</th>
                                         <th>Name</th>
                                         <th>Image</th>
                                         <th>Price</th>
@@ -70,7 +74,6 @@
                                         <th>Description</th>
                                         <th>Offer Price</th>
                                         <th>Offer Expiry</th>
-                                        <th>Status</th>
                                         <th>Created Date</th>
                                         <th>Updated Date</th>
                                     </tr>
@@ -86,6 +89,62 @@
         </div>
     </div>
 </div>
+
+
+
+<div class="modal fade" id="specificationModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Technical Specification</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="specifiactionForm" action="{{ route('admin.product.import') }}" method="POST"
+                    enctype="multipart/form-data">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="variants" id="specification">
+                                <div class="row specification-row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="parameterName"><b>Parameter Name</b></label>
+                                            <input type="text" name="parameterName[]" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="parameterRange"><b>Value</b></label>
+                                            <input type="text" name="parameterRange[]" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <button class="btn btn-primary add-more" type="button"
+                                                style="margin-top: 30px;">Add
+                                                More</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- <span class="btn btn-link add-more" id="addMore"><i class="dripicons-plus"></i> @lang('file.Add New Attribute')</span> -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="submit" form="specifiactionForm" class="btn btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
     aria-hidden="true">
@@ -139,48 +198,115 @@
                 },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
+                { data: 'status', name: 'status' },
                 { data: 'name', name: 'name' },
                 {
                     data: 'image', name: 'image', render: function (data, type, row) {
-                        return '<img src="' + data + '" alt="Product Image" width="70">';
+                        return '<img src="' + data + '" alt="Product Image" width="70" height="70" >';
                     }
                     , orderable: false, searchable: false
                 },
-
                 { data: 'price', name: 'price' },
-                { data: 'category_name', name: 'category_name' },
-                { data: 'brand_name', name: 'brand_name' },
-                { data: 'product_group_name', name: 'product_group_name' },
+                { data: 'category', name: 'category' },
+                { data: 'brand', name: 'brand' },
+                { data: 'product_groups', name: 'product_groups' },
 
                 { data: 'description', name: 'description' },
                 { data: 'offer_price', name: 'offer_price' },
                 { data: 'offer_expiry', name: 'offer_expiry' },
-                { data: 'status', name: 'status', orderable: false, searchable: false },
                 { data: 'created_at', name: 'created_at' },
                 { data: 'updated_at', name: 'updated_at' },
             ],
             order: [[1, 'asc']],
             drawCallback: function (settings) {
-                // Your callback code
+                $('#select-all').on('click', function () {
+                    var isChecked = this.checked;
+                    $('#product-table .select-row').each(function () {
+                        $(this).prop('checked', isChecked);
+                    });
+                });
+
+                $('#delete-selected').on('click', function () {
+                    var selectedIds = $('.select-row:checked').map(function () {
+                        return this.value;
+                    }).get();
+
+                    if (selectedIds.length > 0) {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "{{ route('admin.product.deleteSelected') }}",
+                                    method: 'DELETE',
+                                    data: { selected_products: selectedIds },
+                                    success: function (response) {
+                                        ProductTable.ajax.reload(); // Refresh the page
+                                        Swal.fire(
+                                            'Deleted!',
+                                            response.success,
+                                            'success'
+                                        );
+                                    },
+                                    error: function (xhr) {
+                                        Swal.fire(
+                                            'Error!',
+                                            'Something went wrong.',
+                                            'error'
+                                        );
+                                    }
+                                });
+                            }
+                        })
+
+
+                    }
+                    else {
+                        Swal.fire(
+                            'Error!',
+                            'Please select at least one product to delete.',
+                            'error'
+                        );
+                    }
+                })
+
+
+                $('.status-toggle').on('click', function () {
+                    var productId = $(this).data('id');
+                    var status = $(this).is(':checked') ? 1 : 0;
+                    updateStatus(productId, status);
+                });
             }
+
+
+
         });
 
         $('#status').on('change', function () {
             ProductTable.ajax.reload();
         });
 
-        $('#export-products').on('click', function () {
-            var status = $('#status').val();
-            var url = "{{ route('admin.product.export') }}";
-            if (status) {
-                url += "?status=" + status;
-            }
-            window.location.href = url;
+        $(document).ready(function () {
+            $('#export-products').on('click', function () {
+                var status = $('#status').val();
+                var url = "{{ route('admin.product.export') }}";
+                if (status) {
+                    url += "?status=" + status;
+                }
+                window.location.href = url;
+            });
         });
 
-        function updateStatus(groupId, status) {
+
+        function updateStatus(productId, status) {
             $.ajax({
-                url: `{{ url('admin/product/update-status') }}/${groupId}`,
+                url: `{{ url('admin/product/update-status') }}/${productId}`,
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -198,7 +324,7 @@
                         // alert('Status Updated !!');
 
                         // location.reload(); // Refresh the page
-                        ProductGroupTable.ajax.reload();
+                        ProductTable.ajax.reload();
                     } else {
                         alert('Failed to update status.');
                     }
@@ -212,6 +338,38 @@
     });
 
 
+</script>
 
+<script>
+    $(document).ready(function () {
+        $(".add-more").click(function () {
+            var html = `
+                            <div class="row specification-row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="parameterName"><b>Parameter Name</b></label>
+                                        <input required type="text" name="parameterName[]" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="parameterRange"><b>Value</b></label>
+                                        <input required type="text" name="parameterRange[]" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <button class="btn btn-danger remove" type="button" style="margin-top: 30px;">Remove</button>
+                                    </div>
+                                </div>
+                            </div>`;
+            $("#specification").prepend(html);
+        });
+
+        $("#specification").on("click", ".remove", function () {
+            $(this).closest(".specification-row").remove();
+        });
+    });
 </script>
 @endsection

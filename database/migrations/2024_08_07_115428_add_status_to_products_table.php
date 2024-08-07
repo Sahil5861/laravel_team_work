@@ -6,19 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->decimal('offer_price', 8, 2)->nullable();
-            $table->date('offer_expiry')->nullable();
+            $table->boolean('status')->default(true);
         });
     }
 
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('offer_price');
-            $table->dropColumn('offer_expiry');
+            //
         });
     }
 };
