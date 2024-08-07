@@ -31,6 +31,7 @@
                                 <a href="{{ route('admin.grouprelation.create') }}" class="text-dark btn btn-primary">+
                                     Add Product Groups</a>
                                 <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
+                                <br><br>
                                 <select name="status" id="status" class="form-control">
                                     <option value="">All</option>
                                     <option value="1">Active</option>

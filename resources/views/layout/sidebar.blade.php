@@ -24,7 +24,6 @@
         </div>
         <!-- /sidebar header -->
 
-
         <!-- Main navigation -->
         <div class="sidebar-section">
             <ul class="nav nav-sidebar" data-nav-type="accordion">
@@ -35,137 +34,117 @@
                     <i class="ph-dots-three sidebar-resize-show"></i>
                 </li>
                 <li class="nav-item">
-                    <a href="{{route('dashboard')}}" class="nav-link active">
+                    <a href="{{ route('dashboard') }}"
+                        class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                         <i class="ph-house"></i>
-                        <span>
-                            Dashboard
-                        </span>
+                        <span>Dashboard</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.user') }}" class="nav-link">
+                    <a href="{{ route('admin.user') }}"
+                        class="nav-link {{ request()->routeIs('admin.user') ? 'active' : '' }}">
                         <i class="ph-layout"></i>
                         <span>Manage Users</span>
                     </a>
                 </li>
 
                 <li class="nav-item nav-item-submenu">
-                    <a href="#" class="nav-link">
+                    <a href="#"
+                        class="nav-link {{ request()->routeIs('admin.role') || request()->routeIs('admin.colour') || request()->routeIs('admin.size') || request()->routeIs('admin.dealers') || request()->routeIs('admin.contactPersons') || request()->routeIs('admin.brand') || request()->routeIs('admin.plan') || request()->routeIs('admin.category') || request()->routeIs('admin.grouprelation') || request()->routeIs('admin.product') || request()->routeIs('blogs.index') ? 'active' : '' }}">
                         <i class="ph-layout"></i>
                         <span>Master</span>
                     </a>
                     <ul class="nav-group-sub collapse">
                         <li class="nav-item">
-                            <a href="{{ route('admin.role') }}" class="nav-link">
+                            <a href="{{ route('admin.role') }}"
+                                class="nav-link {{ request()->routeIs('admin.role') ? 'active' : '' }}">
                                 <i class="ph-layout"></i>
                                 <span>Manage Roles</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.colour') }}" class="nav-link">
+                            <a href="{{ route('admin.colour') }}"
+                                class="nav-link {{ request()->routeIs('admin.colour') ? 'active' : '' }}">
                                 <i class="ph-layout"></i>
                                 <span>Manage Colours</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.size') }}" class="nav-link">
+                            <a href="{{ route('admin.size') }}"
+                                class="nav-link {{ request()->routeIs('admin.size') ? 'active' : '' }}">
                                 <i class="ph-layout"></i>
                                 <span>Manage Sizes</span>
                             </a>
                         </li>
 
                         <li class="nav-item nav-item-submenu">
-                            <a href="#" class="nav-link">
+                            <a href="#"
+                                class="nav-link {{ request()->routeIs('admin.dealers') || request()->routeIs('admin.contactPersons') ? 'active' : '' }}">
                                 <i class="ph-layout"></i>
                                 <span>Dealers</span>
                             </a>
                             <ul class="nav-group-sub collapse">
                                 <li class="nav-item">
-                                    <a href="{{ route('admin.dealers') }}" class="nav-link">
+                                    <a href="{{ route('admin.dealers') }}"
+                                        class="nav-link {{ request()->routeIs('admin.dealers') ? 'active' : '' }}">
                                         <i class="ph-layout"></i>
                                         <span>Manage Dealers</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{route('admin.contactPersons')}}" class="nav-link">
+                                    <a href="{{ route('admin.contactPersons') }}"
+                                        class="nav-link {{ request()->routeIs('admin.contactPersons') ? 'active' : '' }}">
                                         <i class="ph-layout"></i>
-                                        <span>Manage contact Persons</span>
+                                        <span>Manage Contact Persons</span>
                                     </a>
                                 </li>
                             </ul>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{route('admin.brand')}}" class="nav-link">
+                            <a href="{{ route('admin.brand') }}"
+                                class="nav-link {{ request()->routeIs('admin.brand') ? 'active' : '' }}">
                                 <i class="ph-layout"></i>
                                 <span>Manage Brands</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{route('admin.plan')}}" class="nav-link">
+                            <a href="{{ route('admin.plan') }}"
+                                class="nav-link {{ request()->routeIs('admin.plan') ? 'active' : '' }}">
                                 <i class="ph-layout"></i>
                                 <span>Manage Plans</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{route('admin.category')}}" class="nav-link">
+                            <a href="{{ route('admin.category') }}"
+                                class="nav-link {{ request()->routeIs('admin.category') ? 'active' : '' }}">
                                 <i class="ph-layout"></i>
                                 <span>Manage Categories</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{route('admin.grouprelation')}}" class="nav-link">
+                            <a href="{{ route('admin.grouprelation') }}"
+                                class="nav-link {{ request()->routeIs('admin.grouprelation') ? 'active' : '' }}">
                                 <i class="ph-layout"></i>
                                 <span>Manage Product Relation</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{route('admin.product')}}" class="nav-link">
+                            <a href="{{ route('admin.product') }}"
+                                class="nav-link {{ request()->routeIs('admin.product') ? 'active' : '' }}">
                                 <i class="ph-layout"></i>
                                 <span>Manage Product</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('blogs.index') }}" class="nav-link">
+                            <a href="{{ route('blogs.index') }}"
+                                class="nav-link {{ request()->routeIs('blogs.index') ? 'active' : '' }}">
                                 <i class="ph-layout"></i>
                                 <span>Manage Blogs</span>
                             </a>
                         </li>
                     </ul>
                 </li>
-                {{-- <li class="nav-item nav-item-submenu">
-                    <a href="#" class="nav-link">
-                        <i class="ph-layout"></i>
-                        <span>Products</span>
-                    </a>
-                    <ul class="nav-group-sub collapse">
-                        <li class="nav-item">
-                            <a href="{{route('admin.brand')}}" class="nav-link">
-                                <i class="ph-layout"></i>
-                                <span>Manage Brands</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{route('admin.category')}}" class="nav-link">
-                                <i class="ph-layout"></i>
-                                <span>Manage Categories</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{route('admin.grouprelation')}}" class="nav-link">
-                                <i class="ph-layout"></i>
-                                <span>Manage Product Relation</span>
-                            </a>
-                        </li>
-                        <div class="dropdown-divider"></div>
-                        <li class="nav-item">
-                            <a href="{{route('admin.products')}}" class="nav-link">
-                                <i class="ph-layout"></i>
-                                <span>Manage Product</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li> --}}
             </ul>
         </div>
         <!-- /main navigation -->

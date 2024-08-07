@@ -45,6 +45,9 @@
                                     <a href="#" class="dropdown-item" data-toggle="modal"
                                         data-target="#importModal">Import Products</a>
                                     <a href="#" class="dropdown-item" id="export-products">Export Products</a>
+
+                                    <a href="#" class="dropdown-item" data-toggle="modal"
+                                        data-target="#specificationModal">Specification</a>
                                 </div>
                             </div>
                         </div>
@@ -86,6 +89,62 @@
         </div>
     </div>
 </div>
+
+
+
+<div class="modal fade" id="specificationModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Technical Specification</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="specifiactionForm" action="{{ route('admin.product.import') }}" method="POST"
+                    enctype="multipart/form-data">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="variants" id="specification">
+                                <div class="row specification-row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="parameterName"><b>Parameter Name</b></label>
+                                            <input type="text" name="parameterName[]" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="parameterRange"><b>Value</b></label>
+                                            <input type="text" name="parameterRange[]" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <button class="btn btn-primary add-more" type="button"
+                                                style="margin-top: 30px;">Add
+                                                More</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- <span class="btn btn-link add-more" id="addMore"><i class="dripicons-plus"></i> @lang('file.Add New Attribute')</span> -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="submit" form="specifiactionForm" class="btn btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
     aria-hidden="true">
@@ -143,7 +202,7 @@
                 { data: 'name', name: 'name' },
                 {
                     data: 'image', name: 'image', render: function (data, type, row) {
-                        return '<img src="' + data + '" alt="Product Image" width="70">';
+                        return '<img src="' + data + '" alt="Product Image" width="70" height="70" >';
                     }
                     , orderable: false, searchable: false
                 },
@@ -247,7 +306,7 @@
 
         function updateStatus(productId, status) {
             $.ajax({
-                url: `{{ url('admin/product/update-status') }}/${productId}`,   
+                url: `{{ url('admin/product/update-status') }}/${productId}`,
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -279,5 +338,38 @@
     });
 
 
+</script>
+
+<script>
+    $(document).ready(function () {
+        $(".add-more").click(function () {
+            var html = `
+                            <div class="row specification-row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="parameterName"><b>Parameter Name</b></label>
+                                        <input required type="text" name="parameterName[]" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="parameterRange"><b>Value</b></label>
+                                        <input required type="text" name="parameterRange[]" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <button class="btn btn-danger remove" type="button" style="margin-top: 30px;">Remove</button>
+                                    </div>
+                                </div>
+                            </div>`;
+            $("#specification").prepend(html);
+        });
+
+        $("#specification").on("click", ".remove", function () {
+            $(this).closest(".specification-row").remove();
+        });
+    });
 </script>
 @endsection

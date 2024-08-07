@@ -66,6 +66,9 @@ class ProductsController extends Controller
                     ->addColumn('created_at', function ($row) {
                         return $row->created_at->format('d M Y');
                     })
+                    ->addColumn('description', function ($row) {
+                        return \Illuminate\Support\Str::words($row->description, 10, '...');
+                    })
                     ->addColumn('updated_at', function ($row) {
                         return $row->updated_at->format('d M Y');
                     })
@@ -156,7 +159,7 @@ class ProductsController extends Controller
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'required|exists:brands,id',
             'product_group_id' => 'required|exists:product_groups,id',
-            'description' => 'nullable|string',
+            'description' => 'required',
             'offer_price' => 'nullable|numeric',
             'offer_expiry' => 'nullable|date',
         ]);
@@ -167,7 +170,7 @@ class ProductsController extends Controller
         $product->category_id = $request->input('category_id');
         $product->brand_id = $request->input('brand_id');
         $product->product_group_id = $request->input('product_group_id');
-        $product->description = $request->input('description', ''); // Default to empty string if not provided
+        $product->description = $request->input('description');
         $product->offer_price = $request->input('offer_price');
         $product->offer_expiry = $request->input('offer_expiry') ? \Carbon\Carbon::parse($request->input('offer_expiry'))->format('Y-m-d H:i:s') : null;
 
@@ -213,7 +216,7 @@ class ProductsController extends Controller
             'name' => 'required|string|max:255',
             'price' => 'required|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'description' => 'nullable|string',
+            'description' => 'required',
             'category_id' => 'nullable|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
             'product_group_id' => 'nullable|exists:product_groups,id',
@@ -224,7 +227,7 @@ class ProductsController extends Controller
         // Update the product fields
         $product->name = $validatedData['name'];
         $product->price = $validatedData['price'];
-        $product->description = $validatedData['description'] ?? ''; // Default to empty string if not provided
+        $product->description = $validatedData('description');
         $product->category_id = $validatedData['category_id'];
         $product->brand_id = $validatedData['brand_id'];
         $product->product_group_id = $validatedData['product_group_id'];
