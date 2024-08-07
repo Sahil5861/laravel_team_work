@@ -103,7 +103,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="specifiactionForm" action="{{ route('admin.product.import') }}" method="POST"
+                <form id="specifiactionForm" action="{{ route('admin.product') }}" method="POST"
                     enctype="multipart/form-data">
                     <div class="card">
                         <div class="card-body">
@@ -130,8 +130,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- <span class="btn btn-link add-more" id="addMore"><i class="dripicons-plus"></i> @lang('file.Add New Attribute')</span> -->
                         </div>
                     </div>
                 </form>
@@ -164,6 +162,8 @@
                         <label for="csv_file">Select CSV File</label>
                         <input type="file" name="csv_file" class="form-control" required value="{{ old('csv_file') }}">
                     </div>
+                    <a class="btn btn-success csvSample" href="{{ route('sample-file-download-product') }}">Download
+                        Sample</a>
                 </form>
             </div>
             <div class="modal-footer">

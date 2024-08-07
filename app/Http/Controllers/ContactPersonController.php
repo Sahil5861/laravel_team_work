@@ -184,8 +184,6 @@ class ContactPersonController extends Controller
                     $user->phone = trim($data[3]);
                     $user->dealers_id = $dealer->id;
                     $user->role_id = trim($data[5]);
-                    $user->password = trim($data[])
-
                     $user->save();
                     
                 } else {

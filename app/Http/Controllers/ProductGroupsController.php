@@ -71,46 +71,52 @@ class ProductGroupsController extends Controller
 
     public function store(Request $request)
     {
-
         $validate = $request->validate([
             'name' => 'required',
         ]);
 
         if ($validate == false) {
-            return back()->with('error', 'Required Feild');
+            return back()->with('error', 'Required Field');
         }
+
         if (!empty($request->id)) {
-            $productsgroup = ProductsGroup::firstwhere('id', $request->id);
-            $productsgroup->productsgroup_name = $request->input('name');
-
-            if ($productsgroup->save()) {
-                return back()->with('success', 'Productsgroup Updated Suuccessfully !!');
-            } else {
-                return back()->with('error', 'Something went wrong !!');
+            // Editing an existing product group
+            $productsgroup = ProductsGroup::find($request->id);
+            if (!$productsgroup) {
+                return back()->with('error', 'Product Group not found');
             }
-        } else {
-            $productsgroup = new ProductsGroup();
-
             $productsgroup->products_group_name = $request->input('name');
 
             if ($productsgroup->save()) {
-                return back()->with('success', 'Productsgroup added Suuccessfully !!');
+                return redirect()->route('admin.grouprelation')->with('success', 'Product Group Updated Successfully!');
             } else {
-                return back()->with('error', 'Something went wrong !!');
+                return back()->with('error', 'Something went wrong!');
+            }
+        } else {
+            // Creating a new product group
+            $productsgroup = new ProductsGroup();
+            $productsgroup->products_group_name = $request->input('name');
+
+            if ($productsgroup->save()) {
+                return redirect()->route('admin.grouprelation')->with('success', 'Product Group Added Successfully!');
+            } else {
+                return back()->with('error', 'Something went wrong!');
             }
         }
     }
 
+
     public function remove(Request $request, $id)
     {
-        $productsgroup = ProductsGroup::firstwhere('id', $request->id);
-
-        if ($productsgroup->delete()) {
-            return back()->with('success', 'Productsgroup deleted Suuccessfully !!');
+        $productsgroup = ProductsGroup::find($id);
+    
+        if ($productsgroup && $productsgroup->delete()) {
+            return redirect()->route('admin.grouprelation')->with('success', 'Product Group Deleted Successfully!');
         } else {
-            return back()->with('error', 'Something went wrong !!');
+            return redirect()->route('admin.grouprelation')->with('error', 'Something went wrong!');
         }
     }
+    
 
     public function updateStatus($id, Request $request)
     {
@@ -213,5 +219,23 @@ class ProductGroupsController extends Controller
     }
 
 
+
+    public function sampleFileDownloadProductGroup()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="productgroup_csv_sample.csv"',
+        ];
+
+        $columns = ['ID', 'Name'];
+
+        $callback = function () use ($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 
 }

@@ -21,7 +21,7 @@
                         <h5 class="card-title fw-bold">Add Colour</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('colour.store') }}" method="POST">
+                        <form action="{{ route('admin.colour.create.post') }}" method="POST">
                             @csrf
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name</label>

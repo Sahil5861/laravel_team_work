@@ -27,7 +27,8 @@
                         <div class="card-tools text-end"
                             style="display: flex; align-items:center; justify-content: space-between;">
                             <div class="btns">
-                                <a href="{{ route('admin.contactPersons.create') }}" class="text-dark btn btn-primary">Add
+                                <a href="{{ route('admin.contactPersons.create') }}"
+                                    class="text-dark btn btn-primary">Add
                                     Conatct Persons</a>
                                 <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
                                 <br><br>
@@ -66,6 +67,10 @@
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Phone</th>
+<<<<<<< HEAD
+=======
+                                        <th>Status</th>
+>>>>>>> 49ac828ce07e0c1598b6498cd2b5ab232c831d33
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -135,6 +140,10 @@
                 { data: 'name', name: 'name' },
                 { data: 'email', name: 'email' },
                 { data: 'phone', name: 'phone' },
+<<<<<<< HEAD
+=======
+                { data: 'status', name: 'status' },
+>>>>>>> 49ac828ce07e0c1598b6498cd2b5ab232c831d33
             ],
 
             order: [[1, 'asc']],

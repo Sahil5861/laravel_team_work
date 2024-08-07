@@ -25,10 +25,11 @@ class ColourController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('status', function ($row) {
-                    $checked = $row->status == 'active' ? 'checked' : '';
+                    $checked = $row->status == '1' ? 'checked' : '';
+                    $text = $checked ? 'Active' : 'Inactive';
                     return '<label class="switch">
-                                <input type="checkbox" class="status-toggle" data-id="' . $row->id . '" ' . $checked . '>
-                                <span class="slider round"></span>
+                                    <input type="checkbox" class="status-checkbox status-toggle" data-id="' . $row->id . '" ' . $checked . '>
+                                    <span class="slider round status-text"></span>
                             </label>';
                 })
                 ->addColumn('created_at', function ($row) {
@@ -36,22 +37,18 @@ class ColourController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     return '<div class="dropdown">
-                                <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                    <i class="ph-list"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="' . route('colour.edit', $row->id) . '" class="dropdown-item">
-                                        <i class="ph-pencil me-2"></i>Edit
+                                    <a href="#" class="text-body" data-bs-toggle="dropdown">
+                                        <i class="ph-list"></i>
                                     </a>
-                                    <form action="' . route('colour.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure you want to delete this colour?\')">
-                                        ' . csrf_field() . '
-                                        ' . method_field('DELETE') . '
-                                        <button type="submit" class="dropdown-item">
+                                    <div class="dropdown-menu dropdown-menu-end">
+                                        <a href="' . route('admin.colour.edit', $row->id) . '" class="dropdown-item">
+                                            <i class="ph-pencil me-2"></i>Edit
+                                        </a>
+                                        <a href="' . route('admin.colour.delete', $row->id) . '" data-id="' . $row->id . '" class="dropdown-item delete-button">
                                             <i class="ph-trash me-2"></i>Delete
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>';
+                                        </a>
+                                    </div>
+                                </div>';
                 })
                 ->rawColumns(['action', 'status'])
                 ->make(true);
@@ -59,107 +56,88 @@ class ColourController extends Controller
 
         return view('admin.colour.index');
     }
-
     public function create()
     {
         return view('admin.colour.create');
     }
 
-    public function store(Request $request)
+    public function edit($id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'short_name' => 'required|string|max:255',
-            'status' => 'nullable|in:active,inactive',
-        ]);
-
-        Colour::create([
-            'name' => $request->name,
-            'short_name' => $request->short_name,
-            'status' => $request->status ?? 'inactive',
-        ]);
-
-        return redirect()->route('colour.index')
-            ->with('success', 'Colour created successfully.');
-    }
-
-    public function edit(Colour $colour)
-    {
+        $colour = Colour::findOrFail($id);
         return view('admin.colour.edit', compact('colour'));
     }
 
-    public function update(Request $request, Colour $colour)
+
+
+    public function store(Request $request)
     {
-        $request->validate([
+
+        $validate = $request->validate([
             'name' => 'required|string|max:255',
             'short_name' => 'required|string|max:255',
-            'status' => 'required|in:active,inactive',
         ]);
+        if (!empty($request->id)) {
+            $colour = Colour::firstwhere('id', $request->id);
+            $colour->name = $request->input('name');
+            $colour->short_name = $request->input('short_name');
 
-        $colour->update($request->only('name', 'short_name', 'status'));
+            if ($colour->save()) {
+                return redirect()->route('admin.colour')->with('success', 'Colour ' . $request->id . ' Updated Suuccessfully !!');
+            } else {
+                return back()->with('error', 'Something went wrong !!');
+            }
+        } else {
+            $colour = new Colour();
 
-        return redirect()->route('colour.index')
-            ->with('success', 'Colour updated successfully.');
-    }
+            $colour->name = $request->input('name');
+            $colour->short_name = $request->input('short_name');
 
-    public function destroy(Colour $colour)
-    {
-        $colour->delete();
-
-        return redirect()->route('colour.index')
-            ->with('success', 'Colour deleted successfully.');
-    }
-
-
-    public function toggleStatus(Request $request, $id)
-    {
-        $colour = Colour::find($id);
-        if ($colour) {
-            $colour->status = $request->input('status');
-            $colour->save();
-
-            return response()->json(['success' => 'Status updated successfully.']);
+            if ($colour->save()) {
+                return redirect()->route('admin.colour')->with('success', 'Colour added Suuccessfully !!');
+            } else {
+                return back()->with('error', 'Something went wrong !!');
+            }
         }
-
-        return response()->json(['error' => 'Colour not found.'], 404);
     }
 
-    public function bulkDelete(Request $request)
+
+    public function deleteSelected(Request $request)
     {
-        $ids = $request->ids;
-        Colour::whereIn('id', $ids)->delete();
-
-        return response()->json(['success' => 'Selected Colours have been deleted.']);
+        $selectedColours = $request->input('selected_colours');
+        if (!empty($selectedColours)) {
+            Colour::whereIn('id', $selectedColours)->delete();
+            return response()->json(['success' => true, 'message' => 'Selected Colours deleted successfully.']);
+        }
+        return response()->json(['success' => false, 'message' => 'No Colour selected for deletion.']);
     }
 
 
+    public function remove(Request $request, $id)
+    {
+        $colour = Colour::firstwhere('id', $request->id);
 
-    public function updateStatus($id, Request $request){
+        if ($colour->delete()) {
+            return back()->with('success', 'Colour deleted Suuccessfully !!');
+        } else {
+            return back()->with('error', 'Something went wrong !!');
+        }
+    }
+    public function updateStatus($id, Request $request)
+    {
         $request->validate([
             'status' => 'required|boolean',
         ]);
-        $color = Colour::findOrFail($id);
-        if ($color) {
-            $color->status = $request->status;
-            $color->save();
+
+        $colour = Colour::findOrFail($id);
+        if ($colour) {
+            $colour->status = $request->status;
+            $colour->save();
             return response()->json(['success' => true]);
         } else {
             return response()->json(['success' => false]);
         }
 
     }
-
-    public function bulkStatusUpdate(Request $request)
-    {
-        $ids = $request->ids;
-        $status = $request->status;
-
-        Colour::whereIn('id', $ids)->update(['status' => $status]);
-
-        return response()->json(['success' => 'Selected Colours have been updated.']);
-    }
-
-
 
     public function import(Request $request)
     {
@@ -235,6 +213,25 @@ class ColourController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function sampleFileDownloadColour()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="colour_csv_sample.csv"',
+        ];
+
+        $columns = ['ID', 'Name', 'Short Name', 'status'];
+
+        $callback = function () use ($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
 
 
 }

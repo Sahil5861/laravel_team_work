@@ -25,10 +25,11 @@ class SizeController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('status', function ($row) {
-                    $checked = $row->status == 'active' ? 'checked' : '';
+                    $checked = $row->status == '1' ? 'checked' : '';
+                    $text = $checked ? 'Active' : 'Inactive';
                     return '<label class="switch">
-                                <input type="checkbox" class="status-toggle" data-id="' . $row->id . '" ' . $checked . '>
-                                <span class="slider round"></span>
+                                    <input type="checkbox" class="status-checkbox status-toggle" data-id="' . $row->id . '" ' . $checked . '>
+                                    <span class="slider round status-text"></span>
                             </label>';
                 })
                 ->addColumn('created_at', function ($row) {
@@ -36,22 +37,18 @@ class SizeController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     return '<div class="dropdown">
-                                <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                    <i class="ph-list"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="' . route('size.edit', $row->id) . '" class="dropdown-item">
-                                        <i class="ph-pencil me-2"></i>Edit
+                                    <a href="#" class="text-body" data-bs-toggle="dropdown">
+                                        <i class="ph-list"></i>
                                     </a>
-                                    <form action="' . route('size.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure you want to delete this size?\')">
-                                        ' . csrf_field() . '
-                                        ' . method_field('DELETE') . '
-                                        <button type="submit" class="dropdown-item">
+                                    <div class="dropdown-menu dropdown-menu-end">
+                                        <a href="' . route('admin.size.edit', $row->id) . '" class="dropdown-item">
+                                            <i class="ph-pencil me-2"></i>Edit
+                                        </a>
+                                        <a href="' . route('admin.size.delete', $row->id) . '" data-id="' . $row->id . '" class="dropdown-item delete-button">
                                             <i class="ph-trash me-2"></i>Delete
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>';
+                                        </a>
+                                    </div>
+                                </div>';
                 })
                 ->rawColumns(['action', 'status'])
                 ->make(true);
@@ -59,97 +56,87 @@ class SizeController extends Controller
 
         return view('admin.size.index');
     }
-
     public function create()
     {
         return view('admin.size.create');
     }
 
-    public function store(Request $request)
+    public function edit($id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'short_name' => 'required|string|max:255',
-            'status' => 'nullable|in:active,inactive',
-        ]);
-
-        Size::create([
-            'name' => $request->name,
-            'short_name' => $request->short_name,
-            'status' => $request->status ?? 'inactive',
-        ]);
-
-        return redirect()->route('size.index')
-            ->with('success', 'Size created successfully.');
-    }
-
-    public function edit(Size $size)
-    {
+        $size = Size::findOrFail($id);
         return view('admin.size.edit', compact('size'));
     }
 
-    public function update(Request $request, Size $size)
+
+
+    public function store(Request $request)
     {
-        $request->validate([
+
+        $validate = $request->validate([
             'name' => 'required|string|max:255',
             'short_name' => 'required|string|max:255',
-            'status' => 'required|in:active,inactive',
         ]);
+        if (!empty($request->id)) {
+            $size = Size::firstwhere('id', $request->id);
+            $size->name = $request->input('name');
+            $size->short_name = $request->input('short_name');
 
-        $size->update($request->only('name', 'short_name', 'status'));
+            if ($size->save()) {
+                return redirect()->route('admin.size')->with('success', 'Size ' . $request->id . ' Updated Suuccessfully !!');
+            } else {
+                return back()->with('error', 'Something went wrong !!');
+            }
+        } else {
+            $size = new Size();
 
-        return redirect()->route('size.index')
-            ->with('success', 'Size updated successfully.');
-    }
+            $size->name = $request->input('name');
+            $size->short_name = $request->input('short_name');
 
-    public function destroy(Size $size)
-    {
-        $size->delete();
-
-        return redirect()->route('size.index')
-            ->with('success', 'Size deleted successfully.');
-    }
-
-
-    public function toggleStatus(Request $request, $id)
-    {
-        $size = Size::find($id);
-        if ($size) {
-            $size->status = $request->input('status');
-            $size->save();
-
-            return response()->json(['success' => 'Status updated successfully.']);
+            if ($size->save()) {
+                return redirect()->route('admin.size')->with('success', 'Size added Suuccessfully !!');
+            } else {
+                return back()->with('error', 'Something went wrong !!');
+            }
         }
-
-        return response()->json(['error' => 'Size not found.'], 404);
     }
 
-    public function bulkDelete(Request $request)
-    {
-        $ids = $request->ids;
-        Size::whereIn('id', $ids)->delete();
-
-        return response()->json(['success' => 'Selected Sizes have been deleted.']);
-    }
-
-    public function bulkStatusUpdate(Request $request)
-    {
-        $ids = $request->ids;
-        $status = $request->status;
-
-        Size::whereIn('id', $ids)->update(['status' => $status]);
-
-        return response()->json(['success' => 'Selected Sizes have been updated.']);
-    }
 
     public function deleteSelected(Request $request)
     {
         $selectedSizes = $request->input('selected_sizes');
         if (!empty($selectedSizes)) {
             Size::whereIn('id', $selectedSizes)->delete();
-            return response()->json(['success' => true, 'message' => 'Selected size deleted successfully.']);
+            return response()->json(['success' => true, 'message' => 'Selected Sizes deleted successfully.']);
         }
-        return response()->json(['success' => false, 'message' => 'No sizes selected for deletion.']);
+        return response()->json(['success' => false, 'message' => 'No Size selected for deletion.']);
+    }
+
+
+    public function remove(Request $request, $id)
+    {
+        $size = Size::firstwhere('id', $request->id);
+
+        if ($size->delete()) {
+            return back()->with('success', 'Size deleted Suuccessfully !!');
+        } else {
+            return back()->with('error', 'Something went wrong !!');
+        }
+    }
+    public function updateStatus($id, Request $request)
+    {
+        $request->validate([
+            'status' => 'required|boolean',
+        ]);
+
+        $size = Size::findOrFail($id);
+        if ($size) {
+            $size->status = $request->status;
+            $size->save();
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false]);
+        }
+
     }
 
     public function import(Request $request)
@@ -180,6 +167,8 @@ class SizeController extends Controller
 
     }
 
+
+
     public function export(Request $request)
     {
         try {
@@ -191,7 +180,7 @@ class SizeController extends Controller
 
                 // Add headers for CSV
                 $sheet->fromArray(['ID', 'Name', 'Short Name', 'status'], null, 'A1');
-                // Fetch size based on status
+                // Fetch Size based on status
                 $query = Size::query();
                 if ($status !== null) {
                     $query->where('status', $status);
@@ -224,6 +213,25 @@ class SizeController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function sampleFileDownloadSize()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="size_csv_sample.csv"',
+        ];
+
+        $columns = ['ID', 'Name', 'Short Name', 'status'];
+
+        $callback = function () use ($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
 
 
 }
