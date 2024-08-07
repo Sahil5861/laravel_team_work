@@ -102,6 +102,8 @@
                         <label for="csv_file">Select CSV File</label>
                         <input type="file" name="csv_file" class="form-control" required value="{{old('csv_file')}}">
                     </div>
+                    <a class="btn btn-success csvSample" href="{{ route('sample-file-download-plan') }}">Download
+                    Sample</a>
                 </form>
             </div>
             <div class="modal-footer">

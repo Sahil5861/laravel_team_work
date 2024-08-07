@@ -45,7 +45,6 @@
                                     <a href="#" class="dropdown-item" data-toggle="modal"
                                         data-target="#importModal">Import Roles</a>
                                     <a href="#" class="dropdown-item" id="export-roles">Export Roles</a>
-
                                 </div>
                             </div>
 
@@ -99,6 +98,8 @@
                         <label for="csv_file">Select CSV File</label>
                         <input type="file" name="csv_file" class="form-control" required value="{{old('csv_file')}}">
                     </div>
+                    <a class="btn btn-success csvSample" href="{{ route('sample-file-download-role') }}">Download
+                        Sample</a>
                 </form>
             </div>
             <div class="modal-footer">

@@ -277,4 +277,22 @@ class UserController extends Controller
         }
     }
 
+    public function sampleFileDownloadUser()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="user_csv_sample.csv"',
+        ];
+
+        $columns = ['Id','Name', 'Email', 'Phone', 'Role', 'Created At'];
+
+        $callback = function () use ($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
 }

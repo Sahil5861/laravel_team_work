@@ -54,7 +54,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('admin/user/delete-selected', [UserController::class, 'deleteSelected'])->name('admin.user.deleteSelected');
     Route::post('admin/user/import', [UserController::class, 'import'])->name('admin.user.import');
     Route::get('admin/user/export', [UserController::class, 'export'])->name('admin.user.export');
-
+    Route::get('/sample-file-download-user', [UserController::class, 'sampleFileDownloadUser'])->name('sample-file-download-user');
 
 
 
@@ -71,32 +71,44 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('admin/role/delete-selected', [RoleController::class, 'deleteSelected'])->name('admin.role.deleteSelected');
     Route::get('admin/role/export', [RoleController::class, 'export'])->name('admin.role.export');
     Route::post('admin/role/import', [RoleController::class, 'import'])->name('admin.role.import');
+    Route::get('/sample-file-download-role', [RoleController::class, 'sampleFileDownloadRole'])->name('sample-file-download-role');
 
-
-    Route::resource('admin/size', SizeController::class);
-    Route::get('admin/size', [SizeController::class, 'index'])->name('admin.size');
-    Route::post('admin/sizes/toggle-status/{id}', [SizeController::class, 'toggleStatus'])->name('sizes.toggleStatus');
-    Route::post('admin/sizes/bulk-delete', [SizeController::class, 'bulkDelete'])->name('sizes.bulkDelete');
-    Route::post('admin/sizes/bulk-status-update', [SizeController::class, 'bulkStatusUpdate'])->name('sizes.bulkStatusUpdate');
-    Route::get('admin/sizes/export', [SizeController::class, 'export'])->name('sizes.export');
-    Route::post('admin/sizes/import', [SizeController::class, 'import'])->name('sizes.import');
-    Route::delete('admin/sizes/delete-selected', [SizeController::class, 'deleteSelected'])->name('admin.sizes.deleteSelected');
 
 
     // -----------------------------------colors Routes--------------------------------------
 
-    Route::resource('admin/colour', ColourController::class);
+
+
     Route::get('admin/colour', [ColourController::class, 'index'])->name('admin.colour');
-    Route::post('admin/colours/toggle-status/{id}', [ColourController::class, 'toggleStatus'])->name('colours.toggleStatus');
-    Route::post('admin/colours/delete-selected', [ColourController::class, 'deleteSelected'])->name('admin.colours.deleteSelected');
-    Route::post('admin/colours/bulk-status-update', [ColourController::class, 'bulkStatusUpdate'])->name('colours.bulkStatusUpdate');
-    Route::post('admin/colours/update-status/{id}', [ColourController::class, 'updateStatus'])->name('admin.colours.status');
-    Route::get('admin/colours/export', [ColourController::class, 'export'])->name('colours.export');
-    Route::post('admin/colours/import', [ColourController::class, 'import'])->name('colours.import');
-    Route::post('admin/colours/bulk-delete', [ColourController::class, 'bulkDelete'])->name('colours.bulkDelete');
-    Route::delete('admin/colours/delete-selected', [ColourController::class, 'deleteSelected'])->name('admin.colours.deleteSelected');
+    Route::post('admin/colour/update-status/{id}', [ColourController::class, 'updateStatus'])->name('admin.colour.status');
+    Route::get('admin/colour/create', [ColourController::class, 'create'])->name('admin.colour.create');
+    Route::get('admin/colour/edit/{id}', [ColourController::class, 'edit'])->name('admin.colour.edit');
+    Route::get('admin/colour/delete/{id}', [ColourController::class, 'remove'])->name('admin.colour.delete');
+    Route::post('admin/colour/create', [ColourController::class, 'store'])->name('admin.colour.create.post');
+    Route::put('admin/colour/edit/{id}', [ColourController::class, 'store'])->name('admin.colour.edit.post'); // Updated to PUT method
+    Route::delete('admin/colour/delete-selected', [ColourController::class, 'deleteSelected'])->name('admin.colour.deleteSelected');
+    Route::get('admin/colour/export', [ColourController::class, 'export'])->name('admin.colour.export');
+    Route::post('admin/colour/import', [ColourController::class, 'import'])->name('admin.colour.import');
+    Route::get('/sample-file-download-colour', [ColourController::class, 'sampleFileDownloadColour'])->name('sample-file-download-colour');
 
 
+
+    // -----------------------------------Size Routes--------------------------------------
+
+
+
+    Route::get('admin/size', [SizeController::class, 'index'])->name('admin.size');
+    Route::post('admin/size/update-status/{id}', [SizeController::class, 'updateStatus'])->name('admin.size.status');
+    Route::get('admin/size/create', [SizeController::class, 'create'])->name('admin.size.create');
+    Route::get('admin/size/edit/{id}', [SizeController::class, 'edit'])->name('admin.size.edit');
+    Route::get('admin/size/delete/{id}', [SizeController::class, 'remove'])->name('admin.size.delete');
+    Route::post('admin/size/create', [SizeController::class, 'store'])->name('admin.size.create.post');
+    Route::put('admin/size/edit/{id}', [SizeController::class, 'store'])->name('admin.size.edit.post'); // Updated to PUT method
+    Route::delete('admin/size/delete-selected', [SizeController::class, 'deleteSelected'])->name('admin.size.deleteSelected');
+    Route::get('admin/size/export', [SizeController::class, 'export'])->name('admin.size.export');
+    Route::post('admin/size/import', [SizeController::class, 'import'])->name('admin.size.import');
+    Route::get('/sample-file-download-size', [SizeController::class, 'sampleFileDownloadSize'])->name('sample-file-download-size');
+ 
 
 
 
@@ -114,6 +126,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('admin/category/delete-selected', [CategoryController::class, 'deleteSelected'])->name('admin.category.deleteSelected');
     Route::get('admin/category/export', [CategoryController::class, 'export'])->name('admin.category.export');
     Route::post('admin/category/import', [CategoryController::class, 'import'])->name('admin.category.import');
+    Route::get('/sample-file-download-category', [CategoryController::class, 'sampleFileDownloadCategory'])->name('sample-file-download-category');
+    Route::get('admin/category/sample-file-download', [CategoryController::class, 'downloadSampleFile'])->name('admin.category.download-sample-file');
 
 
 
@@ -129,7 +143,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('admin/brand/delete-selected', [BrandController::class, 'deleteSelected'])->name('admin.brand.deleteSelected');
     Route::get('admin/brand/export', [BrandController::class, 'export'])->name('admin.brand.export');
     Route::post('admin/brand/import', [BrandController::class, 'import'])->name('admin.brand.import');
-
+    Route::get('/sample-file-download-brand', [BrandController::class, 'sampleFileDownloadBrand'])->name('sample-file-download-brand');
 
 
 
@@ -145,7 +159,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('admin/plan/delete-selected', [PlanController::class, 'deleteSelected'])->name('admin.plan.deleteSelected');
     Route::get('admin/plan/export', [PlanController::class, 'export'])->name('admin.plan.export');
     Route::post('admin/plan/import', [PlanController::class, 'import'])->name('admin.plan.import');
-
+    Route::get('/sample-file-download-plan', [PlanController::class, 'sampleFileDownloadPlan'])->name('sample-file-download-plan');
+  
 
 
 
@@ -163,6 +178,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('admin/group-relation/delete-selected', [ProductGroupsController::class, 'deleteSelected'])->name('admin.grouprelation.deleteSelected');
     Route::get('admin/group-relation/export', [ProductGroupsController::class, 'export'])->name('admin.grouprelation.export');
     Route::post('admin/group-relation/import', [ProductGroupsController::class, 'import'])->name('admin.grouprelation.import');
+    Route::get('/sample-file-download-productgroup', [ProductGroupsController::class, 'sampleFileDownloadProductGroup'])->name('sample-file-download-productgroup');
+
 
     // -------------------------------------Product Routes---------------------------------------
 
@@ -177,7 +194,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('admin/product/delete-selected', [ProductsController::class, 'deleteSelected'])->name('admin.product.deleteSelected');
     Route::get('admin/product/export', [ProductsController::class, 'export'])->name('admin.product.export');
     Route::post('admin/product/import', [ProductsController::class, 'import'])->name('admin.product.import');
-
+    Route::get('/sample-file-download-product', [ProductsController::class, 'sampleFileDownloadProduct'])->name('sample-file-download-product');
 
 
     // ------------------------------------Dealers Routes----------------------------------------
@@ -193,7 +210,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/dealers/export', [DealersController::class, 'export'])->name('admin.dealers.export');
     Route::post('admin/dealers/import', [DealersController::class, 'import'])->name('admin.dealers.import');
     // Route::get('admin/dealers/view/{id}', [DealersController::class, 'view'])->name('admin.dealers.view');
-    
+    Route::get('/sample-file-download-dealer', [DealersController::class, 'sampleFileDownloadDealer'])->name('sample-file-download-dealer');
 
 
     // -------------------------------------Dealers View Routes----------------------------------
@@ -201,7 +218,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('admin/dealers/view/create/{id}', [ViewsController::class, 'store'])->name('admin.dealers.view.create.post');
 
 
-    Route::post('admin/dealers/{id}/update-primary-contact', [DealersController::class,'updatePrimaryContact'])->name('admin.dealers.updatePrimary');
+    Route::post('admin/dealers/{id}/update-primary-contact', [DealersController::class, 'updatePrimaryContact'])->name('admin.dealers.updatePrimary');
     //-------------------------------------Conatact Persons--------------------------------------
 
     Route::get('admin/contact-persons', [ContactPersonController::class, 'index'])->name('admin.contactPersons');

@@ -29,7 +29,7 @@ class DealersController extends Controller
             }
 
             $data = $query->latest()->with('ContactPerson')->get();
-            
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('status', function ($row) {
@@ -40,7 +40,7 @@ class DealersController extends Controller
                                     <span class="slider round status-text"></span>
                             </label>';
                 })
-                ->addColumn('view', function ($row){
+                ->addColumn('view', function ($row) {
                     return '<a href="' . route('admin.dealers.viewdata', $row->id) . '" class="text-primary"><i class="ph-eye me-2"></i></a>';
                 })
                 ->addColumn('action', function ($row) {
@@ -60,13 +60,14 @@ class DealersController extends Controller
                 })
                 ->rawColumns(['action', 'status', 'view'])
                 ->make(true);
-            }
-            $contactPersons = ContactPerson::where('status', 0)->get();
+        }
+        $contactPersons = ContactPerson::where('status', 0)->get();
 
         return view('admin.pages.dealers.index', compact('contactPersons'));
     }
 
-    public function view($id){
+    public function view($id)
+    {
         $dealer = Dealer::find($id);
         $users = User::where('role_id', 3)->where('dealers_id', $id)->get();
 
@@ -229,7 +230,7 @@ class DealersController extends Controller
                 $sheet = $spreadsheet->getActiveSheet();
 
                 // Add headers for CSV
-                $sheet->fromArray(['ID', 'Dealer Name', 'Dealer Email', 'Dealer Phone', 'City', 'State', 'Conuntry', 'Conatact Person Id', 'Is Authenticated','GST number'], null, 'A1');
+                $sheet->fromArray(['ID', 'Dealer Name', 'Dealer Email', 'Dealer Phone', 'City', 'State', 'Conuntry', 'Conatact Person Id', 'Is Authenticated', 'GST number'], null, 'A1');
 
                 // Fetch brands based on status
                 $query = Dealer::query();
@@ -272,7 +273,7 @@ class DealersController extends Controller
         }
     }
 
-   // app/Http/Controllers/DealerController.php
+    // app/Http/Controllers/DealerController.php
 
     public function updatePrimaryContact(Request $request, $dealerId)
     {
@@ -286,8 +287,25 @@ class DealersController extends Controller
         $dealer->contactPersons()->where('id', $contactPersonId)->update(['is_primary' => true]);
 
         return response()->json(['success' => 'Primary contact updated successfully.']);
-}
+    }
 
+    public function sampleFileDownloadDealer()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="dealer_csv_sample.csv"',
+        ];
+
+        $columns = ['ID', 'Dealer Name', 'Dealer Email', 'Dealer Phone', 'City', 'State', 'Conuntry', 'Conatact Person Id', 'Is Authenticated', 'GST number'];
+
+        $callback = function () use ($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 
 
 

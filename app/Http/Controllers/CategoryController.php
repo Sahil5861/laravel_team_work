@@ -6,16 +6,14 @@ use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-
 use App\Models\Category;
 
-use Yajra\DataTables\Facades\DataTables;
+use DataTables;
 
 class CategoryController extends Controller
 {
     public function index(Request $request)
     {
-
         if ($request->ajax()) {
             $query = Category::query();
 
@@ -59,85 +57,10 @@ class CategoryController extends Controller
                 ->rawColumns(['action', 'status', 'image'])
                 ->make(true);
         }
+
         return view('admin.pages.categories.index');
     }
 
-    // -----------------------------Data table-------------------------------------------
-    public function getData(Request $request)
-    {
-        $draw = $request->get('draw');
-        $start = $request->get("start", 0);
-        $rowperpage = $request->get("length", 10); // total number of rows per page
-
-        $columnIndex_arr = $request->get('order');
-        $columnName_arr = $request->get('columns');
-        $order_arr = $request->get('order');
-        $search_arr = $request->get('search');
-
-        $columnIndex = $columnIndex_arr[0]['column']; // Column index
-        $columnName = $columnName_arr[$columnIndex]['data']; // Column name
-
-        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
-        $searchValue = $search_arr['value']; // Search value
-
-        $totalRecords = Category::select('count(*) as allcount')->count();
-
-        // total records with filter
-        $totalRecordswithFilter = Category::select('count(*) as allcount')
-            ->where('category_name', 'like', '%' . $searchValue . '%')
-            ->count();
-
-        $records = Category::orderBy($columnName, $columnSortOrder)
-            ->where('category_name', 'like', '%' . $searchValue . '%')
-            ->orWhere(function ($query) use ($searchValue) {
-                $query->where('category_name', 'like', '%' . $searchValue . '%');
-            })
-            ->select('*')
-            ->skip($start)
-            ->take($rowperpage)
-            ->get();
-
-        $dataArr = array();
-
-        foreach ($records as $record) {
-            $statusLabel = $record->status == 1 ? '<span class="text-success">Active</span>' : '<span class="text-danger">Inactive</span>';
-            $statusChecked = $record->status == 1 ? 'checked' : '';
-            $dataArr[] = array(
-                "id" => $record->id,
-                "action" => '<button type="button" class="btn text-white" data-bs-toggle="dropdown" data-color-theme="dark" aria-expanded="false" style="border: none;">
-                                <i class="ph-list me-2"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <a href="' . route('admin.category.edit', $record->id) . '" class="dropdown-item">
-                                    Edit
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a href="' . route('admin.category.delete', $record->id) . '" class="dropdown-item">
-                                    Delete
-                                </a>
-                            </div>',
-                "image" => '<img src="' . asset($record->image) . '" alt="image" width="100px">',
-                "category_name" => $record->category_name,
-
-                "status" => '<label class="form-check form-switch form-check-reverse" style="display:flex; justify-content:space-between; width:50%;">
-                <input type="checkbox" class="status-checkbox form-check-input" data-id="' . $record->id . '" ' . $statusChecked . ' id="status' . $record->id . '" style="cursor:pointer;">
-                ' . $statusLabel . '
-            </label>',
-            );
-        }
-
-        $response = array(
-            "draw" => intval($draw),
-            "iTotalRecords" => $totalRecords,
-            "iTotalDisplayRecords" => $totalRecordswithFilter, // Corrected: 'iTotalDisplayRecords' instead of 'irecordsfiltered'
-            "aaData" => $dataArr, // Corrected: 'aaData' instead of 'data'
-        );
-
-        return response()->json($response);
-    }
-
-
-    // -----------------------------Data table Ends-------------------------------------------
 
     public function create()
     {
@@ -156,58 +79,54 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-
         $validate = $request->validate([
             'name' => 'required',
             'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif',
         ]);
-
-        if ($validate == false) {
-            return back()->with('error', 'Required Feild');
-        }
+    
         if (!empty($request->id)) {
-            $category = Category::firstwhere('id', $request->id);
+            $category = Category::find($request->id);
+            if (!$category) {
+                return back()->with('error', 'Category not found!');
+            }
+    
             $category->category_name = $request->input('name');
-            $category->parent_category = $request->input('parent_category');
-
+    
             if ($request->file('image')) {
                 $image = $request->file('image');
                 $imagename = time() . '.' . $image->getClientOriginalName();
                 $destination = public_path('uploads/category');
                 $image->move($destination, $imagename);
-
-                $imagepath = 'uploads/category/' . $imagename;
-                $category->image = $imagepath;
+    
+                $category->image = 'uploads/category/' . $imagename;
             }
-
+    
             if ($category->save()) {
-                return back()->with('success', 'Category Updated Suuccessfully !!');
+                return redirect()->route('admin.category')->with('success', 'Category ' . $request->id . ' Updated Successfully !!');
             } else {
                 return back()->with('error', 'Something went wrong !!');
             }
         } else {
             $category = new Category();
-
             $category->category_name = $request->input('name');
-            $category->parent_category = $request->input('parent_category');
-
+    
             if ($request->file('image')) {
                 $image = $request->file('image');
                 $imagename = time() . '.' . $image->getClientOriginalName();
                 $destination = public_path('uploads/category');
                 $image->move($destination, $imagename);
-
-                $imagepath = 'uploads/category/' . $imagename;
-                $category->image = $imagepath;
+    
+                $category->image = 'uploads/category/' . $imagename;
             }
-
+    
             if ($category->save()) {
-                return redirect()->route('admin.category')->with('success', 'Category added Suuccessfully !!');
+                return redirect()->route('admin.category')->with('success', 'Category added Successfully !!');
             } else {
                 return back()->with('error', 'Something went wrong !!');
             }
         }
     }
+    
 
     public function remove(Request $request, $id)
     {
@@ -220,6 +139,7 @@ class CategoryController extends Controller
         }
     }
 
+
     public function updateStatus($id, Request $request)
     {
         $request->validate([
@@ -231,22 +151,23 @@ class CategoryController extends Controller
             $category->status = $request->status;
             $category->save();
             return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false]);
         }
-        else{
-            return response()->json(['error' => false]);
-        }
+
     }
+
+
 
     public function deleteSelected(Request $request)
     {
         $selectedCategories = $request->input('selected_categories');
         if (!empty($selectedCategories)) {
             Category::whereIn('id', $selectedCategories)->delete();
-            return response()->json(['success' => true, 'message' => 'Selected categories deleted successfully.']);
+            return response()->json(['success' => true, 'message' => 'Selected category deleted successfully.']);
         }
-        return response()->json(['success' => false, 'message' => 'No categories selected for deletion.']);
+        return response()->json(['success' => false, 'message' => 'No category selected for deletion.']);
     }
-
 
     public function import(Request $request)
     {
@@ -272,53 +193,73 @@ class CategoryController extends Controller
             fclose($handle);
         }
 
-        return redirect()->route('admin.category')->with('success', 'Category imported successfully.');
+        return redirect()->route('admin.category')->with('success', 'Categories imported successfully.');
 
     }
-
 
     public function export(Request $request)
     {
-        $status = $request->query('status', '');
+        try {
+            $status = $request->query('status', null); // Get status from query parameters
 
-        $query = Category::query();
+            $response = new StreamedResponse(function () use ($status) {
+                $spreadsheet = new Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
 
-        if ($status !== '') {
-            $query->where('status', $status);
+                // Add headers for CSV
+                $sheet->fromArray(['ID', 'Name', 'Image', 'Created At', 'Status'], null, 'A1');
+
+                // Fetch category based on status
+                $query = Category::query();
+                if ($status !== null) {
+                    $query->where('status', $status);
+                }
+                $categories = $query->get();
+                $categoriesData = [];
+                foreach ($categories as $category) {
+                    $categoriesData[] = [
+                        $category->id,
+                        $category->category_name,
+                        $category->image,
+                        $category->created_at->format('d M Y'),
+                        $category->status == 1 ? 'Active' : 'Inactive',
+                    ];
+                }
+                $sheet->fromArray($categoriesData, null, 'A2');
+
+                // Write CSV to output
+                $writer = new Csv($spreadsheet);
+                $writer->setUseBOM(true);
+                $writer->save('php://output');
+            });
+
+            // Set headers for response
+            $response->headers->set('Content-Type', 'text/csv');
+            $response->headers->set('Content-Disposition', 'attachment; filename="categories.csv"');
+
+            return $response;
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        $categories = $query->get();
-
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        // Add header row
-        $sheet->setCellValue('A1', 'Id')
-            ->setCellValue('B1', 'Category Name')
-            ->setCellValue('C1', 'Image')
-            ->setCellValue('D1', 'Created At')
-            ->setCellValue('E1', 'Status');
-
-        // Add data rows
-        $row = 2;
-        foreach ($categories as $category) {
-            $sheet->setCellValue('A' . $row, $category->id)
-                ->setCellValue('B' . $row, $category->category_name)
-                ->setCellValue('C' . $row, $category->image)
-                ->setCellValue('D' . $row, $category->created_at->format('d M Y'))
-                ->setCellValue('E' . $row, $category->status == 1 ? 'Active' : 'Inactive');
-            $row++;
-        }
-
-        $writer = new Csv($spreadsheet);
-        $response = new StreamedResponse(function () use ($writer) {
-            $writer->save('php://output');
-        });
-
-        $response->headers->set('Content-Type', 'text/csv');
-        $response->headers->set('Content-Disposition', 'attachment; filename="categories.csv"');
-
-        return $response;
     }
-}
 
+
+    public function sampleFileDownloadCategory()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="category_csv_sample.csv"',
+        ];
+
+        $columns = ['ID', 'Name', 'Image', 'Created At', 'Status'];
+
+        $callback = function () use ($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+}

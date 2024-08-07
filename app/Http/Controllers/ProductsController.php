@@ -59,7 +59,7 @@ class ProductsController extends Controller
                     ->addColumn('product_groups', function ($row) {
                         return $row->productGroup->products_group_name ?? 'N/A';
                     })
-                 
+
                     ->addColumn('offer_expiry', function ($row) {
                         return $row->offer_expiry ? $row->offer_expiry->format('d M Y') : 'N/A';
                     })
@@ -197,9 +197,9 @@ class ProductsController extends Controller
     }
     public function deleteSelected(Request $request)
     {
-        $selectedPlans = $request->input('selected_products');
-        if (!empty($selectedPlans)) {
-            Products::whereIn('id', $selectedPlans)->delete();
+        $selectedProducts = $request->input('selected_products');
+        if (!empty($selectedProducts)) {
+            Products::whereIn('id', $selectedProducts)->delete();
             return response()->json(['success' => true, 'message' => 'Selected product deleted successfully.']);
         }
         return response()->json(['success' => false, 'message' => 'No product selected for deletion.']);
@@ -227,7 +227,7 @@ class ProductsController extends Controller
         // Update the product fields
         $product->name = $validatedData['name'];
         $product->price = $validatedData['price'];
-        $product->description = $validatedData('description');
+        $product->description = $validatedData['description'];
         $product->category_id = $validatedData['category_id'];
         $product->brand_id = $validatedData['brand_id'];
         $product->product_group_id = $validatedData['product_group_id'];
@@ -281,12 +281,17 @@ class ProductsController extends Controller
                     if ($index === 0)
                         continue; // Skip header row
 
+                    // Find IDs by names
+                    $category = Category::where('category_name', $row[2])->first();
+                    $brand = Brand::where('brand_name', $row[3])->first();
+                    $productGroup = ProductsGroup::where('products_group_name', $row[4])->first();
+
                     $product = new Products();
                     $product->name = $row[0];
                     $product->price = $row[1];
-                    $product->category_id = $row[2];
-                    $product->brand_id = $row[3];
-                    $product->product_group_id = $row[4];
+                    $product->category_id = $category ? $category->id : null;
+                    $product->brand_id = $brand ? $brand->id : null;
+                    $product->product_group_id = $productGroup ? $productGroup->id : null;
                     $product->description = $row[5];
                     $product->offer_price = $row[6];
                     $product->offer_expiry = isset($row[7]) ? Carbon::parse($row[7])->format('Y-m-d H:i:s') : null;
@@ -312,10 +317,9 @@ class ProductsController extends Controller
 
 
 
-
     public function export(Request $request)
     {
-        $products = Products::all();
+        $products = Products::with('category', 'brand', 'productGroup')->get();
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -323,9 +327,9 @@ class ProductsController extends Controller
         // Set header
         $sheet->setCellValue('A1', 'Name')
             ->setCellValue('B1', 'Price')
-            ->setCellValue('C1', 'Category ID')
-            ->setCellValue('D1', 'Brand ID')
-            ->setCellValue('E1', 'Product Group ID')
+            ->setCellValue('C1', 'Category Name')
+            ->setCellValue('D1', 'Brand Name')
+            ->setCellValue('E1', 'Product Group Name')
             ->setCellValue('F1', 'Description')
             ->setCellValue('G1', 'Offer Price')
             ->setCellValue('H1', 'Offer Expiry')
@@ -336,9 +340,9 @@ class ProductsController extends Controller
         foreach ($products as $product) {
             $sheet->setCellValue('A' . $rowNum, $product->name)
                 ->setCellValue('B' . $rowNum, $product->price)
-                ->setCellValue('C' . $rowNum, $product->category_id)
-                ->setCellValue('D' . $rowNum, $product->brand_id)
-                ->setCellValue('E' . $rowNum, $product->product_group_id)
+                ->setCellValue('C' . $rowNum, $product->category->category_name ?? 'N/A')
+                ->setCellValue('D' . $rowNum, $product->brand->brand_name ?? 'N/A')
+                ->setCellValue('E' . $rowNum, $product->productGroup->products_group_name ?? 'N/A')
                 ->setCellValue('F' . $rowNum, $product->description)
                 ->setCellValue('G' . $rowNum, $product->offer_price)
                 ->setCellValue('H' . $rowNum, $product->offer_expiry ? $product->offer_expiry->format('Y-m-d') : '')
@@ -356,4 +360,23 @@ class ProductsController extends Controller
 
         return $response;
     }
+
+    public function sampleFileDownloadProduct()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="product_csv_sample.csv"',
+        ];
+
+        $columns = ['Name', 'Price', 'Category Name', 'Brand Name', 'Product Group Name', 'Description', 'Offer Price', 'Offer Expiry', 'Image'];
+
+        $callback = function () use ($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
 }

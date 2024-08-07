@@ -240,4 +240,24 @@ class BrandController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+
+    public function sampleFileDownloadBrand()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="brand_csv_sample.csv"',
+        ];
+
+        $columns = ['ID', 'Name', 'Image', 'Created At', 'Status'];
+
+        $callback = function () use ($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
 }

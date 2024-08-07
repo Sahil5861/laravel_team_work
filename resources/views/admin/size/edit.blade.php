@@ -31,7 +31,7 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('size.update', $size->id) }}" method="POST">
+                        <form action="{{ route('admin.size.edit.post', $size->id) }}" method="POST">
                             @csrf
                             @method('PUT')
                             <div class="mb-3">

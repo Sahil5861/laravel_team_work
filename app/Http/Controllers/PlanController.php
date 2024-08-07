@@ -264,4 +264,25 @@ class PlanController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function sampleFileDownloadPlan()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="plan_csv_sample.csv"',
+        ];
+
+        $columns = ['ID', 'Name', 'Description', 'Image', 'Price', 'Special Price', 'Expiry Date', 'Created At', 'Status'];
+
+        $callback = function () use ($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+
+
 }

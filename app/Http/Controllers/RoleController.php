@@ -184,7 +184,7 @@ class RoleController extends Controller
                 $sheet = $spreadsheet->getActiveSheet();
 
                 // Add headers for CSV
-                $sheet->fromArray(['ID', 'Name', 'Image', 'Created At', 'Status'], null, 'A1');
+                $sheet->fromArray(['ID', 'Name', 'Created At', 'Status'], null, 'A1');
 
                 // Fetch roles based on status
                 $query = Role::query();
@@ -219,6 +219,23 @@ class RoleController extends Controller
         }
     }
 
+    public function sampleFileDownloadRole()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="role_csv_sample.csv"',
+        ];
+
+        $columns = ['Id', 'Name', 'Created At', 'Status'];
+
+        $callback = function () use ($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 
 
 
