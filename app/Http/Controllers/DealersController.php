@@ -199,23 +199,25 @@ class DealersController extends Controller
             $header = fgetcsv($handle, 1000, ','); // Skip the header row
 
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+                // dd($person);
+                // exit;
                 Dealer::create([
                     'id' => $data[0],
                     'business_name' => $data[1],
                     'business_email' => $data[2],
-                    'city' => $data[3],
-                    'state' => $data[4],
-                    'country' => $data[5],
-                    'contact_person_id' => $data[6],
-                    'authenticated' => $data[7],
-                    'GST_number' => $data[8],
+                    'phone_number' => $data[3],
+                    'city' => $data[4],
+                    'state' => $data[5],
+                    'country' => $data[6],
+                    'authenticated' => $data[7] == 'Yes' ? 1 : 0,
+                    'GST_number' => $data[8] ? : null,
                 ]);
             }
 
             fclose($handle);
         }
 
-        return redirect()->route('admin.brand')->with('success', 'Dealers imported successfully.');
+        return redirect()->route('admin.dealers')->with('success', 'Dealers imported successfully.');
 
     }
 
@@ -230,7 +232,7 @@ class DealersController extends Controller
                 $sheet = $spreadsheet->getActiveSheet();
 
                 // Add headers for CSV
-                $sheet->fromArray(['ID', 'Dealer Name', 'Dealer Email', 'Dealer Phone', 'City', 'State', 'Conuntry', 'Conatact Person Id', 'Is Authenticated', 'GST number'], null, 'A1');
+                $sheet->fromArray(['ID', 'Dealer Name', 'Dealer Email', 'Dealer Phone', 'City', 'State', 'Conuntry', 'Is Authenticated', 'GST number'], null, 'A1');
 
                 // Fetch brands based on status
                 $query = Dealer::query();
@@ -250,7 +252,6 @@ class DealersController extends Controller
                         $dealer->city,
                         $dealer->state,
                         $dealer->country,
-                        $contactPerson ? $contactPerson->name : 'Not assigned', // Safely handle null case
                         $dealer->authenticated ? 'Yes' : 'No',
                         $dealer->GST_number ? $dealer->GST_number : 'Not Provided',
                     ];
