@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AdditionalImage;
 use Illuminate\Http\Request;
 use App\Models\Products;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\ProductsGroup;
+use Illuminate\Support\Facades\Storage;
 use DataTables;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -31,24 +33,24 @@ class ProductsController extends Controller
                         $checked = $row->status == '1' ? 'checked' : '';
                         $text = $checked ? 'Active' : 'Inactive';
                         return '<label class="switch">
-                                        <input type="checkbox" class="status-checkbox status-toggle" data-id="' . $row->id . '" ' . $checked . '>
-                                        <span class="slider round status-text"></span>
-                                </label>';
+                                                    <input type="checkbox" class="status-checkbox status-toggle" data-id="' . $row->id . '" ' . $checked . '>
+                                                    <span class="slider round status-text"></span>
+                                            </label>';
                     })
                     ->addColumn('action', function ($row) {
                         return '<div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="' . route('admin.product.edit', $row->id) . '" class="dropdown-item">
-                                                <i class="ph-pencil me-2"></i>Edit
-                                            </a>
-                                            <a href="' . route('admin.product.delete', $row->id) . '" data-id="' . $row->id . '" class="dropdown-item delete-button">
-                                                <i class="ph-trash me-2"></i>Delete
-                                            </a>
-                                        </div>
-                                    </div>';
+                                                    <a href="#" class="text-body" data-bs-toggle="dropdown">
+                                                        <i class="ph-list"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                        <a href="' . route('admin.product.edit', $row->id) . '" class="dropdown-item">
+                                                            <i class="ph-pencil me-2"></i>Edit
+                                                        </a>
+                                                        <a href="' . route('admin.product.delete', $row->id) . '" data-id="' . $row->id . '" class="dropdown-item delete-button">
+                                                            <i class="ph-trash me-2"></i>Delete
+                                                        </a>
+                                                    </div>
+                                                </div>';
                     })
                     ->addColumn('category', function ($row) {
                         return $row->category->category_name ?? 'N/A';
@@ -59,7 +61,6 @@ class ProductsController extends Controller
                     ->addColumn('product_groups', function ($row) {
                         return $row->productGroup->products_group_name ?? 'N/A';
                     })
-
                     ->addColumn('offer_expiry', function ($row) {
                         return $row->offer_expiry ? $row->offer_expiry->format('d M Y') : 'N/A';
                     })
@@ -114,7 +115,6 @@ class ProductsController extends Controller
             ->make(true);
     }
 
-
     public function updateStatus($id, Request $request)
     {
         $request->validate([
@@ -129,7 +129,6 @@ class ProductsController extends Controller
         } else {
             return response()->json(['success' => false]);
         }
-
     }
 
     public function create()
@@ -153,48 +152,140 @@ class ProductsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+            'name' => 'required|string|max:255',
             'price' => 'required|numeric',
-            'category_id' => 'required|exists:categories,id',
-            'brand_id' => 'required|exists:brands,id',
-            'product_group_id' => 'required|exists:product_groups,id',
-            'description' => 'required',
+            'category_id' => 'required|integer',
+            'brand_id' => 'required|integer',
+            'product_group_id' => 'required|integer',
+            'description' => 'nullable|string',
             'offer_price' => 'nullable|numeric',
             'offer_expiry' => 'nullable|date',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'additional_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $product = new Products();
-        $product->name = $request->input('name');
-        $product->price = $request->input('price');
-        $product->category_id = $request->input('category_id');
-        $product->brand_id = $request->input('brand_id');
-        $product->product_group_id = $request->input('product_group_id');
-        $product->description = $request->input('description');
-        $product->offer_price = $request->input('offer_price');
-        $product->offer_expiry = $request->input('offer_expiry') ? \Carbon\Carbon::parse($request->input('offer_expiry'))->format('Y-m-d H:i:s') : null;
+        $product->fill($request->only([
+            'name',
+            'price',
+            'category_id',
+            'brand_id',
+            'product_group_id',
+            'description',
+            'offer_price'
+        ]));
+        $product->offer_expiry = $request->input('offer_expiry') ? Carbon::parse($request->input('offer_expiry'))->format('Y-m-d') : null;
 
         if ($request->hasFile('image')) {
-            // Remove old image if exists
-            if ($product->image && file_exists(public_path($product->image))) {
-                unlink(public_path($product->image));
-            }
-
-            // Upload new image
-            $image = $request->file('image');
-            $imagename = time() . '.' . $image->getClientOriginalExtension();
-            $destination = public_path('uploads/product');
-            $image->move($destination, $imagename);
-
-            $product->image = 'uploads/product/' . $imagename;
+            $imagePaths = $this->handleImageUpload($request->file('image'), 'product');
+            $product->image = $imagePaths['original'];
         }
 
         if ($product->save()) {
-            return redirect()->route('admin.product')->with('success', 'Product saved successfully!');
+            if ($request->hasFile('additional_images')) {
+                foreach ($request->file('additional_images') as $file) {
+                    $imagePaths = $this->handleImageUpload($file, 'additionalimage');
+                    AdditionalImage::create([
+                        'product_id' => $product->id,
+                        'image' => $imagePaths['original'],
+                        'image_medium' => $imagePaths['medium'],
+                        'image_small' => $imagePaths['small'],
+                    ]);
+                }
+            }
+
+            return redirect()->route('admin.product')->with('success', 'Product created successfully.');
         } else {
-            return back()->with('error', 'Something went wrong!');
+            return redirect()->back()->with('error', 'Failed to create product.');
         }
     }
+
+
+    protected function handleImageUpload($image, $folder)
+    {
+        $imageName = time() . '.' . $image->getClientOriginalExtension();
+        $basePath = 'public/storage/uploads/' . $folder . '/';
+
+        // Define paths for different image sizes
+        $paths = [
+            'original' => $basePath . 'original/' . $imageName,
+            'medium' => $basePath . 'medium/' . $imageName,
+            'small' => $basePath . 'small/' . $imageName,
+        ];
+
+        // Create directories if they do not exist
+        foreach (array_values($paths) as $path) {
+            $directory = dirname(storage_path('app/' . $path));
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
+            }
+        }
+
+        // Save original image
+        $image->move(storage_path('app/' . $basePath . 'original'), $imageName);
+
+        // Resize and save images
+        $this->resizeImage(storage_path('app/' . $paths['original']), 800, 600, storage_path('app/' . $paths['medium']));
+        $this->resizeImage(storage_path('app/' . $paths['original']), 400, 300, storage_path('app/' . $paths['small']));
+
+        return [
+            'original' => Storage::url($paths['original']),
+            'medium' => Storage::url($paths['medium']),
+            'small' => Storage::url($paths['small'])
+        ];
+    }
+
+
+    protected function resizeImage($filePath, $width, $height, $outputPath)
+    {
+        list($originalWidth, $originalHeight, $type) = getimagesize($filePath);
+
+        $imageResized = imagecreatetruecolor($width, $height);
+
+        switch ($type) {
+            case IMAGETYPE_JPEG:
+                $imageSource = imagecreatefromjpeg($filePath);
+                break;
+
+            case IMAGETYPE_PNG:
+                $imageSource = imagecreatefrompng($filePath);
+                break;
+
+            case IMAGETYPE_GIF:
+                $imageSource = imagecreatefromgif($filePath);
+                break;
+
+            default:
+                return;
+        }
+
+        // Resize and resample
+        imagecopyresampled($imageResized, $imageSource, 0, 0, 0, 0, $width, $height, $originalWidth, $originalHeight);
+
+        // Save resized image
+        switch ($type) {
+            case IMAGETYPE_JPEG:
+                imagejpeg($imageResized, $outputPath);
+                break;
+
+            case IMAGETYPE_PNG:
+                imagepng($imageResized, $outputPath);
+                break;
+
+            case IMAGETYPE_GIF:
+                imagegif($imageResized, $outputPath);
+                break;
+        }
+
+        imagedestroy($imageResized);
+        imagedestroy($imageSource);
+    }
+
+
+
+
+
+
     public function deleteSelected(Request $request)
     {
         $selectedProducts = $request->input('selected_products');
@@ -205,13 +296,10 @@ class ProductsController extends Controller
         return response()->json(['success' => false, 'message' => 'No product selected for deletion.']);
     }
 
-
-
     public function update(Request $request, $id)
     {
         $product = Products::findOrFail($id);
 
-        // Validate the incoming request
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric',
@@ -224,47 +312,29 @@ class ProductsController extends Controller
             'offer_expiry' => 'nullable|date',
         ]);
 
-        // Update the product fields
-        $product->name = $validatedData['name'];
-        $product->price = $validatedData['price'];
-        $product->description = $validatedData['description'];
-        $product->category_id = $validatedData['category_id'];
-        $product->brand_id = $validatedData['brand_id'];
-        $product->product_group_id = $validatedData['product_group_id'];
-        $product->offer_price = $validatedData['offer_price'];
-        $product->offer_expiry = $validatedData['offer_expiry'] ? \Carbon\Carbon::parse($validatedData['offer_expiry'])->format('Y-m-d H:i:s') : null;
-
-        // Handle the image file
         if ($request->hasFile('image')) {
-            // Remove old image if exists
-            if ($product->image && file_exists(public_path($product->image))) {
-                unlink(public_path($product->image));
-            }
-
-            // Upload new image
-            $image = $request->file('image');
-            $imagename = time() . '.' . $image->getClientOriginalExtension();
-            $destination = public_path('uploads/product');
-            $image->move($destination, $imagename);
-
-            $product->image = 'uploads/product/' . $imagename;
+            $validatedData['image'] = $this->handleImageUpload($request->file('image'));
         }
 
-        // Save the updated product
-        $product->save();
+        $product->fill($validatedData);
+        $product->offer_expiry = $request->input('offer_expiry') ? Carbon::parse($request->input('offer_expiry'))->format('Y-m-d') : null;
 
-        return redirect()->route('admin.product')->with('success', 'Product updated successfully.');
+        if ($product->save()) {
+            return redirect()->route('admin.product')->with('success', 'Product updated successfully!');
+        } else {
+            return back()->with('error', 'Failed to update the product.');
+        }
     }
 
-
-    public function remove(Request $request, $id)
+    public function destroy($id)
     {
-        $product = Products::firstwhere('id', $request->id);
+        $product = Products::findOrFail($id);
 
-        if ($product->delete()) {
-            return back()->with('success', 'Product deleted Suuccessfully !!');
+        if ($product) {
+            $product->delete();
+            return redirect()->route('admin.product')->with('success', 'Product deleted successfully!');
         } else {
-            return back()->with('error', 'Something went wrong !!');
+            return redirect()->route('admin.product')->with('error', 'Product not found!');
         }
     }
 

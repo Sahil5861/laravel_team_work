@@ -41,4 +41,11 @@ class Products extends Model
     {
         return $this->belongsTo(ProductsGroup::class);
     }
+
+    // Product.php
+    public function additionalImages()
+    {
+        return $this->hasMany(AdditionalImage::class);
+    }
+
 }

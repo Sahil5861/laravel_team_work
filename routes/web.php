@@ -16,6 +16,7 @@ use App\Http\Controllers\DealersController;
 use App\Http\Controllers\ViewsController;
 use App\Http\Controllers\ContactPersonController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdditionalImageController;
 
 // Public Routes
 Route::get('/', function () {
@@ -108,7 +109,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/size/export', [SizeController::class, 'export'])->name('admin.size.export');
     Route::post('admin/size/import', [SizeController::class, 'import'])->name('admin.size.import');
     Route::get('/sample-file-download-size', [SizeController::class, 'sampleFileDownloadSize'])->name('sample-file-download-size');
- 
+
 
 
 
@@ -160,7 +161,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/plan/export', [PlanController::class, 'export'])->name('admin.plan.export');
     Route::post('admin/plan/import', [PlanController::class, 'import'])->name('admin.plan.import');
     Route::get('/sample-file-download-plan', [PlanController::class, 'sampleFileDownloadPlan'])->name('sample-file-download-plan');
-  
+
 
 
 
@@ -195,6 +196,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/product/export', [ProductsController::class, 'export'])->name('admin.product.export');
     Route::post('admin/product/import', [ProductsController::class, 'import'])->name('admin.product.import');
     Route::get('/sample-file-download-product', [ProductsController::class, 'sampleFileDownloadProduct'])->name('sample-file-download-product');
+    
+    
+    // ------------------------------------additional images Routes----------------------------------------
+
+    Route::get('admin/products/{productId}/additional-images/create', [AdditionalImageController::class, 'create'])->name('admin.additionalImages.create');
+    Route::post('admin/products/{productId}/additional-images', [AdditionalImageController::class, 'store'])->name('admin.additionalImages.store');
+    Route::get('admin/additional-images/{id}/edit', [AdditionalImageController::class, 'edit'])->name('admin.additionalImages.edit');
+    Route::put('admin/additional-images/{id}', [AdditionalImageController::class, 'update'])->name('admin.additionalImages.update');
+    Route::delete('admin/additional-images/{id}', [AdditionalImageController::class, 'destroy'])->name('admin.additionalImages.destroy');
 
 
     // ------------------------------------Dealers Routes----------------------------------------
