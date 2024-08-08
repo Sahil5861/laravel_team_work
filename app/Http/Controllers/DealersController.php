@@ -297,14 +297,13 @@ class DealersController extends Controller
             'Content-Disposition' => 'attachment; filename="dealer_csv_sample.csv"',
         ];
 
-        $columns = ['ID', 'Dealer Name', 'Dealer Email', 'Dealer Phone', 'City', 'State', 'Conuntry', 'Conatact Person Id', 'Is Authenticated', 'GST number'];
+        $columns = ['ID', 'Dealer Name', 'Dealer Email', 'Dealer Phone', 'City', 'State', 'Conuntry', 'Is Authenticated', 'GST number'];
 
         $callback = function () use ($columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
             fclose($file);
         };
-
         return response()->stream($callback, 200, $headers);
     }
 
