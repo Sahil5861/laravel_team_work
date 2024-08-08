@@ -15,6 +15,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\DealersController;
 use App\Http\Controllers\ViewsController;
 use App\Http\Controllers\ContactPersonController;
+use App\Http\Controllers\GalleryController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -234,7 +235,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('admin/contact-persons/delete-selected', [ContactPersonController::class, 'deleteSelected'])->name('admin.contactPersons.deleteSelected');
     Route::get('/sample-file-download-contactperson', [ContactPersonController::class, 'sampleFileDownloadContactPerson'])->name('sample-file-download-contactperson');
 
-
+    //--------------------------------------Gallery Routes---------------------------------------
+    Route::get('admin/gallery', [GalleryController::class, 'viewfolders'])->name('admin.gallery');
+    Route::get('admin/gallery/{id}', [GalleryController::class, 'viewfolderImages'])->name('admin.gallery.image');
+    Route::post('admin/gallery/upload-images', [GalleryController::class, 'uploadImages'])->name('admin.gallery.upload.images');
 
 
 

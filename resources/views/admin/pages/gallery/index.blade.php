@@ -9,7 +9,7 @@
                 <div class="page-header-content d-lg-flex">
                     <div class="d-flex">
                         <h4 class="page-title mb-0">
-                            Dashboard - <span class="fw-normal">Conatct Persons</span>
+                            Dashboard - <span class="fw-normal">Image Gallery</span>
                         </h4>
                         <a href="#page_header"
                             class="btn btn-light align-self-center collapsed d-lg-none border-transparent rounded-pill p-0 ms-auto"
@@ -23,13 +23,12 @@
             <div class="content">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title">Conatct Persons</h5>
-                        <div class="card-tools text-end"
+                        <h5 class="card-title">Image Gallery</h5>
+                        {{-- <div class="card-tools text-end"
                             style="display: flex; align-items:center; justify-content: space-between;">
                             <div class="btns">
-                                <a href="{{ route('admin.contactPersons.create') }}"
-                                    class="text-dark btn btn-primary">Add
-                                    Conatct Persons</a>
+                                <a href="{{ route('admin.dealers.create') }}" class="text-dark btn btn-primary">Add
+                                    Dealers</a>
                                 <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
                                 <br><br>
                                 <select name="status" id="status" class="form-control">
@@ -44,35 +43,57 @@
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a href="#" class="dropdown-item" data-toggle="modal"
-                                        data-target="#importModal">Import Contact Persons</a>
-                                    <a href="#" class="dropdown-item" id="export-contacts">Export Contact Persons</a>
+                                        data-target="#importModal">Import Dealers</a>
+                                    <a href="#" class="dropdown-item" id="export-dealers">Export Dealers</a>
 
                                 </div>
                             </div>
 
-                        </div>
+                        </div> --}}
                     </div>
                     <div class="card-body">
-                        @if(session('success'))
+                        {{-- @if(session('success'))
                             <div class="alert alert-success">{{ session('success') }}</div>
-                        @endif
-                        <div class="table-responsive">
-                            <table class="table table-bordered text-center" id="persons-table">
+                        @endif --}}
+                        <?php 
+                            $colors = ['primary', 'info', 'success']
+                        ?>
+                        <div class="container-fluid">
+                            <div class="row">
+                                @foreach ($folders as $i => $folder)
+                                <div class="col-lg-4">
+                                    <a href="{{route('admin.gallery.image', $folder->id)}}" class="text-white" style="text-decoration: none;">
+                                        <div class="col-sm-12 p-4 bg-{{$colors[$i]}}" style="display: flex; justify-content: center;align-items: center;">
+                                            <h3>{{$folder->name}}</h3>
+                                        </div>
+                                    </a>
+                                    
+                                </div>    
+                                @if ($i >= 3)
+                                    $i = 0;
+                                @endif
+                                @endforeach
+                                
+                            </div>
+                        </div>
+                        {{-- <div class="table-responsive">
+                            <table class="table table-bordered text-center" id="dealers-table">
                                 <thead>
                                     <tr>
                                         <th><input type="checkbox" id="select-all"></th>
                                         <th>ID</th>
-                                        <th>Action</th>
-                                        {{-- <th>Status</th> --}}
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Phone</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                        <th>Dealers Name</th>
+                                        <th>Dealers Email</th>
+                                        <th>Dealers Phone</th>
+                                        <th>View</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 </tbody>
                             </table>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>
@@ -80,25 +101,27 @@
     </div>
 </div>
 
-<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
+{{-- Modal --}}
+
+{{-- <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="importModalLabel">Import Contact Persons</h5>
+                <h5 class="modal-title" id="importModalLabel">Import Dealers</h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="importForm" action="{{route('admin.contactPersons.import')}}" method="POST"
+                <form id="importForm" action="{{route('admin.dealers.import')}}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
                     <div class="form-group">
                         <label for="csv_file">Select CSV File</label>
                         <input type="file" name="csv_file" class="form-control" required value="{{old('csv_file')}}">
                     </div>
-                    <a class="btn btn-success csvSample" href="{{ route('sample-file-download-contactperson') }}">Download
+                    <a class="btn btn-success csvSample" href="{{ route('sample-file-download-dealer') }}">Download
                     Sample</a>
                 </form>
             </div>
@@ -108,16 +131,17 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
-        var personsTable = $('#persons-table').DataTable({
+        var contactPersons = @json($contactPersons);
+        var dealersTable = $('#dealers-table').DataTable({
             processing: true,
             serverSide: true,
             ajax: {
-                url: "{{ route('admin.contactPersons') }}",
+                url: "{{ route('admin.dealers') }}",
                 data: function (d) {
                     d.status = $('#status').val();
                 }
@@ -132,20 +156,20 @@
                         return '<input type="checkbox" class="select-row" value="' + row.id + '">';
                     }
                 },
-                { data: 'DT_RowIndex', name: 'DT_RowIndex' },
+                { data: 'id', name: 'id' },
+                { data: 'status', name: 'status' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
-                // { data: 'status', name: 'status' },
-                { data: 'name', name: 'name' },
-                { data: 'email', name: 'email' },
-                { data: 'phone', name: 'phone' },
+                { data: 'business_name', name: 'business_name' },
+                { data: 'business_email', name: 'business_email' },
+                { data: 'phone_number', name: 'phone_number' },
+                { data: 'view', name: 'view', orderable: false, searchable: false },
             ],
 
             order: [[1, 'asc']],
-            // personsTable.ajax.reload();
             drawCallback: function (settings) {
                 $('#select-all').on('click', function () {
                     var isChecked = this.checked;
-                    $('#persons-table .select-row').each(function () {
+                    $('#dealers-table .select-row').each(function () {
                         $(this).prop('checked', isChecked);
                     });
                 });
@@ -167,11 +191,11 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: "{{ route('admin.contactPersons.deleteSelected') }}",
+                                    url: "{{ route('admin.dealers.deleteSelected') }}",
                                     method: 'DELETE',
-                                    data: { selected_persons: selectedIds },
+                                    data: { selected_dealers: selectedIds },
                                     success: function (response) {
-                                        personsTable.ajax.reload(); // Refresh the page
+                                        BrandTable.ajax.reload(); // Refresh the page
                                         Swal.fire(
                                             'Deleted!',
                                             response.success,
@@ -194,15 +218,15 @@
                     else {
                         Swal.fire(
                             'Error!',
-                            'Please select at least one Contact to delete.',
+                            'Please select at least one brand to delete.',
                             'error'
                         );
                     }
                 })
                 $('.status-toggle').on('click', function () {
-                    var conatctPersonId = $(this).data('id');
+                    var dealerId = $(this).data('id');
                     var status = $(this).is(':checked') ? 1 : 0;
-                    updateStatus(conatctPersonId, status);
+                    updateStatus(dealerId, status);
                 });
             }
 
@@ -211,13 +235,13 @@
         });
 
         $('#status').on('change', function () {
-            personsTable.ajax.reload();
+            dealersTable.ajax.reload();
         });
 
         $(document).ready(function () {
-            $('#export-contacts').on('click', function () {
+            $('#export-dealers').on('click', function () {
                 var status = $('#status').val();
-                var url = "{{ route('admin.contactPersons.export') }}";
+                var url = "{{ route('admin.dealers.export') }}";
                 if (status) {
                     url += "?status=" + status;
                 }
@@ -225,10 +249,28 @@
             });
         });
 
+        $(document).on('change', '.contact-person-select', function() {
+        var contactPersonId = $(this).val();
+        var dealerId = $(this).data('dealer-id');
 
-        function updateStatus(conatctPersonId, status) {
+        $.ajax({
+            url: 'admin/dealers/' + dealerId + '/update-primary-contact',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                contact_person_id: contactPersonId
+            },
+            success: function(response) {
+                alert(response.success);
+                dealersTable.ajax.reload();
+            }
+        });
+    });
+
+
+        function updateStatus(brandId, status) {
             $.ajax({
-                url: `{{ url('admin/contact-persons/update-status') }}/${conatctPersonId}`,
+                url: `{{ url('admin/dealer/update-status') }}/${brandId}`,
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -246,7 +288,7 @@
                         // alert('Status Updated !!');
 
                         // location.reload(); // Refresh the page
-                        personsTable.ajax.reload();
+                        BrandTable.ajax.reload();
                     } else {
                         alert('Failed to update status.');
                     }
@@ -260,5 +302,5 @@
     });
 
 
-</script>
+</script> --}}
 @endsection
