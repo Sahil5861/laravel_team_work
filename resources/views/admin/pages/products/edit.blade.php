@@ -46,26 +46,36 @@
                                         @enderror
                                     </div>
 
-                                    <div class="col-sm-12">
-                                        <div class="row">
-                                            <div class="col-lg-2">
-                                                @if($product->image)
-                                                    <div class="img mb-2">
-                                                        <img src="{{ asset($product->image) }}" alt="Current Image"
-                                                            style="max-width: 100%; height: auto;">
-                                                    </div>
-                                                @endif
-                                            </div>
-                                            <div class="col-lg-10">
-                                                <label for="image">Update Image</label>
-                                                <input type="file" name="image" id="image" placeholder="Choose Image"
-                                                    class="form-control">
-                                                @error('image')
-                                                    <span class="text-danger">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                        </div>
+                                    <div class="mb-3">
+                                        <label for="main_image" class="form-label">Main Image</label>
+                                        @if($product->main_image)
+                                            <img src="{{ asset('storage/products/' . $product->main_image) }}"
+                                                alt="Product Image" class="img-fluid mt-2" style="max-width: 200px;">
+                                        @endif
+                                        <input type="file" class="form-control mt-2" id="main_image" name="main_image">
                                     </div>
+
+                                    <div class="mb-3">
+                                        <label for="additional_images" class="form-label">Additional Images</label>
+                                        <input type="file" class="form-control" id="additional_images"
+                                            name="additional_images[]" multiple>
+                                        @if($product->additionalImages->count())
+                                            <div class="mt-2">
+                                                @foreach($product->additionalImages as $additionalImage)
+                                                    <div class="d-inline-block me-2 position-relative">
+                                                        <img src="{{ asset('storage/uploads/additionalimage/' . $additionalImage->image) }}"
+                                                            alt="Additional Image" class="img-fluid" style="max-width: 150px;">
+                                                        <button type="button"
+                                                            class="btn btn-danger btn-sm position-absolute top-0 end-0 mt-2 me-2"
+                                                            onclick="deleteImage({{ $additionalImage->id }})">X</button>
+                                                        <input type="hidden" name="remove_additional_images[]"
+                                                            value="{{ $additionalImage->id }}">
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+
                                     <div class="mb-3">
                                         <label for="description" class="form-label">Description</label>
                                         <textarea name="description" id="description"
@@ -75,6 +85,7 @@
                                         @enderror
                                     </div>
                                 </div>
+
                                 <div class="col-lg-6 border-left">
                                     <div class="mb-3">
                                         <label for="category_id" class="form-label">Category</label>
@@ -151,4 +162,55 @@
         </div>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function deleteImage(id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{{ route('admin.product.image.delete') }}',
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        id: id
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire(
+                                'Deleted!',
+                                'The image has been deleted.',
+                                'success'
+                            ).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                'Something went wrong.',
+                                'error'
+                            );
+                        }
+                    },
+                    error: function () {
+                        Swal.fire(
+                            'Error!',
+                            'Something went wrong.',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    }
+</script>
 @endsection
