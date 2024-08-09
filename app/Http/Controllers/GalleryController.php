@@ -16,21 +16,23 @@ class GalleryController extends Controller
 
     public function viewfolderImages(Request $request ,$id){
         $folder = Folder::find($id);
+        $limit = $request->input('limit', 12);
         // $images = Gallery::where('folder_id', $id)->get();
         $offset = $request->get('offset', 0);
-        $limit = $request->input('limit');
         if ($limit) {
-            $images = Gallery::where('folder_id', $id)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+            $images = Gallery::where('folder_id', $id)->skip($offset)->take($limit)->get();
             if ($request->ajax()) {
                 return response()->json($images);
             }
-        } else {
-            $images = Gallery::where('folder_id', $id)->get(); // Get all images
-        }        
-
+        }  
+        
+        // $images = Gallery::paginate($limit);
+        // if ($request->ajax()) {
+        //     return response()->json([
+        //         'images' => $images->items(),
+        //         'pagination' => (string) $images->links()->render()
+        //     ]);
+        // }
         return view('admin.pages.gallery.images', compact('folder', 'images'));
     }
 

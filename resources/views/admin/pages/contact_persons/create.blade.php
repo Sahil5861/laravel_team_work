@@ -63,25 +63,10 @@
                                                     <span class="text-danger">{{$message}}</span>
                                                     @enderror
                                                 </span>
-                                            </div>
-                                            
-                                            
+                                            </div>  
                                         </div>
                                         <div class="row mb-3">
-                                            <div class="col-lg-3">
-                                                <label for="role">Conatct Person Role</label>
-                                                {{-- <input type="text" id="role" name="role" class="form-control bg-dark text-white" placeholder="Enter Dealer's Email" value="Contact Person" readonly> --}}
-                                                <select name="role" id="role" class="form-control bg-dark text-white">
-                                                    @foreach ($roles as $role)
-                                                        <option value="{{$role->id}}" {{$role->id == 3 ? 'selected': 'disabled'}}>{{$role->name}}</option>
-                                                    @endforeach
-                                                </select>
-                                                <span>
-                                                    @error('role')
-                                                    <span class="text-danger">{{$message}}</span>
-                                                    @enderror
-                                                </span>
-                                            </div>
+                                            <input type="hidden" id="role" name="role" class="form-control"value="3" readonly>
                                             <div class="col-lg-3">
                                                 <label for="pass1">Create Password</label>
                                                 <input type="password" id="password" name="password" class="form-control" placeholder="Create Password" value="{{old('pass1')}}">

@@ -87,7 +87,6 @@ class ContactPersonController extends Controller
             'password' => 'required|min:8|confirmed',
             'password_confirmation' => 'required|min:8',
             'dealer_id' => 'required|string',
-
         ]);
         if (!empty($request->id)) {
             $person = User::firstwhere('id', $request->id);

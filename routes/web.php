@@ -18,6 +18,7 @@ use App\Http\Controllers\ContactPersonController;
 use App\Http\Controllers\GalleryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdditionalImageController;
+use App\Http\Controllers\LocationController;
 
 // Public Routes
 Route::get('/', function () {
@@ -254,6 +255,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('blogs', BlogController::class);
     Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
+
+    Route::get('/states/{id}', [LocationController::class, 'getStates'])->name('getStates');
+    Route::get('/cities/{id}', [LocationController::class, 'getCities'])->name('getCities');
 
 
 });

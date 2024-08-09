@@ -3,9 +3,9 @@
     .image-container {
     position: relative;
     display: inline-block;
-    margin: 10px;
-    height: 100px;
-    width: 100px;
+    margin: 10px 0;
+    height: 150px;
+    width: 150px;
     overflow: hidden;
 }
 
@@ -56,7 +56,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Dark background */
+    background: rgba(0, 0, 0, 0.5); /*Dark background*/
     display: none; /* Hidden by default */
     justify-content: center;
     align-items: center;
@@ -64,8 +64,8 @@
 }
 
 .overlay img {
-    max-width: 90%;
-    max-height: 90%;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .close-btn {
@@ -111,10 +111,17 @@
 
             @if (session('success'))
             <script>
-                alert('{{ session('success') }}');
+                // alert('{{ session('success') }}');
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Image(s) Uploaded Successfully !!.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+
             </script>
             @endif
-            <div class="row w-100">
+            <div class="row m-auto">
                 <div class="col-lg-9 col-md-6">
                     <form action="{{route('admin.gallery.upload.images')}}" method="post" enctype="multipart/form-data">
                         @csrf
@@ -135,36 +142,32 @@
                     </form>
                 </div>
                 <div class="col-lg-3 col-md-6 p-3">
-                    {{-- <input type="number" id="limit" value="12" min="1" class="form-control" placeholder="Enter number of images per page"> --}}
-                    <select id="limit" class="form-control bg-dark text-white">
-                        {{-- @if ($images && $images->count())
+                    <input type="hidden" id="limit" value="4" min="1" class="form-control" placeholder="Enter number of images per page">
+                    {{-- <select id="limit" class="form-control bg-dark text-white">
+                        @if ($images && $images->count())
                             <option value="{{$images->count()}}" selected>--Select Page Per view</option>
-                        @endif --}}
-                        {{-- <option value="3">3</option>
-                        <option value="2">2</option> --}}
-                        <option value="1">1</option>
+                        @endif
+                        <option value="3">3</option>
+                        <option value="2">2</option>
+                        <option value="1">1</option> --}}
 
                         <!-- Add more options as needed -->
-                    </select>
-                    <button id="loadMoreBtn" class="btn btn-primary my-3">Load More</button>
+                    {{-- </select> --}}
+                    
                     
                 </div>
             </div>
-            <div class="container-fluid w-100">
-                <div class="row gap-1">
+            <div class="container  m-auto">
+                <div class="row gap-1 m-auto" id="imageGallery">
                     @if (!$images)
                         <p>No Images</p>
-                    @else
-                    <div id="imageGallery"></div>
-                    
-                    {{-- <div id="paginationLinks"></div> --}}
                     @endif
-                    
                 </div>
+                <button id="loadMoreBtn" class="btn btn-primary my-3" onclick="loadmoreimages()">Load More</button>
             </div>
             <div id="imageOverlay" class="overlay">
                 <span class="close-btn" onclick="closeOverlay()">&times;</span>
-                <img id="overlayImage" src="" alt="Image" width="400px">
+                <img id="overlayImage" src="" alt="Image" width="800px">
             </div>
         </div>
     </div>
@@ -173,21 +176,25 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     let offset = 0;
-    // let limit = $('#limit').val()
+    let limit = $('#limit').val()
+
+    $(document).ready(function() {
+        loadmoreimages(); // Load initial set of images
+    });
     function loadmoreimages(){
         $.ajax({
             type: 'GET',
             url: '{{ route('admin.gallery.image', $folder->id) }}',
             data: {
                 offset: offset,
-                limit: $('#limit').val(),
+                limit: limit,
             },
             success : function(images){
                 if (images.length > 0) {
                     let imageHtml = '';
                     images.forEach(image =>{
                         imageHtml += `
-                        <div class="col-lg-3 image-container">
+                        <div class="col-lg-2 image-container">
                             <img src="{{ asset('') }}${image.image_path}" class="image" alt="${image.image_path}">
                             <button class="copy-btn" onclick="copyImagePath('${image.image_path}')" data-toggle="tooltip" data-placement="top" title="Copy Path"><i class="ph ph-copy"></i></button>
                             <button class="view-btn" onclick="viewImage('{{ asset('') }}${image.image_path}')" data-toggle="tooltip" data-placement="top" title="View Image"><i class="ph ph-eye"></i></button>
@@ -196,8 +203,14 @@
                         `;
                     });
                     $('#imageGallery').append(imageHtml);
-                    offset += $('#limit').val();
+                    offset += images.length;
+                    if (images.length < limit) {
+                        $('#loadMoreBtn').hide();    
+                    }
 
+                }
+                else{
+                    $('#loadMoreBtn').hide();
                 }
             }
         })
@@ -214,7 +227,7 @@
     //             let imageHtml = '';
     //             images.forEach(image => {
     //                 imageHtml += `
-    //                     <div class="col-lg-3 image-container">
+    //                     <div class="col-lg-2 image-container">
     //                         <img src="{{ asset('') }}${image.image_path}" class="image" alt="${image.image_path}">
     //                         <button class="copy-btn" onclick="copyImagePath('${image.image_path}')" data-toggle="tooltip" data-placement="top" title="Copy Path"><i class="ph ph-copy"></i></button>
     //                         <button class="view-btn" onclick="viewImage('{{ asset('') }}${image.image_path}')" data-toggle="tooltip" data-placement="top" title="View Image"><i class="ph ph-eye"></i></button>
@@ -228,13 +241,7 @@
     //     });
     // }
 
-    $(document).ready(function() {
-        loadmoreimages(); // Load initial set of images
-
-         $('#loadMoreBtn').on('click', function() {
-            loadMoreImages();
-        });
-    });
+    
 
 
     // $(document).ready(function (){

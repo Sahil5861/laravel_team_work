@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Dealer;
 use App\Models\User;
+use App\Models\Country;
+use App\Models\City;
+use App\Models\State;
 use App\Models\ContactPerson;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
@@ -76,24 +80,22 @@ class DealersController extends Controller
 
     public function create()
     {
-        $contactPersons = ContactPerson::where('is_primary', 0)->get();
-        return view('admin.pages.dealers.create', compact('contactPersons'));
+        $countries = Country::all();
+        return view('admin.pages.dealers.create', compact('countries'));
     }
 
 
     public function edit($id)
     {
         $dealer = Dealer::find($id);
-        $contactPersons = ContactPerson::all();
-        return view('admin.pages.dealers.edit', compact('dealer', 'contactPersons'));
+        $countries = Country::all();
+        $contactPersons = User::where('role_id', 3)->get();
+        return view('admin.pages.dealers.edit', compact('dealer', 'contactPersons', 'countries'));
     }
 
 
     public function store(Request $request)
     {
-
-        // dd($request);
-        // exit;
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email',
@@ -104,6 +106,14 @@ class DealersController extends Controller
             'contact_person_id' => 'nullable|max:6',
             'authenticated' => 'required',
             'gst_no' => 'nullable|string|max:15',
+
+            // contact person validation
+            'contact_name' => 'required|string|max:255',
+            'contact_email' => 'required|email',
+            'contact_phone' => 'required|string|max:20',
+            'role_id' => 'required',
+            'password' => 'required|min:8|confirmed',
+            'password_confirmation' => 'required|min:8',
         ]);
         if (!empty($request->id)) {
             $dealer = Dealer::firstwhere('id', $request->id);
@@ -123,24 +133,32 @@ class DealersController extends Controller
                 return back()->with('error', 'Something went wrong !!');
             }
         } else {
-
+        
             $dealer = new Dealer();
 
             $dealer->business_name = $request->input('name');
             $dealer->business_email = $request->input('email');
             $dealer->phone_number = $request->input('phone');
-            $dealer->contact_person_id = $request->input('contact_person_id');
             $dealer->city = $request->input('city');
             $dealer->state = $request->input('state');
             $dealer->country = $request->input('country');
             $dealer->authenticated = $request->input('authenticated');
             $dealer->GST_number = $request->input('gst_no');
+            $dealer->save();
 
-            if ($dealer->save()) {
-                return redirect()->route('admin.dealers')->with('success', 'Dealer added Suuccessfully !!');
-            } else {
-                return back()->with('error', 'Something went wrong !!');
-            }
+
+            $user = new User();
+            $user->name = $request->input('contact_name');
+            $user->email = $request->input('contact_email');
+            $user->phone = $request->input('contact_phone');
+            $user->role_id = $request->input('role_id');
+            $user->password =Hash::make($request->input('password'));
+            $user->real_password = $request->input('password');
+            $user->dealers_id = $dealer->id; // Associate with the dealer
+            $user->save();
+            
+            return redirect()->route('admin.dealers')->with('success', 'Dealer added Suuccessfully !!');
+
         }
     }
 
