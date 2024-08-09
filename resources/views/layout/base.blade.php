@@ -20,7 +20,11 @@
 
     <!-- /global stylesheets -->
     <style>
-
+        .img-preview {
+            max-width: 150px;
+            max-height: 150px;
+            margin: 10px;
+        }
     </style>
 </head>
 

@@ -145,6 +145,23 @@
                         </li>
                     </ul>
                 </li>
+
+                <li class="nav-item nav-item-submenu">
+                    <a href="#"
+                        class="nav-link {{ request()->routeIs('admin.gallery') || request()->routeIs('admin.gallery.images') ? 'active' : '' }}">
+                        <i class="ph-layout"></i>
+                        <span>Gallery</span>
+                    </a>
+                    <ul class="nav-group-sub collapse">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.gallery') }}"
+                                class="nav-link {{ request()->routeIs('admin.gallery') ? 'active' : '' }}">
+                                <i class="ph-image"></i>
+                                <span>Image Gallery</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
         </div>
         <!-- /main navigation -->
