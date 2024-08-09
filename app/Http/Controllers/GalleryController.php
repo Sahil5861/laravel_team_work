@@ -68,7 +68,11 @@ class GalleryController extends Controller
             return redirect()->route('admin.gallery.image', $folder->id)->with('success', 'Images Uploaded Successfully!');
         }
         else{
-            return back()->withErrors(['error' => 'No images were uploaded.']);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No images were uploaded.'
+            ], 400);
+            
         }
          
     }

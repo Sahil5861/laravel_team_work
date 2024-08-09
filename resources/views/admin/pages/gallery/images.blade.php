@@ -99,13 +99,14 @@
                 </div>
             </div>
             @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                    </ul>
-                </div>
+                <script>
+                    Swal.fire({
+                    title: 'error!',
+                    text: ,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+                </script>
             @endif
 
 
@@ -130,9 +131,9 @@
                             <div class="col-lg-8 col-md-10">
                                 <input type="file" class="form-control" name="images[]" id="image" multiple accept="image/*">
                                 <span>
-                                    {{-- @error('images*')
+                                    @error('images*')
                                     <span class="text-danger">{{$message}}</span>
-                                    @enderror --}}
+                                    @enderror
                                 </span>
                             </div>
                             <div class="col-lg-4 col-md-2">
@@ -142,24 +143,12 @@
                     </form>
                 </div>
                 <div class="col-lg-3 col-md-6 p-3">
-                    <input type="hidden" id="limit" value="4" min="1" class="form-control" placeholder="Enter number of images per page">
-                    {{-- <select id="limit" class="form-control bg-dark text-white">
-                        @if ($images && $images->count())
-                            <option value="{{$images->count()}}" selected>--Select Page Per view</option>
-                        @endif
-                        <option value="3">3</option>
-                        <option value="2">2</option>
-                        <option value="1">1</option> --}}
-
-                        <!-- Add more options as needed -->
-                    {{-- </select> --}}
-                    
-                    
+                    <input type="hidden" id="limit" value="4" min="1" class="form-control" placeholder="Enter number of images per page">    
                 </div>
             </div>
-            <div class="container  m-auto">
+            <div class="container m-auto">
                 <div class="row gap-1 m-auto" id="imageGallery">
-                    @if (!$images)
+                    @if (empty($images))
                         <p>No Images</p>
                     @endif
                 </div>
@@ -176,11 +165,14 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     let offset = 0;
-    let limit = $('#limit').val()
+    let limit = $('#limit').val();
+
 
     $(document).ready(function() {
         loadmoreimages(); // Load initial set of images
+        
     });
+    
     function loadmoreimages(){
         $.ajax({
             type: 'GET',
@@ -215,43 +207,6 @@
             }
         })
     }
-    // function fetchImages(limit = 12) {
-    //     $.ajax({
-    //         url: '{{ route('admin.gallery.image', $folder->id) }}', // Update this to your route
-    //         type: 'GET',
-    //         data: { limit: limit },
-    //         success: function(response) {
-    //             const images = response.images;
-    //             const pagination = response.pagination;
-
-    //             let imageHtml = '';
-    //             images.forEach(image => {
-    //                 imageHtml += `
-    //                     <div class="col-lg-2 image-container">
-    //                         <img src="{{ asset('') }}${image.image_path}" class="image" alt="${image.image_path}">
-    //                         <button class="copy-btn" onclick="copyImagePath('${image.image_path}')" data-toggle="tooltip" data-placement="top" title="Copy Path"><i class="ph ph-copy"></i></button>
-    //                         <button class="view-btn" onclick="viewImage('{{ asset('') }}${image.image_path}')" data-toggle="tooltip" data-placement="top" title="View Image"><i class="ph ph-eye"></i></button>
-    //                     </div>
-    //                 `;
-    //             });
-
-    //             $('#imageGallery').html(imageHtml);
-    //             // $('#paginationLinks').html(pagination);
-    //         }
-    //     });
-    // }
-
-    
-
-
-    // $(document).ready(function (){
-    //     fetchImages($('#limit').val());
-
-    //     $('#limit').on('change', function() {
-    //         fetchImages($(this).val());
-    //     });
-
-    // });
     function copyImagePath(path) {
     // Create a temporary input to hold the text to copy
     const tempInput = document.createElement('input');
@@ -290,47 +245,5 @@
     function closeOverlay() {
         document.getElementById('imageOverlay').style.display = 'none';
     }
-
-
-
 </script>
-
-{{-- <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addModalLabel">Add Brand Images </h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form action="{{route('admin.dealers.view.create.post', $folder->id)}}" method="POST"
-                    enctype="multipart/form-data">
-                    @csrf
-                    <div class="row mb-4">
-                        <div class="col-lg-6">
-                            <label for="name">Contact Person Name</label>
-                            <input type="text" id="name" name="name" class="form-control" placeholder="Username"  autofocus value="{{old('name')}}">
-                            <span>
-                                @error('name')
-                                <span class="text-danger">{{$message}}</span>
-                                @enderror
-                            </span>
-                        </div>
-                        
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-block">Create </button>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div> --}}
-
-
 @endsection
