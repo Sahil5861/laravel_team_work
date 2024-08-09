@@ -196,7 +196,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/product/export', [ProductsController::class, 'export'])->name('admin.product.export');
     Route::post('admin/product/import', [ProductsController::class, 'import'])->name('admin.product.import');
     Route::get('/sample-file-download-product', [ProductsController::class, 'sampleFileDownloadProduct'])->name('sample-file-download-product');
-    
+    Route::post('admin/product/image/delete', [ProductsController::class, 'deleteImage'])->name('admin.product.image.delete');
+
     
     // ------------------------------------additional images Routes----------------------------------------
 

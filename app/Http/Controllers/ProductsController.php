@@ -74,7 +74,7 @@ class ProductsController extends Controller
                         return $row->updated_at->format('d M Y');
                     })
                     ->addColumn('image', function ($row) {
-                        return $row->image ? asset($row->image) : 'No Image';
+                        return $row->image ? asset('storage/uploads/' . $row->image) : 'No Image';
                     })
                     ->rawColumns(['status', 'action'])
                     ->make(true);
@@ -138,16 +138,17 @@ class ProductsController extends Controller
         $productGroups = ProductsGroup::all();
         return view('admin.pages.products.create', compact('categories', 'brands', 'productGroups'));
     }
-
     public function edit($id)
     {
         $brands = Brand::all();
         $productGroups = ProductsGroup::all();
         $categories = Category::all();
         $product = Products::findOrFail($id);
+        $additionalImages = AdditionalImage::where('product_id', $id)->get();
 
-        return view('admin.pages.products.edit', compact('product', 'brands', 'productGroups', 'categories'));
+        return view('admin.pages.products.edit', compact('product', 'brands', 'productGroups', 'categories', 'additionalImages'));
     }
+
 
     public function store(Request $request)
     {
@@ -200,11 +201,94 @@ class ProductsController extends Controller
         }
     }
 
+    public function update(Request $request, $id)
+    {
+        // Validate input
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'main_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'additional_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'remove_additional_images' => 'nullable|array',
+            'remove_additional_images.*' => 'exists:additional_images,id',
+        ]);
+
+        // Find the product
+        $product = Products::findOrFail($id);
+
+        // Update the main image if a new one is provided
+        if ($request->hasFile('main_image')) {
+            // Delete the old main image file
+            if ($product->main_image) {
+                Storage::delete('public/products/' . $product->main_image);
+            }
+
+            // Store the new main image
+            $product->main_image = $request->file('main_image')->store('public/products');
+        }
+
+        // Update or delete additional images
+        if ($request->has('remove_additional_images')) {
+            foreach ($request->input('remove_additional_images') as $imageId) {
+                $image = AdditionalImage::find($imageId);
+                if ($image) {
+                    // Delete the image file
+                    Storage::delete('public/uploads/additional_images/' . $image->image);
+                    // Delete the image record from database
+                    $image->delete();
+                }
+            }
+        }
+
+        // Handle the new additional images
+        if ($request->hasFile('additional_images')) {
+            foreach ($request->file('additional_images') as $file) {
+                $imagePaths = $this->handleImageUpload($file, 'additional_images');
+                AdditionalImage::create([
+                    'product_id' => $product->id,
+                    'image' => $imagePaths['original'],
+                    'image_medium' => $imagePaths['medium'],
+                    'image_small' => $imagePaths['small'],
+                ]);
+            }
+        }
+
+        // Update other product details
+        $product->name = $request->input('name');
+        // Update other fields as needed
+
+        // Save the product
+        $product->save();
+
+        return redirect()->route('admin.product')->with('success', 'Product updated successfully');
+    }
+
+
+    public function deleteImage(Request $request)
+    {
+        $imageId = $request->input('id');
+
+        // Find the image by its ID
+        $image = AdditionalImage::find($imageId);
+
+        if ($image) {
+            // Delete the image file from storage
+            Storage::delete('public/uploads/additional_images/' . $image->image);
+
+            // Delete the image record from the database
+            $image->delete();
+
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false]);
+    }
+
 
     protected function handleImageUpload($image, $folder)
     {
         $imageName = time() . '.' . $image->getClientOriginalExtension();
-        $basePath = 'public/storage/uploads/' . $folder . '/';
+        $basePath = 'public/uploads/' . $folder . '/';
+  
 
         // Define paths for different image sizes
         $paths = [
@@ -228,61 +312,56 @@ class ProductsController extends Controller
         $this->resizeImage(storage_path('app/' . $paths['original']), 800, 600, storage_path('app/' . $paths['medium']));
         $this->resizeImage(storage_path('app/' . $paths['original']), 400, 300, storage_path('app/' . $paths['small']));
 
-        return [
-            'original' => Storage::url($paths['original']),
-            'medium' => Storage::url($paths['medium']),
-            'small' => Storage::url($paths['small'])
-        ];
+        return $paths;
     }
 
 
     protected function resizeImage($filePath, $width, $height, $outputPath)
     {
         list($originalWidth, $originalHeight, $type) = getimagesize($filePath);
-
+    
         $imageResized = imagecreatetruecolor($width, $height);
-
+    
         switch ($type) {
             case IMAGETYPE_JPEG:
                 $imageSource = imagecreatefromjpeg($filePath);
                 break;
-
+    
             case IMAGETYPE_PNG:
                 $imageSource = imagecreatefrompng($filePath);
                 break;
-
+    
             case IMAGETYPE_GIF:
                 $imageSource = imagecreatefromgif($filePath);
                 break;
-
+                
             default:
-                return;
+                return; // Return if the image type is unsupported
         }
-
-        // Resize and resample
+    
+        // Resize and resample the image
         imagecopyresampled($imageResized, $imageSource, 0, 0, 0, 0, $width, $height, $originalWidth, $originalHeight);
-
-        // Save resized image
+    
+        // Save the resized image to the specified output path
         switch ($type) {
             case IMAGETYPE_JPEG:
                 imagejpeg($imageResized, $outputPath);
                 break;
-
+    
             case IMAGETYPE_PNG:
                 imagepng($imageResized, $outputPath);
                 break;
-
+    
             case IMAGETYPE_GIF:
                 imagegif($imageResized, $outputPath);
                 break;
         }
-
+    
+        // Free up memory
         imagedestroy($imageResized);
         imagedestroy($imageSource);
     }
-
-
-
+    
 
 
 
@@ -296,35 +375,6 @@ class ProductsController extends Controller
         return response()->json(['success' => false, 'message' => 'No product selected for deletion.']);
     }
 
-    public function update(Request $request, $id)
-    {
-        $product = Products::findOrFail($id);
-
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'description' => 'required',
-            'category_id' => 'nullable|exists:categories,id',
-            'brand_id' => 'nullable|exists:brands,id',
-            'product_group_id' => 'nullable|exists:product_groups,id',
-            'offer_price' => 'nullable|numeric',
-            'offer_expiry' => 'nullable|date',
-        ]);
-
-        if ($request->hasFile('image')) {
-            $validatedData['image'] = $this->handleImageUpload($request->file('image'));
-        }
-
-        $product->fill($validatedData);
-        $product->offer_expiry = $request->input('offer_expiry') ? Carbon::parse($request->input('offer_expiry'))->format('Y-m-d') : null;
-
-        if ($product->save()) {
-            return redirect()->route('admin.product')->with('success', 'Product updated successfully!');
-        } else {
-            return back()->with('error', 'Failed to update the product.');
-        }
-    }
 
     public function destroy($id)
     {
@@ -369,7 +419,8 @@ class ProductsController extends Controller
 
                     // Handle image (if provided)
                     if (!empty($row[8])) {
-                        $imagePath = 'uploads/product/' . basename($row[8]);
+                        $imagePath = 'product/' . basename($row[8]);
+                        
                         $product->image = $imagePath;
                     }
 
