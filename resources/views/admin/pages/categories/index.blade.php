@@ -28,8 +28,8 @@
                         <div class="card-tools text-end"
                             style="display: flex; align-items:center; justify-content: space-between;">
                             <div class="btns">
-                                <a href="{{ route('admin.category.create') }}" class="text-dark btn btn-primary">Add
-                                    Categories</a>
+                                <a href="#" class="text-dark btn btn-primary" data-toggle="modal" data-target="#addModal">Add Categories</a>
+                                {{-- <a href="{{ route('admin.category.create') }}" class="text-dark btn btn-primary">Add Categories</a> --}}
                                 <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
                                 <select name="status" id="status" class="form-control mt-3">
                                     <option value="">All</option>
@@ -79,6 +79,45 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Add a New  Categories</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('admin.category.create.post') }}" id="addForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row mb-3">
+                        <div class="col-lg-6">
+                            <input type="text" id="name" name="name" class="form-control"
+                                placeholder="Enter Category Name" autofocus>
+                            <span>
+                                @error('name')
+                                    <span class="text-danger">{{$message}}</span>
+                                @enderror
+                            </span>
+                        </div>
+                        <div class="col-lg-6">
+                            <input type="file" name="image" id="image" placeholder="Choose Image"
+                                class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="submit"  form="addForm" class="btn btn-primary">+ Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
     aria-hidden="true">

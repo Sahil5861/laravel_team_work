@@ -43,40 +43,18 @@
                 <li class="nav-item">
                     <a href="{{ route('admin.user') }}"
                         class="nav-link {{ request()->routeIs('admin.user') ? 'active' : '' }}">
-                        <i class="ph-layout"></i>
+                        <i class="ph-user"></i>
                         <span>Manage Users</span>
                     </a>
                 </li>
 
                 <li class="nav-item nav-item-submenu">
                     <a href="#"
-                        class="nav-link {{ request()->routeIs('admin.role') || request()->routeIs('admin.colour') || request()->routeIs('admin.size') || request()->routeIs('admin.dealers') || request()->routeIs('admin.contactPersons') || request()->routeIs('admin.brand') || request()->routeIs('admin.plan') || request()->routeIs('admin.category') || request()->routeIs('admin.grouprelation') || request()->routeIs('admin.product') || request()->routeIs('blogs.index') ? 'active' : '' }}">
+                        class="nav-link {{ request()->routeIs('admin.role') || request()->routeIs('admin.colour') || request()->routeIs('admin.size') || request()->routeIs('admin.dealers') || request()->routeIs('admin.contactPersons') || request()->routeIs('admin.plan') || request()->routeIs('blogs.index') ? 'active' : '' }}">
                         <i class="ph-layout"></i>
                         <span>Master</span>
                     </a>
                     <ul class="nav-group-sub collapse">
-                        <li class="nav-item">
-                            <a href="{{ route('admin.role') }}"
-                                class="nav-link {{ request()->routeIs('admin.role') ? 'active' : '' }}">
-                                <i class="ph-layout"></i>
-                                <span>Manage Roles</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.colour') }}"
-                                class="nav-link {{ request()->routeIs('admin.colour') ? 'active' : '' }}">
-                                <i class="ph-layout"></i>
-                                <span>Manage Colours</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.size') }}"
-                                class="nav-link {{ request()->routeIs('admin.size') ? 'active' : '' }}">
-                                <i class="ph-layout"></i>
-                                <span>Manage Sizes</span>
-                            </a>
-                        </li>
-
                         <li class="nav-item nav-item-submenu">
                             <a href="#"
                                 class="nav-link {{ request()->routeIs('admin.dealers') || request()->routeIs('admin.contactPersons') ? 'active' : '' }}">
@@ -99,41 +77,28 @@
                                     </a>
                                 </li>
                             </ul>
-                        </li>
-
+                        </li>                        
                         <li class="nav-item">
-                            <a href="{{ route('admin.brand') }}"
-                                class="nav-link {{ request()->routeIs('admin.brand') ? 'active' : '' }}">
+                            <a href="{{ route('admin.colour') }}"
+                                class="nav-link {{ request()->routeIs('admin.colour') ? 'active' : '' }}">
                                 <i class="ph-layout"></i>
-                                <span>Manage Brands</span>
+                                <span>Manage Colours</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.size') }}"
+                                class="nav-link {{ request()->routeIs('admin.size') ? 'active' : '' }}">
+                                <i class="ph-layout"></i>
+                                <span>Manage Sizes</span>
+                            </a>
+                        </li>
+
+                        
                         <li class="nav-item">
                             <a href="{{ route('admin.plan') }}"
                                 class="nav-link {{ request()->routeIs('admin.plan') ? 'active' : '' }}">
                                 <i class="ph-layout"></i>
                                 <span>Manage Plans</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.category') }}"
-                                class="nav-link {{ request()->routeIs('admin.category') ? 'active' : '' }}">
-                                <i class="ph-layout"></i>
-                                <span>Manage Categories</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.grouprelation') }}"
-                                class="nav-link {{ request()->routeIs('admin.grouprelation') ? 'active' : '' }}">
-                                <i class="ph-layout"></i>
-                                <span>Manage Product Relation</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.product') }}"
-                                class="nav-link {{ request()->routeIs('admin.product') ? 'active' : '' }}">
-                                <i class="ph-layout"></i>
-                                <span>Manage Product</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -146,6 +111,44 @@
                     </ul>
                 </li>
 
+
+                <li class="nav-item nav-item-submenu">
+                    <a href="#"
+                        class="nav-link {{ request()->routeIs('admin.brand') || request()->routeIs('admin.category') || request()->routeIs('admin.grouprelation') || request()->routeIs('admin.product') ? 'active' : '' }}">
+                        <i class="ph-layout"></i>
+                        <span>Manage Products</span>
+                    </a>
+                    <ul class="nav-group-sub collapse">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.brand') }}"
+                                class="nav-link {{ request()->routeIs('admin.brand') ? 'active' : '' }}">
+                                <i class="ph-layout"></i>
+                                <span>Brands</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.category') }}"
+                                class="nav-link {{ request()->routeIs('admin.category') ? 'active' : '' }}">
+                                <i class="ph-layout"></i>
+                                <span>Categories</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.grouprelation') }}"
+                                class="nav-link {{ request()->routeIs('admin.grouprelation') ? 'active' : '' }}">
+                                <i class="ph-layout"></i>
+                                <span>Product Relation</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.product') }}"
+                                class="nav-link {{ request()->routeIs('admin.product') ? 'active' : '' }}">
+                                <i class="ph-layout"></i>
+                                <span>Product</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="nav-item nav-item-submenu">
                     <a href="#"
                         class="nav-link {{ request()->routeIs('admin.gallery') || request()->routeIs('admin.gallery.images') ? 'active' : '' }}">

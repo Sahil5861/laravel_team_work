@@ -27,8 +27,10 @@
                         <div class="card-tools text-end"
                             style="display: flex; align-items:center; justify-content: space-between;">
                             <div class="btns">
-                                <a href="{{ route('admin.brand.create') }}" class="text-dark btn btn-primary">Add
-                                    Brands</a>
+                                {{-- If user wants to remove modal, and use a new page to add :
+                                    1. Remove the add modal from the web page : --}}    
+                                <a href="{{ route('admin.brand.create') }}" class="text-dark btn btn-primary" data-toggle="modal" data-target="#addModal">Add Brands</a>
+                                {{-- <a href="{{ route('admin.brand.create') }}" class="text-dark btn btn-primary">Add Brands</a> --}}
                                 <button class="btn btn-danger" id="delete-selected">Delete Selected</button>
                                 <br><br>
                                 <select name="status" id="status" class="form-control">
@@ -42,8 +44,7 @@
                                     <i class="ph-list"></i>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="#" class="dropdown-item" data-toggle="modal"
-                                        data-target="#importModal">Import Brands</a>
+                                    <a href="#" class="dropdown-item" data-toggle="modal" data-target="#importModal">Import Brands</a>
                                     <a href="#" class="dropdown-item" id="export-brands">Export Brands</a>
 
                                 </div>
@@ -79,6 +80,50 @@
     </div>
 </div>
 
+{{-- Add Modal --}}
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Add a New Brand</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('admin.brand.create.post')}}" id="addForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row mb-3">
+                        <div class="col-lg-6">
+                            <label for="name">Brand Name</label>
+                            <input type="text" id="name" name="name" class="form-control"
+                                placeholder="Enter Brand Name" autofocus {{old('name')}}>
+                            <span>
+                                @error('name')
+                                    <span class="text-danger">{{$message}}</span>
+                                @enderror
+                            </span>
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="image">Select Image</label>
+                            <input type="file" name="image" id="image" class="form-control"
+                                placeholder="Choose Image" {{old('image')}}>
+                        </div>
+                        <br><br>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="submit" form="addForm" class="btn btn-primary">+ Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{-- Add Modal End--}}
+
+{{-- Import Modal --}}
 <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -108,6 +153,8 @@
         </div>
     </div>
 </div>
+{{-- Import Modal End--}}
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>

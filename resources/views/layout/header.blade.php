@@ -10,15 +10,10 @@
 		<div class="navbar-brand flex-1 flex-lg-0">
 			<a href="index.html" class="d-inline-flex align-items-center">
 				<img src="{{asset('assets/images/logo_icon.svg')}}" alt="">
-				<img src="{{asset('assets/images/logo_text_light.svg')}}" class="d-none d-sm-inline-block h-16px ms-3"
-					alt="">
+				{{-- <img src="{{asset('assets/images/logo_text_light.svg')}}" class="d-none d-sm-inline-block h-16px ms-3" alt=""> --}}
+				<h3 class="d-none d-sm-inline-block h-16px ms-3 text-white title">{{env('COMPANY_NAME')}}</h3>
 			</a>
 		</div>
-
-
-
-
-
 		<ul class="nav flex-row justify-content-end order-1 order-lg-2">
 			<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
 				<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
@@ -36,24 +31,7 @@
 						<i class="ph-user-circle me-2"></i>
 						My profile
 					</a>
-					<a href="#" class="dropdown-item">
-						<i class="ph-currency-circle-dollar me-2"></i>
-						My subscription
-					</a>
-					<a href="#" class="dropdown-item">
-						<i class="ph-shopping-cart me-2"></i>
-						My orders
-					</a>
-					<a href="#" class="dropdown-item">
-						<i class="ph-envelope-open me-2"></i>
-						My inbox
-						<span class="badge bg-primary rounded-pill ms-auto">26</span>
-					</a>
 					<div class="dropdown-divider"></div>
-					<a href="#" class="dropdown-item">
-						<i class="ph-gear me-2"></i>
-						Account settings
-					</a>
 					<a href="{{route('logout')}}" class="dropdown-item">
 						<i class="ph-sign-out me-2"></i>
 						Logout
@@ -113,14 +91,6 @@
 					<input type="radio" class="form-check-input cursor-pointer ms-auto" name="main-theme" value="dark">
 				</div>
 			</label>
-		</div>
-
-		<div class="border-top text-center py-2 px-3">
-			<a href="https://themeforest.net/item/limitless-responsive-web-application-kit/13080328?ref=kopyov"
-				class="btn btn-yellow fw-semibold w-100 my-1" target="_blank">
-				<i class="ph-shopping-cart me-2"></i>
-				Purchase Limitless
-			</a>
 		</div>
 	</div>
 </div>

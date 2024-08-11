@@ -21,7 +21,7 @@
                         <h5 class="card-title fw-bold">Add Category</h5>
                     </div>
                     <div class="card-body">
-                                    <form action="{{ route('admin.category.create.post') }}" method="POST"
+                                    <form action="{{ route('admin.category.create.post') }}" id="addForm" method="POST"
                                         enctype="multipart/form-data">
                                         @csrf
                                         <div class="row mb-3">
@@ -41,7 +41,7 @@
                                         </div>
                                         <div class="row mb-3">
                                             <div class=" col-lg-4">
-                                                <button type="submit" class="btn btn-primary">Create </button>
+                                                <button type="submit" class="btn btn-primary">Create</button>
                                             </div>
                                         </div>
                                     </form>

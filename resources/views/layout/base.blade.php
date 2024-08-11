@@ -20,6 +20,10 @@
 
     <!-- /global stylesheets -->
     <style>
+        .   :hover{
+            text-decoration: none;
+            border: none;
+        }
         .img-preview {
             max-width: 150px;
             max-height: 150px;
