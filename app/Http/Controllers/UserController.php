@@ -115,7 +115,7 @@ class UserController extends Controller
 
     public function create()
     {
-        $roles = Role::all();
+        $roles = Role::where('name', '!=', 'dealer')->get();
         return view('admin.users.create', compact('roles'));
     }
 

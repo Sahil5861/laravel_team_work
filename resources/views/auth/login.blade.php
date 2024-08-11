@@ -53,24 +53,17 @@
                                 </div>
                             </div>
 
-                            <div class="d-flex align-items-center mb-3">
-                                <label class="form-check">
-                                    <input type="checkbox" name="remember" class="form-check-input" checked>
-                                    <span class="form-check-label">Remember</span>
-                                </label>
-
-                                <a href="login_password_recover.html" class="ms-auto">Forgot password?</a>
-                            </div>
+                            
 
                             <div class="mb-3">
                                 <button type="submit" class="btn btn-primary w-100">Sign in</button>
                             </div>
 
-                            <div class="text-center text-muted content-divider mb-3">
+                            {{-- <div class="text-center text-muted content-divider mb-3">
                                 <span class="px-2">or sign in with</span>
-                            </div>
+                            </div> --}}
 
-                            <div class="text-center mb-3">
+                            {{-- <div class="text-center mb-3">
                                 <button type="button"
                                     class="btn btn-outline-primary btn-icon rounded-pill border-width-2"><i
                                         class="ph-facebook-logo"></i></button>
@@ -83,7 +76,7 @@
                                 <button type="button"
                                     class="btn btn-outline-info btn-icon rounded-pill border-width-2 ms-2"><i
                                         class="ph-twitter-logo"></i></button>
-                            </div>
+                            </div> --}}
 
                             <div class="text-center text-muted content-divider mb-3">
                                 <span class="px-2">Don't have an account?</span>
