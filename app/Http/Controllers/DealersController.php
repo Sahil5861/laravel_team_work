@@ -105,7 +105,7 @@ class DealersController extends Controller
             'country' => 'required|string|max:100',
             'contact_person_id' => 'nullable|max:6',
             'authenticated' => 'required',
-            'gst_no' => 'nullable|string|max:15',
+            'gst_no' => 'nullable|string|max:15|required_if:authenticated,1',
 
             // contact person validation
             'contact_name' => 'required|string|max:255',
